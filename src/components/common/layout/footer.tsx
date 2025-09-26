@@ -61,7 +61,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/propietarios"
+                  href="#"
                   className="text-gray-600 hover:text-green-600 transition-colors text-sm"
                 >
                   Para propietarios

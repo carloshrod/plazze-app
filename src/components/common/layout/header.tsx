@@ -26,7 +26,7 @@ const Header = () => {
               Explorar
             </Link>
             <Link
-              href="/como-funciona"
+              href="#"
               className="text-gray-700 hover:text-primary transition-colors"
             >
               Soy un Plazzer
@@ -34,14 +34,14 @@ const Header = () => {
           </nav>
 
           {!isAuth && (
-            <Link href="/registro" className="hidden md:flex">
+            <Link href="/auth/registro" className="hidden md:flex">
               <Button type="primary">Registrarse</Button>
             </Link>
           )}
 
           <div className="hidden md:flex items-center space-x-4">
             {isAuth ? (
-              <Link href="/cuenta">
+              <Link href="#">
                 <Button
                   type="text"
                   icon={<User size={20} />}
@@ -49,7 +49,7 @@ const Header = () => {
                 />
               </Link>
             ) : (
-              <Link href="/login">
+              <Link href="/auth/login">
                 <Button variant="text" color="primary">
                   Iniciar sesión
                 </Button>
