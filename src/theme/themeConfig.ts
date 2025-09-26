@@ -17,6 +17,15 @@ const theme: ThemeConfig = {
     Select: {
       fontFamily: "Mont",
     },
+    DatePicker: {
+      fontFamily: "Mont",
+      cellHoverBg: "rgba(8, 182, 61, 0.08)",
+      cellActiveWithRangeBg: "#e6f4ea",
+      cellRangeBorderColor: "#08b63d",
+      controlItemBgActive: "#08b63d",
+      controlItemBgActiveHover: "#07a336",
+      cellHoverWithRangeBg: "#e6f4ea",
+    },
   },
 };
 
