@@ -50,7 +50,7 @@ export const SiteInfo = ({ site }: SiteInfoProps) => {
 
       <div>
         <h2 className="text-xl font-semibold mb-4 text-gray-900">Ubicación</h2>
-        <div className="h-[400px]">
+        <div className="h-[300px]">
           <SitesMap
             sites={[site]}
             center={[site.coordinates.lat, site.coordinates.lng]}

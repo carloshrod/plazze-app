@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
-import { mockSites } from "@/mock/sites";
+import { Button } from "antd";
+import { Bookmark, MapPin } from "lucide-react";
 import { BookingForm } from "@/components/features/site-detail/booking-form";
 import { SiteImages } from "@/components/features/site-detail/site-images";
 import { SiteInfo } from "@/components/features/site-detail/site-info";
+import { ScrollToBookingButton } from "@/components/common/ui/scroll-to-booking-button";
+import { mockSites } from "@/mock/sites";
 import { Site } from "@/types/site";
-import { Bookmark, MapPin } from "lucide-react";
-import { Button } from "antd";
 
 interface SiteDetailPageProps {
   params: {
@@ -27,9 +28,9 @@ export default function SiteDetailPage({ params }: SiteDetailPageProps) {
   const images = [site.image, site.image, site.image, site.image];
 
   return (
-    <main className="min-h-screen bg-gray-50 px-12">
+    <main className="min-h-screen bg-gray-50 px-6 md:px-12">
       {/* Header con título y ubicación */}
-      <div className="pt-8">
+      <div className="pt-8 space-y-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-3xl font-bold text-gray-900">{site.name}</h1>
@@ -60,19 +61,16 @@ export default function SiteDetailPage({ params }: SiteDetailPageProps) {
             <span>{site.location}</span>
           </div>
         </div>
+
+        <SiteImages images={images} />
       </div>
 
       {/* Contenido principal */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <SiteImages images={images} />
-            <div className="mt-8">
-              <SiteInfo site={site} />
-            </div>
-          </div>
-          <div className="relative">
-            <div className="sticky top-20 bg-gray-50 pt-8 -mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Formulario de reserva - Visible primero en móvil, a la derecha en desktop */}
+          <div className="md:col-start-2 lg:col-start-3 md:row-start-1">
+            <div id="booking-form" className="sticky top-20 bg-gray-50">
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">
                   Reservar este lugar
@@ -81,7 +79,14 @@ export default function SiteDetailPage({ params }: SiteDetailPageProps) {
               <BookingForm site={site} />
             </div>
           </div>
+
+          {/* Información del sitio - Después del formulario en móvil, a la izquierda en desktop */}
+          <div className="lg:col-span-2 lg:row-start-1">
+            <SiteInfo site={site} />
+          </div>
         </div>
+
+        <ScrollToBookingButton />
       </div>
     </main>
   );

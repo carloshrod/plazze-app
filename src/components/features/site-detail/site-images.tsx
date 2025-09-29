@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { useState } from 'react';
+import Image from "next/image";
+import { useState } from "react";
 
 interface SiteImagesProps {
   images: string[];
@@ -11,8 +11,8 @@ export const SiteImages = ({ images }: SiteImagesProps) => {
   const [mainImage, setMainImage] = useState(images[0]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-100">
+    <div className="grid md:grid-cols-[5fr_4fr] gap-1 md:gap-4">
+      <div className="w-full relative aspect-[16/9] rounded-lg overflow-hidden bg-gray-100">
         <Image
           src={mainImage}
           alt="Site main image"
@@ -22,12 +22,12 @@ export const SiteImages = ({ images }: SiteImagesProps) => {
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw"
         />
       </div>
-      <div className="grid grid-cols-4 gap-4">
-        {images.map((image, index) => (
+      <div className="grid grid-cols-4 md:grid-cols-2 md:grid-rows-2 gap-1 md:gap-4 h-[calc(100%+2px)]">
+        {images.slice(0, 4).map((image, index) => (
           <div
             key={index}
-            className={`relative aspect-video rounded-lg overflow-hidden cursor-pointer border-2 bg-gray-100 ${
-              image === mainImage ? 'border-primary' : 'border-transparent'
+            className={`relative aspect-[16/9] md:aspect-auto md:h-full rounded-lg overflow-hidden cursor-pointer border-2 bg-gray-100 ${
+              index === 0 ? "border-primary" : "border-transparent"
             }`}
             onClick={() => setMainImage(image)}
           >
