@@ -5,8 +5,8 @@ import SearchBar from "@/components/common/ui/search-bar";
 const HeroSection = () => {
   return (
     <section className="py-8 relative bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <div className="mb-24">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Busca, Encuentra y Reserva
           </h1>
@@ -15,14 +15,15 @@ const HeroSection = () => {
             inolvidables
           </p>
 
+          {/* Barra de búsqueda */}
           <SearchBar />
-
-          <Link href="/sitios">
-            <Button type="primary" size="large" className="px-8">
-              Explorar sitios
-            </Button>
-          </Link>
         </div>
+
+        <Link href="/sitios">
+          <Button type="primary" size="large" className="px-8">
+            Explorar sitios
+          </Button>
+        </Link>
       </div>
     </section>
   );
