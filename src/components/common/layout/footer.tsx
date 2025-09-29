@@ -56,7 +56,7 @@ const Footer = () => {
                   href="/sitios"
                   className="text-gray-600 hover:text-green-600 transition-colors text-sm"
                 >
-                  Explorar sitios
+                  Explorar plazzes
                 </Link>
               </li>
               <li>

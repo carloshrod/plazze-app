@@ -13,11 +13,11 @@ const CTASection = () => {
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div className="text-left">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-              ¿Tienes un local? <br />
+              ¿Tienes un plazze? <br />
               <span className="text-white/90">Es momento de crecer</span>
             </h2>
             <p className="text-xl text-white/80 mb-8 max-w-md">
-              Únete a Plazze y forma parte de la red de locales más grande.
+              Se un plazzer y forma parte de la red de locales más grande.
               Aumenta tu visibilidad y llega a más clientes.
             </p>
             <Link href="/propietarios">
@@ -25,7 +25,7 @@ const CTASection = () => {
                 size="large"
                 className="px-8 py-6 h-auto !text-primary hover:!text-primary/90 bg-white hover:bg-white/95 border-0 rounded-xl text-lg font-semibold shadow-lg transition-all hover:shadow-xl"
               >
-                Registra tu local ahora
+                Registra tu plazze ahora
               </Button>
             </Link>
           </div>
