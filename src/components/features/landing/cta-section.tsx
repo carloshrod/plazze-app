@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "antd";
 import { LogoIcon } from "@/components/common/ui/logos/logo-icon";
+import { ROUTES } from "@/consts/routes";
 
 const CTASection = () => {
   return (
@@ -20,7 +21,7 @@ const CTASection = () => {
               Se un plazzer y forma parte de la red de locales más grande.
               Aumenta tu visibilidad y llega a más clientes.
             </p>
-            <Link href="/propietarios">
+            <Link href={ROUTES.ADMIN.PLAZZES}>
               <Button
                 size="large"
                 className="px-8 py-6 h-auto !text-primary hover:!text-primary/90 bg-white hover:bg-white/95 border-0 rounded-xl text-lg font-semibold shadow-lg transition-all hover:shadow-xl"

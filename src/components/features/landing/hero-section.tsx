@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Button } from "antd";
+import { LuArrowUpRight } from "react-icons/lu";
 import SearchBar from "@/components/common/ui/search-bar";
-import { ArrowUpRight, ArrowUpRightFromCircle } from "lucide-react";
+import { ROUTES } from "@/consts/routes";
 
 const HeroSection = () => {
   return (
@@ -22,11 +22,11 @@ const HeroSection = () => {
 
         <div>
           <Link
-            href="/sitios"
-            className="inline-flex justify-center text-primary hover:text-primary/80 hover:bg-primary/10 px-4 py-2 rounded-md font-semibold transition-colors group"
+            href={ROUTES.PUBLIC.PLAZZES.LIST}
+            className="inline-flex justify-center text-2xl text-primary hover:text-primary/80 hover:bg-primary/10 px-4 py-2 rounded-md font-semibold transition-colors group"
           >
             Explorar plazzes
-            <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+            <LuArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
           </Link>
         </div>
       </div>

@@ -1,20 +1,20 @@
-import { Search, Zap, Shield } from "lucide-react";
+import { LuSearch, LuShield, LuZap } from "react-icons/lu";
 
 const FeaturesSection = () => {
   const features = [
     {
-      icon: <Search size={32} className="text-primary" />,
+      icon: <LuSearch size={32} className="text-primary" />,
       title: "Búsqueda inteligente",
       description: "Encuentra el lugar perfecto con nuestros filtros avanzados",
     },
     {
-      icon: <Zap size={32} className="text-primary" />,
+      icon: <LuZap size={32} className="text-primary" />,
       title: "Reserva instantánea",
       description:
         "Confirma tu reserva al instante sin esperas ni llamadas telefónicas",
     },
     {
-      icon: <Shield size={32} className="text-primary" />,
+      icon: <LuShield size={32} className="text-primary" />,
       title: "Reservas seguras",
       description:
         "Todas tus reservas están protegidas con nuestra garantía de satisfacción",

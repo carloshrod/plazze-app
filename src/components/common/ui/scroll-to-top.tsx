@@ -1,7 +1,7 @@
 "use client";
 
-import { ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
+import { LuArrowUp } from "react-icons/lu";
 
 const ScrollToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -36,7 +36,7 @@ const ScrollToTop = () => {
           className="fixed bottom-8 right-8 p-3 rounded-full bg-primary hover:bg-primary/90 text-white shadow-lg transition-all hover:shadow-xl z-50"
           aria-label="Ir al inicio"
         >
-          <ArrowUp size={24} />
+          <LuArrowUp size={24} />
         </button>
       )}
     </>

@@ -2,9 +2,9 @@
 
 import { DatePicker, InputNumber, Button, TimePicker } from "antd";
 import { Site } from "@/types/site";
-import { Clock, Users } from "lucide-react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
+import { LuCalendarDays, LuClock, LuUsers } from "react-icons/lu";
 
 dayjs.locale("es");
 
@@ -38,7 +38,7 @@ export const BookingForm = ({ site }: BookingFormProps) => {
             showNow={false}
             format={formatDate}
             placeholder="Fecha"
-            suffixIcon={<Clock size={20} className="text-gray-400" />}
+            suffixIcon={<LuCalendarDays size={20} className="text-gray-400" />}
             className="w-full"
             disabledDate={(current: dayjs.Dayjs) => {
               return current && current.isBefore(dayjs(), "day");
@@ -50,7 +50,7 @@ export const BookingForm = ({ site }: BookingFormProps) => {
               size="large"
               format="HH:mm"
               placeholder="Hora"
-              suffixIcon={<Clock size={20} className="text-gray-400" />}
+              suffixIcon={<LuClock size={20} className="text-gray-400" />}
               className="w-full border-0 shadow-none"
               minuteStep={15}
               showNow={false}
@@ -62,7 +62,7 @@ export const BookingForm = ({ site }: BookingFormProps) => {
               placeholder="Personas"
               min={1}
               max={site.capacity}
-              prefix={<Users size={20} className="text-gray-400" />}
+              prefix={<LuUsers size={20} className="text-gray-400" />}
               className="!w-full"
               controls={true}
             />

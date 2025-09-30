@@ -1,25 +1,26 @@
+import { ROUTES } from "@/consts/routes";
 import Link from "next/link";
-import { Utensils, Beer, Music } from "lucide-react";
+import { LuBeer, LuMusic, LuUtensils } from "react-icons/lu";
 
 const CategoriesSection = () => {
   const categories = [
     {
-      href: "/sitios?categoria=restaurantes",
-      icon: <Utensils size={32} className="text-primary" />,
+      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?categoria=restaurantes`,
+      icon: <LuUtensils size={32} className="text-primary" />,
       bgColor: "bg-primary/5",
       title: "Restaurantes",
       description: "Descubre los mejores sabores de la ciudad",
     },
     {
-      href: "/sitios?categoria=bares",
-      icon: <Beer size={32} className="text-primary" />,
+      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?categoria=bares`,
+      icon: <LuBeer size={32} className="text-primary" />,
       bgColor: "bg-primary/5",
       title: "Bares",
       description: "Relájate con los mejores cócteles y ambiente",
     },
     {
-      href: "/sitios?categoria=discotecas",
-      icon: <Music size={32} className="text-primary" />,
+      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?categoria=discotecas`,
+      icon: <LuMusic size={32} className="text-primary" />,
       bgColor: "bg-primary/5",
       title: "Discotecas",
       description: "Baila toda la noche en los mejores lugares",

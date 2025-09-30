@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "antd";
-import { MapPin, Users, Clock } from "lucide-react";
 import { Site } from "@/types/site";
+import { LuClock, LuMapPin, LuUsers } from "react-icons/lu";
+import { ROUTES } from "@/consts/routes";
 
 interface SitesGridProps {
   sites: Site[];
@@ -14,7 +15,7 @@ const SitesGrid = ({ sites }: SitesGridProps) => {
       {sites.map((site) => (
         <Link
           key={site.id}
-          href={`/sitios/${site.id}`}
+          href={ROUTES.PUBLIC.PLAZZES.DETAIL(site.id)}
           className="group relative block bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 overflow-hidden"
         >
           <div className="flex flex-col sm:flex-row">
@@ -37,7 +38,7 @@ const SitesGrid = ({ sites }: SitesGridProps) => {
                   {site.name}
                 </h3>
                 <p className="text-sm text-gray-600 mb-2 flex items-center gap-1">
-                  <MapPin size={16} />
+                  <LuMapPin size={16} />
                   {site.location}
                 </p>
               </div>
@@ -59,11 +60,11 @@ const SitesGrid = ({ sites }: SitesGridProps) => {
 
               <div className="flex flex-wrap gap-4 mt-auto">
                 <span className="text-sm text-gray-600 flex items-center gap-1">
-                  <Users size={16} />
+                  <LuUsers size={16} />
                   {site.capacity} personas
                 </span>
                 <span className="text-sm text-gray-600 flex items-center gap-1">
-                  <Clock size={16} />
+                  <LuClock size={16} />
                   {site.schedule}
                 </span>
                 <span className="text-lg font-semibold text-primary">

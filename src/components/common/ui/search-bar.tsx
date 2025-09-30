@@ -1,8 +1,14 @@
 "use client";
 
 import { Button, DatePicker, Input, InputNumber, TimePicker } from "antd";
-import { Calendar, Clock, MapPin, Search, Users } from "lucide-react";
 import dayjs from "dayjs";
+import {
+  LuCalendarDays,
+  LuClock,
+  LuMapPin,
+  LuSearch,
+  LuUsers,
+} from "react-icons/lu";
 
 const SearchBar = () => {
   return (
@@ -12,7 +18,7 @@ const SearchBar = () => {
           <Input
             size="large"
             placeholder="¿Dónde quieres ir?"
-            prefix={<MapPin size={20} className="text-gray-400" />}
+            prefix={<LuMapPin size={20} className="text-gray-400" />}
             className="w-full border-0 shadow-none"
           />
         </div>
@@ -21,7 +27,7 @@ const SearchBar = () => {
             size="large"
             format="DD/MM/YYYY"
             placeholder="Fecha"
-            suffixIcon={<Calendar size={20} className="text-gray-400" />}
+            suffixIcon={<LuCalendarDays size={20} className="text-gray-400" />}
             className="w-full border-0 shadow-none"
             disabledDate={(current: dayjs.Dayjs) =>
               current && current.isBefore(dayjs(), "day")
@@ -33,7 +39,7 @@ const SearchBar = () => {
             size="large"
             format="HH:mm"
             placeholder="Hora"
-            suffixIcon={<Clock size={20} className="text-gray-400" />}
+            suffixIcon={<LuClock size={20} className="text-gray-400" />}
             className="w-full border-0 shadow-none"
             minuteStep={15}
             showNow={false}
@@ -46,7 +52,7 @@ const SearchBar = () => {
             placeholder="Personas"
             min={1}
             max={99}
-            prefix={<Users size={20} className="text-gray-400" />}
+            prefix={<LuUsers size={20} className="text-gray-400" />}
             className="!w-full lg:!min-w-[120px] border-0 shadow-none"
             controls={true}
           />
@@ -54,7 +60,7 @@ const SearchBar = () => {
         <Button
           type="primary"
           size="large"
-          icon={<Search size={20} />}
+          icon={<LuSearch size={20} />}
           className="px-8"
         >
           <span className="block sm:hidden lg:block">Buscar</span>
