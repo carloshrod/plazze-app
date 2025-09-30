@@ -1,20 +1,20 @@
 import { notFound } from "next/navigation";
 import { Button } from "antd";
-import { Bookmark, MapPin } from "lucide-react";
-import { BookingForm } from "@/components/features/site-detail/booking-form";
-import { SiteImages } from "@/components/features/site-detail/site-images";
-import { SiteInfo } from "@/components/features/site-detail/site-info";
+import { LuBookmark, LuMapPin } from "react-icons/lu";
+import { SiteImages } from "@/components/features/plazzes/plazze-detail/site-images";
+import { BookingForm } from "@/components/features/plazzes/plazze-detail/booking-form";
+import { SiteInfo } from "@/components/features/plazzes/plazze-detail/site-info";
 import { ScrollToBookingButton } from "@/components/common/ui/scroll-to-booking-button";
 import { mockSites } from "@/mock/sites";
 import { Site } from "@/types/site";
 
-interface SiteDetailPageProps {
+interface PlazzeDetailPageProps {
   params: {
     id: string;
   };
 }
 
-export default function SiteDetailPage({ params }: SiteDetailPageProps) {
+export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
   const site = mockSites.find((site: Site) => site.id === params.id);
 
   // Simular autenticación
@@ -38,7 +38,7 @@ export default function SiteDetailPage({ params }: SiteDetailPageProps) {
               <Button
                 type="text"
                 icon={
-                  <Bookmark
+                  <LuBookmark
                     size={20}
                     className="text-gray-500 group-hover:text-primary"
                   />
@@ -51,13 +51,13 @@ export default function SiteDetailPage({ params }: SiteDetailPageProps) {
               </Button>
             ) : (
               <div className="flex items-center gap-2 text-gray-500">
-                <Bookmark size={20} />
+                <LuBookmark size={20} />
                 <span className="text-sm">Inicia sesión para guardar</span>
               </div>
             )}
           </div>
           <div className="flex items-center gap-2 text-gray-600">
-            <MapPin size={20} />
+            <LuMapPin size={20} />
             <span>{site.location}</span>
           </div>
         </div>

@@ -4,8 +4,6 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ConfigProvider } from "antd";
 import es_ES from "antd/locale/es_ES";
 import theme from "@/theme/themeConfig";
-import Header from "@/components/common/layout/header";
-import Footer from "@/components/common/layout/footer";
 
 export const metadata: Metadata = {
   title: "Plazze - Reserva espacios únicos para tus eventos",
@@ -19,13 +17,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className="font-mont" suppressHydrationWarning>
         <AntdRegistry>
           <ConfigProvider theme={theme} locale={es_ES}>
-            <Header />
             {children}
-            <Footer />
           </ConfigProvider>
         </AntdRegistry>
       </body>

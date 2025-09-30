@@ -1,9 +1,9 @@
 import SearchBar from "@/components/common/ui/search-bar";
-import SitesGrid from "@/components/features/sites/sites-grid";
-import SitesMap from "@/components/features/sites/sites-map";
+import SitesGrid from "@/components/features/plazzes/sites-grid";
+import SitesMap from "@/components/features/plazzes/sites-map";
 import { mockSites } from "@/mock/sites";
 
-export default function SitesPage() {
+export default function PlazzesPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Hero con barra de búsqueda */}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LogoIcon } from "@/components/common/ui/logos/logo-icon";
 import LoginForm from "@/components/features/auth/login-form";
+import { ROUTES } from "@/consts/routes";
 
 export default function LoginPage() {
   return (
@@ -16,7 +17,7 @@ export default function LoginPage() {
             <p className="text-gray-600 mt-2">
               ¿No tienes una cuenta?{" "}
               <Link
-                href="/auth/registro"
+                href={ROUTES.PUBLIC.AUTH.REGISTER}
                 className="text-primary hover:text-primary/90"
               >
                 Regístrate

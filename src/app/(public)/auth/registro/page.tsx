@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LogoIcon } from "@/components/common/ui/logos/logo-icon";
 import RegisterForm from "@/components/features/auth/register-form";
+import { ROUTES } from "@/consts/routes";
 
 export default function RegisterPage() {
   return (
@@ -16,7 +17,7 @@ export default function RegisterPage() {
             <p className="text-gray-600 mt-2">
               ¿Ya tienes una cuenta?{" "}
               <Link
-                href="/auth/login"
+                href={ROUTES.PUBLIC.AUTH.LOGIN}
                 className="text-primary hover:text-primary/90"
               >
                 Inicia sesión
