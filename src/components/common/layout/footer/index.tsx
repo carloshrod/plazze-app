@@ -2,7 +2,7 @@ import FooterBrand from "./footer-brand";
 import FooterLinks from "./footer-links";
 import FooterContact from "./footer-contact";
 import FooterCredits from "./footer-credits";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/cn";
 
 const Footer = ({ isDashboard = false }: { isDashboard?: boolean }) => {
   return (

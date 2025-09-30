@@ -12,4 +12,5 @@ export interface Site {
   schedule: string;
   price: number;
   category: string;
+  status: "active" | "maintenance" | "inactive";
 }

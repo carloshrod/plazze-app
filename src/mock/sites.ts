@@ -16,6 +16,7 @@ export const mockSites: Site[] = [
     schedule: "9:00 AM - 10:00 PM",
     price: 150,
     category: "terrazas",
+    status: "active",
   },
   {
     id: "2",
@@ -32,6 +33,7 @@ export const mockSites: Site[] = [
     schedule: "10:00 AM - 12:00 AM",
     price: 300,
     category: "salones",
+    status: "maintenance",
   },
   {
     id: "3",
@@ -48,6 +50,7 @@ export const mockSites: Site[] = [
     schedule: "4:00 PM - 2:00 AM",
     price: 250,
     category: "terrazas",
+    status: "active",
   },
   {
     id: "4",
@@ -64,6 +67,7 @@ export const mockSites: Site[] = [
     schedule: "8:00 AM - 8:00 PM",
     price: 100,
     category: "estudios",
+    status: "inactive",
   },
   {
     id: "5",
@@ -80,5 +84,6 @@ export const mockSites: Site[] = [
     schedule: "10:00 AM - 11:00 PM",
     price: 200,
     category: "jardines",
+    status: "active",
   },
 ];

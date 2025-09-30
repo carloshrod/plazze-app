@@ -17,6 +17,10 @@ const theme: ThemeConfig = {
     Select: {
       fontFamily: "Mont",
     },
+    Dropdown: {
+      controlItemBgHover: "rgba(8, 182, 61, 0.1)",
+      controlItemBgActive: "rgba(8, 182, 61, 0.1)",
+    },
     DatePicker: {
       fontFamily: "Mont",
       cellHoverBg: "rgba(8, 182, 61, 0.08)",
