@@ -4,6 +4,7 @@ export const ROUTES = {
     PLAZZES: {
       LIST: "/plazzes",
       DETAIL: (id: string) => `/plazzes/${id}`,
+      CONFIRM: (id: string) => `/plazzes/${id}/confirmar-booking`,
     },
     AUTH: {
       LOGIN: "/auth/login",

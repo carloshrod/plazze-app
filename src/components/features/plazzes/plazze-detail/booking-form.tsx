@@ -5,6 +5,8 @@ import { Plazze } from "@/types/plazze";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import { LuCalendarDays, LuClock, LuUsers } from "react-icons/lu";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/consts/routes";
 
 dayjs.locale("es");
 
@@ -13,6 +15,8 @@ interface BookingFormProps {
 }
 
 export const BookingForm = ({ plazze }: BookingFormProps) => {
+  const router = useRouter();
+
   const formatDate = (date: dayjs.Dayjs) => {
     if (!date) return "";
     const localDate = date.locale("es");
@@ -72,7 +76,9 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
             type="primary"
             size="large"
             className="w-full"
-            href={`/plazzes/${plazze.id}/confirm`}
+            onClick={() =>
+              router.push(ROUTES.PUBLIC.PLAZZES.CONFIRM(plazze.id))
+            }
           >
             Reservar ahora
           </Button>
