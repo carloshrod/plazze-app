@@ -4,10 +4,10 @@ import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
-import { Site } from "@/types/site";
+import { Plazze } from "@/types/plazze";
 
-interface SitesMapProps {
-  sites: Site[];
+interface MapClientProps {
+  plazzes: Plazze[];
   center?: [number, number];
   zoom?: number;
   showPopup?: boolean;
@@ -15,30 +15,30 @@ interface SitesMapProps {
 }
 
 const MapClient = ({
-  sites,
+  plazzes,
   center = [9.0746, -79.4455], // Panamá por defecto
   zoom = 12,
   showPopup = true,
   className = "h-[calc(100vh-200px)] w-full rounded-lg z-0",
-}: SitesMapProps) => {
+}: MapClientProps) => {
   return (
     <MapContainer center={center} zoom={zoom} className={className}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {sites.map((site) => (
+      {plazzes.map((plazze) => (
         <Marker
-          key={site.id}
-          position={[site.coordinates.lat, site.coordinates.lng]}
+          key={plazze.id}
+          position={[plazze.coordinates.lat, plazze.coordinates.lng]}
         >
           {showPopup && (
             <Popup>
               <div className="text-sm">
-                <h3 className="font-semibold mb-1">{site.name}</h3>
-                <p className="text-gray-600">{site.location}</p>
+                <h3 className="font-semibold mb-1">{plazze.name}</h3>
+                <p className="text-gray-600">{plazze.location}</p>
                 <p className="text-primary font-semibold mt-1">
-                  ${site.price}/hora
+                  ${plazze.price}/hora
                 </p>
               </div>
             </Popup>
@@ -51,7 +51,7 @@ const MapClient = ({
               permanent
               className="bg-white px-2 py-1 rounded shadow-md border border-gray-200"
             >
-              {site.name}
+              {plazze.name}
             </Tooltip>
           )}
         </Marker>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { LuPen, LuTrash2 } from "react-icons/lu";
 import { capitalizeWords, formatCurrency } from "@/utils/format";
 import { ROUTES } from "@/consts/routes";
-import { mockSites } from "@/mock/sites";
+import { mockPlazzes } from "@/mock/plazzes";
 
 const statusColors = {
   active: "success",
@@ -25,7 +25,7 @@ export function PlazzesTable() {
       title: "Plazze",
       dataIndex: "name",
       key: "name",
-      render: (text: string, record: (typeof mockSites)[0]) => (
+      render: (text: string, record: (typeof mockPlazzes)[0]) => (
         <div className="flex items-center gap-3">
           <Avatar src={record.image} />
           <Link
@@ -62,7 +62,7 @@ export function PlazzesTable() {
       title: "Acciones",
       fixed: "right" as const,
       key: "actions",
-      render: (_: unknown, record: (typeof mockSites)[0]) => (
+      render: (_: unknown, record: (typeof mockPlazzes)[0]) => (
         <div className="flex items-center gap-2">
           <Button
             type="text"
@@ -88,7 +88,7 @@ export function PlazzesTable() {
       <div className="overflow-x-auto -mx-4 md:mx-0">
         <Table
           columns={columns}
-          dataSource={mockSites}
+          dataSource={mockPlazzes}
           rowKey="id"
           scroll={{ x: 820 }}
           className="min-w-[820px]"

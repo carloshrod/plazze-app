@@ -1,7 +1,7 @@
 import SearchBar from "@/components/common/ui/search-bar";
 import PlazzesList from "@/components/features/plazzes/plazzes-list";
 import PlazzesMap from "@/components/features/plazzes/plazzes-map";
-import { mockSites } from "@/mock/sites";
+import { mockPlazzes } from "@/mock/plazzes";
 
 export default function PlazzesPage() {
   return (
@@ -20,13 +20,13 @@ export default function PlazzesPage() {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Grid de sitios */}
           <div className="order-2 lg:order-1">
-            <PlazzesList sites={mockSites} />
+            <PlazzesList plazzes={mockPlazzes} />
           </div>
 
           {/* Mapa */}
           <div className="order-1 lg:order-2">
             <div className="sticky top-28">
-              <PlazzesMap sites={mockSites} />
+              <PlazzesMap plazzes={mockPlazzes} />
             </div>
           </div>
         </div>

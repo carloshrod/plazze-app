@@ -3,11 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { LuArrowUpRight } from "react-icons/lu";
-import { mockSites } from "@/mock/sites";
+import { mockPlazzes } from "@/mock/plazzes";
 import { ROUTES } from "@/consts/routes";
 
 export const TrendingPlazzesSection = () => {
-  const trendingSites = mockSites.slice(0, 6);
+  const trendingPlazzes = mockPlazzes.slice(0, 6);
 
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
@@ -23,29 +23,29 @@ export const TrendingPlazzesSection = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {trendingSites.map((site) => (
+          {trendingPlazzes.map((plazze) => (
             <Link
-              href={ROUTES.PUBLIC.PLAZZES.DETAIL(site.id)}
-              key={site.id}
+              href={ROUTES.PUBLIC.PLAZZES.DETAIL(plazze.id)}
+              key={plazze.id}
               className="group block relative aspect-[4/3] rounded-lg overflow-hidden"
             >
               <Image
-                src={site.image}
-                alt={site.name}
+                src={plazze.image}
+                alt={plazze.name}
                 fill
                 sizes="(max-width: 640px) 100vw, 256px"
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <h3 className="text-xl font-bold mb-2">{site.name}</h3>
+                <h3 className="text-xl font-bold mb-2">{plazze.name}</h3>
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-semibold">
-                    ${site.price.toLocaleString()}
+                    ${plazze.price.toLocaleString()}
                   </span>
                   <span className="text-white/80">/ día</span>
                 </div>
-                <p className="text-white/90 text-sm mt-2">{site.location}</p>
+                <p className="text-white/90 text-sm mt-2">{plazze.location}</p>
               </div>
             </Link>
           ))}

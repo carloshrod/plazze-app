@@ -5,8 +5,8 @@ import { PlazzeImages } from "@/components/features/plazzes/plazze-detail/plazze
 import { BookingForm } from "@/components/features/plazzes/plazze-detail/booking-form";
 import { PlazzeInfo } from "@/components/features/plazzes/plazze-detail/plazze-info";
 import { ScrollToBookingButton } from "@/components/common/ui/scroll-to-booking-button";
-import { mockSites } from "@/mock/sites";
-import { Site } from "@/types/site";
+import { mockPlazzes } from "@/mock/plazzes";
+import { Plazze } from "@/types/plazze";
 
 interface PlazzeDetailPageProps {
   params: {
@@ -15,17 +15,17 @@ interface PlazzeDetailPageProps {
 }
 
 export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
-  const site = mockSites.find((site: Site) => site.id === params.id);
+  const plazze = mockPlazzes.find((plz: Plazze) => plz.id === params.id);
 
   // Simular autenticación
   const isAuthenticated = false;
 
-  if (!site) {
+  if (!plazze) {
     notFound();
   }
 
   // Simular múltiples imágenes (en producción vendrían de la API)
-  const images = [site.image, site.image, site.image, site.image];
+  const images = [plazze.image, plazze.image, plazze.image, plazze.image];
 
   return (
     <main className="min-h-screen bg-gray-50 px-6 md:px-12">
@@ -33,7 +33,7 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
       <div className="pt-8 space-y-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-3xl font-bold text-gray-900">{site.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{plazze.name}</h1>
             {isAuthenticated ? (
               <Button
                 type="text"
@@ -58,7 +58,7 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <LuMapPin size={20} />
-            <span>{site.location}</span>
+            <span>{plazze.location}</span>
           </div>
         </div>
 
@@ -76,13 +76,13 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
                   Reservar este lugar
                 </h2>
               </div>
-              <BookingForm site={site} />
+              <BookingForm plazze={plazze} />
             </div>
           </div>
 
           {/* Información del sitio - Después del formulario en móvil, a la izquierda en desktop */}
           <div className="lg:col-span-2 lg:row-start-1">
-            <PlazzeInfo site={site} />
+            <PlazzeInfo plazze={plazze} />
           </div>
         </div>
 

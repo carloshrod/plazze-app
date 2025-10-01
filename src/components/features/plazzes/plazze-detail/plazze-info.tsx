@@ -1,20 +1,20 @@
 import { Tag } from "antd";
 import { LuClock, LuTags, LuUsers } from "react-icons/lu";
 import PlazzesMap from "../plazzes-map";
-import { Site } from "@/types/site";
+import { Plazze } from "@/types/plazze";
 
-interface SiteInfoProps {
-  site: Site;
+interface PlazzeInfoProps {
+  plazze: Plazze;
 }
 
-export const PlazzeInfo = ({ site }: SiteInfoProps) => {
+export const PlazzeInfo = ({ plazze }: PlazzeInfoProps) => {
   return (
     <div className="flex flex-col gap-8">
       <div>
         <h2 className="text-xl font-semibold mb-4 text-gray-900">
           Descripción
         </h2>
-        <p className="text-gray-700">{site.description}</p>
+        <p className="text-gray-700">{plazze.description}</p>
       </div>
 
       <div>
@@ -24,14 +24,14 @@ export const PlazzeInfo = ({ site }: SiteInfoProps) => {
             <LuUsers className="text-gray-500" size={24} />
             <div>
               <p className="font-medium text-gray-900">Capacidad</p>
-              <p className="text-gray-700">{site.capacity} personas</p>
+              <p className="text-gray-700">{plazze.capacity} personas</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <LuClock className="text-gray-500" size={24} />
             <div>
               <p className="font-medium text-gray-900">Horario</p>
-              <p className="text-gray-700">{site.schedule}</p>
+              <p className="text-gray-700">{plazze.schedule}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -40,7 +40,7 @@ export const PlazzeInfo = ({ site }: SiteInfoProps) => {
               <p className="font-medium text-gray-900">Categoría</p>
               <div className="mt-1">
                 <Tag color="success" className="capitalize">
-                  {site.category}
+                  {plazze.category}
                 </Tag>
               </div>
             </div>
@@ -52,8 +52,8 @@ export const PlazzeInfo = ({ site }: SiteInfoProps) => {
         <h2 className="text-xl font-semibold mb-4 text-gray-900">Ubicación</h2>
         <div className="h-[300px]">
           <PlazzesMap
-            sites={[site]}
-            center={[site.coordinates.lat, site.coordinates.lng]}
+            plazzes={[plazze]}
+            center={[plazze.coordinates.lat, plazze.coordinates.lng]}
             zoom={15}
           />
         </div>

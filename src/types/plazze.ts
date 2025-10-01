@@ -1,4 +1,4 @@
-export interface Site {
+export interface Plazze {
   id: string;
   name: string;
   description: string;

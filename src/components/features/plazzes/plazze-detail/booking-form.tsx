@@ -1,7 +1,7 @@
 "use client";
 
 import { DatePicker, InputNumber, Button, TimePicker } from "antd";
-import { Site } from "@/types/site";
+import { Plazze } from "@/types/plazze";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import { LuCalendarDays, LuClock, LuUsers } from "react-icons/lu";
@@ -9,10 +9,10 @@ import { LuCalendarDays, LuClock, LuUsers } from "react-icons/lu";
 dayjs.locale("es");
 
 interface BookingFormProps {
-  site: Site;
+  plazze: Plazze;
 }
 
-export const BookingForm = ({ site }: BookingFormProps) => {
+export const BookingForm = ({ plazze }: BookingFormProps) => {
   const formatDate = (date: dayjs.Dayjs) => {
     if (!date) return "";
     const localDate = date.locale("es");
@@ -27,7 +27,7 @@ export const BookingForm = ({ site }: BookingFormProps) => {
       <div className="flex flex-col gap-6">
         <div>
           <p className="text-2xl font-bold text-primary">
-            ${site.price.toLocaleString()}{" "}
+            ${plazze.price.toLocaleString()}{" "}
             <span className="text-sm text-gray-500 font-normal">por día</span>
           </p>
         </div>
@@ -61,21 +61,26 @@ export const BookingForm = ({ site }: BookingFormProps) => {
               size="large"
               placeholder="Personas"
               min={1}
-              max={site.capacity}
+              max={plazze.capacity}
               prefix={<LuUsers size={20} className="text-gray-400" />}
               className="!w-full"
               controls={true}
             />
           </div>
 
-          <Button type="primary" size="large" className="w-full">
+          <Button
+            type="primary"
+            size="large"
+            className="w-full"
+            href={`/plazzes/${plazze.id}/confirm`}
+          >
             Reservar ahora
           </Button>
         </div>
 
         <div className="text-sm text-gray-600">
           <p>• Cancelación gratuita hasta 48 horas antes</p>
-          <p>• Capacidad máxima: {site.capacity} personas</p>
+          <p>• Capacidad máxima: {plazze.capacity} personas</p>
         </div>
       </div>
     </div>

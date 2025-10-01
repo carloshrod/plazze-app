@@ -3,11 +3,11 @@
 import Image from "next/image";
 import { useState } from "react";
 
-interface SiteImagesProps {
+interface PlazzeImagesProps {
   images: string[];
 }
 
-export const PlazzeImages = ({ images }: SiteImagesProps) => {
+export const PlazzeImages = ({ images }: PlazzeImagesProps) => {
   const [mainImage, setMainImage] = useState(images[0]);
 
   return (
@@ -15,7 +15,7 @@ export const PlazzeImages = ({ images }: SiteImagesProps) => {
       <div className="w-full relative aspect-[16/9] rounded-lg overflow-hidden bg-gray-100">
         <Image
           src={mainImage}
-          alt="Site main image"
+          alt="Plazze main image"
           fill
           className="object-cover hover:scale-105 transition-transform duration-300"
           priority
@@ -33,7 +33,7 @@ export const PlazzeImages = ({ images }: SiteImagesProps) => {
           >
             <Image
               src={image}
-              alt={`Site image ${index + 1}`}
+              alt={`Plazze image ${index + 1}`}
               fill
               className="object-cover hover:scale-105 transition-transform duration-300"
               sizes="(max-width: 768px) 25vw, (max-width: 1200px) 16vw"

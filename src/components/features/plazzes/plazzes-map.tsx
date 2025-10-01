@@ -1,8 +1,8 @@
 import dynamic from "next/dynamic";
-import { Site } from "@/types/site";
+import { Plazze } from "@/types/plazze";
 
-interface SitesMapProps {
-  sites: Site[];
+interface PlazzesMapProps {
+  plazzes: Plazze[];
   center?: [number, number];
   zoom?: number;
 }
@@ -18,16 +18,20 @@ const MapClient = dynamic(() => import("./map-client"), {
   ),
 });
 
-const PlazzesMap = ({ sites, center, zoom = 12 }: SitesMapProps) => {
+const PlazzesMap = ({ plazzes, center, zoom = 12 }: PlazzesMapProps) => {
   const defaultCenter: [number, number] =
-    sites.length > 0
-      ? [sites[0].coordinates.lat, sites[0].coordinates.lng]
+    plazzes.length > 0
+      ? [plazzes[0].coordinates.lat, plazzes[0].coordinates.lng]
       : [9.0746, -79.4455];
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 h-full">
       <div className="h-full rounded-lg overflow-hidden">
-        <MapClient sites={sites} center={center || defaultCenter} zoom={zoom} />
+        <MapClient
+          plazzes={plazzes}
+          center={center || defaultCenter}
+          zoom={zoom}
+        />
       </div>
     </div>
   );

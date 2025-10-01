@@ -1,6 +1,6 @@
-import { Site } from "@/types/site";
+import { Plazze } from "@/types/plazze";
 
-export const mockSites: Site[] = [
+export const mockPlazzes: Plazze[] = [
   {
     id: "1",
     name: "Terraza Verde",
