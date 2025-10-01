@@ -1,13 +1,13 @@
 import { Tag } from "antd";
 import { LuClock, LuTags, LuUsers } from "react-icons/lu";
-import SitesMap from "../sites-map";
+import PlazzesMap from "../plazzes-map";
 import { Site } from "@/types/site";
 
 interface SiteInfoProps {
   site: Site;
 }
 
-export const SiteInfo = ({ site }: SiteInfoProps) => {
+export const PlazzeInfo = ({ site }: SiteInfoProps) => {
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -51,7 +51,7 @@ export const SiteInfo = ({ site }: SiteInfoProps) => {
       <div>
         <h2 className="text-xl font-semibold mb-4 text-gray-900">Ubicación</h2>
         <div className="h-[300px]">
-          <SitesMap
+          <PlazzesMap
             sites={[site]}
             center={[site.coordinates.lat, site.coordinates.lng]}
             zoom={15}

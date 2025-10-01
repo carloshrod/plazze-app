@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import { Button } from "antd";
 import { LuBookmark, LuMapPin } from "react-icons/lu";
-import { SiteImages } from "@/components/features/plazzes/plazze-detail/site-images";
+import { PlazzeImages } from "@/components/features/plazzes/plazze-detail/plazze-images";
 import { BookingForm } from "@/components/features/plazzes/plazze-detail/booking-form";
-import { SiteInfo } from "@/components/features/plazzes/plazze-detail/site-info";
+import { PlazzeInfo } from "@/components/features/plazzes/plazze-detail/plazze-info";
 import { ScrollToBookingButton } from "@/components/common/ui/scroll-to-booking-button";
 import { mockSites } from "@/mock/sites";
 import { Site } from "@/types/site";
@@ -62,7 +62,7 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
           </div>
         </div>
 
-        <SiteImages images={images} />
+        <PlazzeImages images={images} />
       </div>
 
       {/* Contenido principal */}
@@ -82,7 +82,7 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
 
           {/* Información del sitio - Después del formulario en móvil, a la izquierda en desktop */}
           <div className="lg:col-span-2 lg:row-start-1">
-            <SiteInfo site={site} />
+            <PlazzeInfo site={site} />
           </div>
         </div>
 

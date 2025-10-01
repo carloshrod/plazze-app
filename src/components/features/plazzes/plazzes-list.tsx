@@ -9,7 +9,7 @@ interface SitesGridProps {
   sites: Site[];
 }
 
-const SitesGrid = ({ sites }: SitesGridProps) => {
+const PlazzesList = ({ sites }: SitesGridProps) => {
   return (
     <div className="grid gap-6">
       {sites.map((site) => (
@@ -79,4 +79,4 @@ const SitesGrid = ({ sites }: SitesGridProps) => {
   );
 };
 
-export default SitesGrid;
+export default PlazzesList;

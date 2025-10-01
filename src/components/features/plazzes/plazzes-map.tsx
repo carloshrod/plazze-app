@@ -18,7 +18,7 @@ const MapClient = dynamic(() => import("./map-client"), {
   ),
 });
 
-const SitesMap = ({ sites, center, zoom = 12 }: SitesMapProps) => {
+const PlazzesMap = ({ sites, center, zoom = 12 }: SitesMapProps) => {
   const defaultCenter: [number, number] =
     sites.length > 0
       ? [sites[0].coordinates.lat, sites[0].coordinates.lng]
@@ -33,4 +33,4 @@ const SitesMap = ({ sites, center, zoom = 12 }: SitesMapProps) => {
   );
 };
 
-export default SitesMap;
+export default PlazzesMap;

@@ -6,7 +6,7 @@ import { LuArrowUpRight } from "react-icons/lu";
 import { mockSites } from "@/mock/sites";
 import { ROUTES } from "@/consts/routes";
 
-export const TrendingSitesSection = () => {
+export const TrendingPlazzesSection = () => {
   const trendingSites = mockSites.slice(0, 6);
 
   return (
@@ -64,4 +64,4 @@ export const TrendingSitesSection = () => {
   );
 };
 
-export default TrendingSitesSection;
+export default TrendingPlazzesSection;

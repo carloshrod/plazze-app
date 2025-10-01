@@ -1,6 +1,6 @@
 import SearchBar from "@/components/common/ui/search-bar";
-import SitesGrid from "@/components/features/plazzes/sites-grid";
-import SitesMap from "@/components/features/plazzes/sites-map";
+import PlazzesList from "@/components/features/plazzes/plazzes-list";
+import PlazzesMap from "@/components/features/plazzes/plazzes-map";
 import { mockSites } from "@/mock/sites";
 
 export default function PlazzesPage() {
@@ -20,13 +20,13 @@ export default function PlazzesPage() {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Grid de sitios */}
           <div className="order-2 lg:order-1">
-            <SitesGrid sites={mockSites} />
+            <PlazzesList sites={mockSites} />
           </div>
 
           {/* Mapa */}
           <div className="order-1 lg:order-2">
             <div className="sticky top-28">
-              <SitesMap sites={mockSites} />
+              <PlazzesMap sites={mockSites} />
             </div>
           </div>
         </div>

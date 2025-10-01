@@ -7,7 +7,7 @@ interface SiteImagesProps {
   images: string[];
 }
 
-export const SiteImages = ({ images }: SiteImagesProps) => {
+export const PlazzeImages = ({ images }: SiteImagesProps) => {
   const [mainImage, setMainImage] = useState(images[0]);
 
   return (

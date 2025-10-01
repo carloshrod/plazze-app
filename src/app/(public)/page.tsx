@@ -3,14 +3,14 @@ import FeaturesSection from "@/components/features/landing/features-section";
 import CategoriesSection from "@/components/features/landing/categories-section";
 import CTASection from "@/components/features/landing/cta-section";
 import ScrollToTop from "@/components/common/ui/scroll-to-top";
-import TrendingSitesSection from "@/components/features/landing/trending-sites-section";
+import TrendingPlazzesSection from "@/components/features/landing/trending-plazzes-section";
 
 export default function Home() {
   return (
     <main className="min-h-screen">
       <HeroSection />
       <FeaturesSection />
-      <TrendingSitesSection />
+      <TrendingPlazzesSection />
       <CategoriesSection />
       <CTASection />
       <ScrollToTop />
