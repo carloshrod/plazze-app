@@ -15,7 +15,8 @@ export default function PlazzeForm({
     if (initialValues) {
       form.setFieldsValue(initialValues);
     }
-  }, [form, initialValues]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValues]);
 
   const onFinish = async (values: Partial<Plazze>) => {
     // TODO: Implementar la lógica para guardar o editar el plazze
