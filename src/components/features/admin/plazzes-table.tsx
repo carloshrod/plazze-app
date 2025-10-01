@@ -6,6 +6,8 @@ import { LuPen, LuTrash2 } from "react-icons/lu";
 import { capitalizeWords, formatCurrency } from "@/utils/format";
 import { ROUTES } from "@/consts/routes";
 import { mockPlazzes } from "@/mock/plazzes";
+import PlazzeModal from "./plazze-modal";
+import { type Plazze } from "@/types/plazze";
 
 const statusColors = {
   active: "success",
@@ -62,23 +64,38 @@ export function PlazzesTable() {
       title: "Acciones",
       fixed: "right" as const,
       key: "actions",
-      render: (_: unknown, record: (typeof mockPlazzes)[0]) => (
-        <div className="flex items-center gap-2">
-          <Button
-            type="text"
-            icon={<LuPen size={18} className="text-primary" />}
-            href={`/dashboard/plazzes/${record.id}/edit`}
-          />
-          <Button
-            type="text"
-            icon={<LuTrash2 size={18} className="text-red-500" />}
-            onClick={() => {
-              // TODO: Implementar eliminación
-              console.log("Eliminar", record.id);
-            }}
-          />
-        </div>
-      ),
+      render: (_: unknown, record: (typeof mockPlazzes)[0]) => {
+        const handleEditPlazze = async (values: Partial<Plazze>) => {
+          // TODO: Implementar la lógica para actualizar el plazze
+          console.log("Editando plazze:", record.id, values);
+        };
+
+        return (
+          <div className="flex items-center gap-2">
+            <PlazzeModal
+              mode="edit"
+              plazze={record}
+              onSubmit={handleEditPlazze}
+              trigger={
+                <Button
+                  type="text"
+                  className="hover:!text-primary"
+                  icon={<LuPen size={18} />}
+                />
+              }
+            />
+            <Button
+              type="text"
+              className="hover:!text-red-500"
+              icon={<LuTrash2 size={18} />}
+              onClick={() => {
+                // TODO: Implementar eliminación
+                console.log("Eliminar", record.id);
+              }}
+            />
+          </div>
+        );
+      },
       width: 100,
     },
   ];
