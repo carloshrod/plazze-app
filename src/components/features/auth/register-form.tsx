@@ -11,7 +11,11 @@ interface RegisterFormFields {
   confirmPassword: string;
 }
 
-const RegisterForm = ({ userType }: { userType: "client" | "plazzer" }) => {
+const RegisterForm = ({
+  userType = "client",
+}: {
+  userType?: "client" | "plazzer";
+}) => {
   const [form] = Form.useForm();
 
   const onFinish = (values: RegisterFormFields) => {
