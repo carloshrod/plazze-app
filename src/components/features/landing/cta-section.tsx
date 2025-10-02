@@ -19,7 +19,7 @@ const CTASection = () => {
             </h2>
             <p className="text-xl text-white/80 mb-8 max-w-md">
               Se un plazzer y forma parte de la red de locales más grande.
-              Aumenta tu visibilidad y llega a más clientes.
+              Aumenta tus ingresos y llega a más clientes.
             </p>
             <Link href={ROUTES.ADMIN.PLAZZES}>
               <Button

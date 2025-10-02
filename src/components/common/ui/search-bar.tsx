@@ -37,11 +37,12 @@ const SearchBar = () => {
         <div className="sm:w-[15%]">
           <TimePicker
             size="large"
-            format="HH:mm"
+            use12Hours
+            format="h:mm a"
             placeholder="Hora"
             suffixIcon={<LuClock size={20} className="text-gray-400" />}
             className="w-full border-0 shadow-none"
-            minuteStep={15}
+            minuteStep={30}
             showNow={false}
             needConfirm={false}
           />
