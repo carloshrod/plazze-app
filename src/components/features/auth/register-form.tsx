@@ -4,16 +4,18 @@ import { Button, Form, Input } from "antd";
 
 interface RegisterFormFields {
   name: string;
+  lastName: string;
+  userName: string;
   email: string;
   password: string;
   confirmPassword: string;
 }
 
-const RegisterForm = () => {
+const RegisterForm = ({ userType }: { userType: "client" | "plazzer" }) => {
   const [form] = Form.useForm();
 
   const onFinish = (values: RegisterFormFields) => {
-    console.log("Success:", values);
+    console.log("Success:", values, userType);
   };
 
   return (
@@ -25,7 +27,7 @@ const RegisterForm = () => {
     >
       <div className="grid grid-cols-2 gap-4">
         <Form.Item
-          label="Nombre completo"
+          label="Nombre"
           name="name"
           rules={[
             {
@@ -34,7 +36,33 @@ const RegisterForm = () => {
             },
           ]}
         >
-          <Input size="large" placeholder="Juan Pérez" />
+          <Input size="large" placeholder="Juan" />
+        </Form.Item>
+
+        <Form.Item
+          label="Apellido"
+          name="lastName"
+          rules={[
+            {
+              required: true,
+              message: "Por favor ingresa tu apellido",
+            },
+          ]}
+        >
+          <Input size="large" placeholder="Pérez" />
+        </Form.Item>
+
+        <Form.Item
+          label="Usuario"
+          name="userName"
+          rules={[
+            {
+              required: true,
+              message: "Por favor ingresa tu usuario",
+            },
+          ]}
+        >
+          <Input size="large" placeholder="jperez" />
         </Form.Item>
 
         <Form.Item

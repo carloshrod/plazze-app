@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LogoIcon } from "@/components/common/ui/logos/logo-icon";
-import RegisterForm from "@/components/features/auth/register-form";
+import RegisterTabs from "@/components/features/auth/register-tabs";
 import { ROUTES } from "@/consts/routes";
 
 export default function RegisterPage() {
@@ -25,8 +25,8 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          {/* Form */}
-          <RegisterForm />
+          {/* Tabs para seleccionar tipo de usuario */}
+          <RegisterTabs />
 
           <p className="text-sm text-gray-500 mt-6 text-center">
             Al crear una cuenta, aceptas nuestros{" "}
