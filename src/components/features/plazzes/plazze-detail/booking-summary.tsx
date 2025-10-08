@@ -36,7 +36,7 @@ const BookingSummary = ({ booking }: BookingSummaryProps) => {
                 alt={booking.plazzeName}
                 width={80}
                 height={80}
-                className="object-cover rounded-lg"
+                className="w-20 h-20 object-cover rounded-lg"
               />
             )}
             <div>

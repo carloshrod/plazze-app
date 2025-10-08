@@ -1,15 +1,8 @@
 "use client";
 
 import { Button, Form, Input } from "antd";
-
-interface RegisterFormFields {
-  name: string;
-  lastName: string;
-  userName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+import { useAuthService } from "@/service/auth";
+import { RegisterFormFields } from "@/types/auth";
 
 const RegisterForm = ({
   userType = "client",
@@ -17,9 +10,17 @@ const RegisterForm = ({
   userType?: "client" | "plazzer";
 }) => {
   const [form] = Form.useForm();
+  const { register, loading } = useAuthService();
 
-  const onFinish = (values: RegisterFormFields) => {
-    console.log("Success:", values, userType);
+  const onFinish = async (values: RegisterFormFields) => {
+    await register({
+      name: values.name,
+      lastName: values.lastName,
+      username: values.userName,
+      email: values.email,
+      password: values.password,
+      role: userType === "plazzer" ? "seller" : "guest",
+    });
   };
 
   return (
@@ -134,7 +135,8 @@ const RegisterForm = ({
           htmlType="submit"
           size="large"
           block
-          className="h-11 mt-4 !w-[30%]"
+          className="mt-4 !w-[30%]"
+          loading={loading}
         >
           Crear cuenta
         </Button>

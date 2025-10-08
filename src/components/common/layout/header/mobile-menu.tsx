@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button } from "antd";
-import { useEffect, useRef } from "react";
 import { LuLogOut, LuUser } from "react-icons/lu";
+import { useAuthService } from "@/service/auth";
 import { ROUTES } from "@/consts/routes";
 
 interface MobileMenuProps {
@@ -14,6 +15,7 @@ interface MobileMenuProps {
 
 export function MobileMenu({ isOpen, isAuth, onClose }: MobileMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
+  const { logout } = useAuthService();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -99,7 +101,10 @@ export function MobileMenu({ isOpen, isAuth, onClose }: MobileMenuProps) {
                   </Link>
                   <button
                     className="flex items-center justify-center space-x-2 text-red-500 rounded-md hover:text-white hover:bg-red-500 transition-colors px-2 py-1"
-                    onClick={onClose}
+                    onClick={() => {
+                      logout();
+                      onClose();
+                    }}
                   >
                     <LuLogOut size={20} />
                     <span>Cerrar Sesión</span>

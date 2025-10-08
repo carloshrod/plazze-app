@@ -1,17 +1,18 @@
 "use client";
 
-import Link from "next/link";
-import { Button } from "antd";
-import { LuMenu as MenuIcon, LuX } from "react-icons/lu";
 import { useState } from "react";
+import Link from "next/link";
+import { Button, Skeleton } from "antd";
+import { LuMenu as MenuIcon, LuX } from "react-icons/lu";
 import { Logo } from "../../ui/logos/logo";
 import { MainNav } from "./main-nav";
 import { UserMenu } from "./user-menu";
 import { MobileMenu } from "./mobile-menu";
+import { useAuthStore } from "@/stores/auth";
 import { ROUTES } from "@/consts/routes";
 
 const Header = () => {
-  const isAuth = false;
+  const { isAuthenticated: isAuth, isLoadingAuth } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -23,10 +24,20 @@ const Header = () => {
               <Logo className="h-6 w-auto text-black" />
             </Link>
 
-            <MainNav isAuth={isAuth} />
+            {isLoadingAuth ? (
+              <div className="hidden md:flex items-center ml-8">
+                <Skeleton.Input active className="!w-64" />
+              </div>
+            ) : (
+              <MainNav isAuth={isAuth} />
+            )}
           </div>
 
-          {!isAuth ? (
+          {isLoadingAuth ? (
+            <div className="hidden md:flex items-center">
+              <Skeleton.Input active className="!w-64" />
+            </div>
+          ) : !isAuth ? (
             <div className="hidden md:flex items-center space-x-4">
               <Link
                 href={ROUTES.PUBLIC.AUTH.LOGIN}

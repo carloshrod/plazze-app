@@ -18,6 +18,42 @@
   font-display: swap;
 }
 
+@layer components {
+
+  /* Estilos para los tabs de registro */
+  .register-tabs {
+    & :where(.ant-tabs-nav) {
+      margin-bottom: 2rem !important;
+    }
+
+    & :where(.ant-tabs-nav-list) {
+      display: flex !important;
+      width: 100% !important;
+      justify-content: center !important;
+      gap: 1rem !important;
+    }
+
+    & :where(.ant-tabs-tab) {
+      flex: 1 !important;
+      text-align: center !important;
+      padding: 0.75rem 2rem !important;
+      font-size: 1rem !important;
+      border-radius: 0.5rem !important;
+      font-weight: 500 !important;
+      transition: all 0.2s !important;
+    }
+
+    & :where(.ant-tabs-tab.ant-tabs-tab-active) {
+      font-weight: 700 !important;
+      background-color: rgba(8, 182, 61, 0.1) !important;
+    }
+
+    & :where(.ant-tabs-ink-bar) {
+      display: none !important;
+    }
+  }
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -43,4 +79,13 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.message-right {
+  position: fixed;
+  top: 70px !important;
+  right: 24px !important;
+  left: unset !important;
+  transform-origin: right top !important;
+  transform: translateX(0) !important;
 }

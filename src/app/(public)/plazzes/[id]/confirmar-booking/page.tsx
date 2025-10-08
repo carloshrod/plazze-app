@@ -9,6 +9,7 @@ import { RiPaypalLine } from "react-icons/ri";
 import LoginForm from "@/components/features/auth/login-form";
 import RegisterForm from "@/components/features/auth/register-form";
 import BookingSummary from "@/components/features/plazzes/plazze-detail/booking-summary";
+import { useAuthStore } from "@/stores/auth";
 import { mockPlazzes } from "@/mock/plazzes";
 import dayjs from "dayjs";
 
@@ -19,8 +20,7 @@ export default function ConfirmBookingPage({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isAuthenticated = false; // TODO: Reemplazar con el estado real de autenticación
-
+  const { isAuthenticated } = useAuthStore();
   const currentStep = isAuthenticated ? 1 : 0;
 
   const plazze = mockPlazzes.find((p) => p.id === params.id);
@@ -84,7 +84,7 @@ export default function ConfirmBookingPage({
                         label: "Iniciar sesión",
                         children: (
                           <div className="px-24">
-                            <LoginForm />
+                            <LoginForm redirect={false} />
                           </div>
                         ),
                       },

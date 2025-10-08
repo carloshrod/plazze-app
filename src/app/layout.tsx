@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ConfigProvider } from "antd";
-import es_ES from "antd/locale/es_ES";
 import theme from "@/theme/themeConfig";
+import es_ES from "antd/locale/es_ES";
+import { AuthProvider } from "@/components/providers/auth-provider";
 
 export const metadata: Metadata = {
   title: "Plazze - Reserva espacios únicos para tus eventos",
@@ -21,7 +22,7 @@ export default function RootLayout({
       <body className="font-mont" suppressHydrationWarning>
         <AntdRegistry>
           <ConfigProvider theme={theme} locale={es_ES}>
-            {children}
+            <AuthProvider>{children}</AuthProvider>
           </ConfigProvider>
         </AntdRegistry>
       </body>

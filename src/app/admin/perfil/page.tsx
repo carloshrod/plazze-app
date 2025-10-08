@@ -1,9 +1,14 @@
-import EmailForm from "@/components/features/admin/email-form";
-import PasswordForm from "@/components/features/admin/password-form";
+"use client";
+
 import { Card } from "antd";
 import { LuUser } from "react-icons/lu";
+import EmailForm from "@/components/features/admin/email-form";
+import PasswordForm from "@/components/features/admin/password-form";
+import { useAuthStore } from "@/stores/auth";
 
 export default function ProfilePage() {
+  const { user } = useAuthStore();
+
   return (
     <div>
       <div className="mb-8">
@@ -18,8 +23,10 @@ export default function ProfilePage() {
               <LuUser size={40} className="text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">John Doe</h2>
-              <p className="text-gray-600">john.doe@example.com</p>
+              <h2 className="text-lg font-semibold text-gray-900">
+                {user?.displayName}
+              </h2>
+              <p className="text-gray-600">{user?.email}</p>
             </div>
           </div>
 

@@ -1,75 +1,84 @@
 "use client";
 
-import { Button, Form, Input } from "antd";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Button, Form, Input } from "antd";
+import { FormProps } from "antd/lib";
+import { useAuthService } from "@/service/auth";
+import { LoginFormFields } from "@/types/auth";
 
-interface LoginFormFields {
-  email: string;
-  password: string;
+interface Props {
+  redirect?: boolean;
 }
 
-const LoginForm = () => {
+const LoginForm = ({ redirect = true }: Props) => {
   const [form] = Form.useForm();
+  const { login, loading } = useAuthService();
+  const searchParams = useSearchParams();
 
-  const onFinish = (values: LoginFormFields) => {
-    console.log("Success:", values);
+  const onFinish: FormProps<LoginFormFields>["onFinish"] = async (values) => {
+    const redirectTo = searchParams.get("redirect_to") ?? undefined;
+    await login(values, redirect, redirectTo);
   };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={onFinish}
-      requiredMark={false}
-    >
-      <Form.Item
-        label="Correo electrónico"
-        name="email"
-        rules={[
-          {
-            required: true,
-            message: "Por favor ingresa tu correo electrónico",
-          },
-          {
-            type: "email",
-            message: "Por favor ingresa un correo electrónico válido",
-          },
-        ]}
+    <>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        requiredMark={false}
       >
-        <Input size="large" placeholder="correo@ejemplo.com" />
-      </Form.Item>
-
-      <Form.Item
-        label="Contraseña"
-        name="password"
-        rules={[
-          {
-            required: true,
-            message: "Por favor ingresa tu contraseña",
-          },
-        ]}
-      >
-        <Input.Password size="large" placeholder="••••••••" />
-      </Form.Item>
-
-      <div className="flex justify-end mb-6">
-        <Link href="#" className="text-sm text-primary hover:text-primary/90">
-          ¿Olvidaste tu contraseña?
-        </Link>
-      </div>
-
-      <div className="text-end">
-        <Button
-          type="primary"
-          htmlType="submit"
-          size="large"
-          block
-          className="h-11 !w-[45%]"
+        <Form.Item
+          label="Correo electrónico"
+          name="email"
+          rules={[
+            {
+              required: true,
+              message: "Por favor ingresa tu correo electrónico",
+            },
+            {
+              type: "email",
+              message: "Por favor ingresa un correo electrónico válido",
+            },
+          ]}
         >
-          Iniciar sesión
-        </Button>
-      </div>
-    </Form>
+          <Input size="large" placeholder="correo@ejemplo.com" />
+        </Form.Item>
+
+        <Form.Item
+          label="Contraseña"
+          name="password"
+          rules={[
+            {
+              required: true,
+              message: "Por favor ingresa tu contraseña",
+            },
+          ]}
+        >
+          <Input.Password size="large" placeholder="••••••••" />
+        </Form.Item>
+
+        <div className="flex justify-end mb-6">
+          <Link href="#" className="text-sm text-primary hover:text-primary/90">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
+
+        <div className="text-end">
+          <Button
+            type="primary"
+            htmlType="submit"
+            size="large"
+            block
+            className="h-11 !w-[45%]"
+            loading={loading}
+          >
+            Iniciar sesión
+          </Button>
+        </div>
+      </Form>
+    </>
   );
 };
 

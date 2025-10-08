@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import { Button, Form, Input, message } from "antd";
+import { useAuthStore } from "@/stores/auth";
 
 type EmailFormValues = {
   email: string;
@@ -8,6 +10,13 @@ type EmailFormValues = {
 
 const EmailForm = () => {
   const [emailForm] = Form.useForm<EmailFormValues>();
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (user?.email) {
+      emailForm.setFieldsValue({ email: user.email });
+    }
+  }, [user]);
 
   const onEmailFinish = async (values: EmailFormValues) => {
     try {
@@ -25,9 +34,6 @@ const EmailForm = () => {
       layout="vertical"
       onFinish={onEmailFinish}
       requiredMark={false}
-      initialValues={{
-        email: "john.doe@example.com",
-      }}
     >
       <Form.Item
         label="Nuevo correo electrónico"

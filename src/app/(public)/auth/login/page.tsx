@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { LogoIcon } from "@/components/common/ui/logos/logo-icon";
 import LoginForm from "@/components/features/auth/login-form";
@@ -26,7 +27,9 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <LoginForm />
+          <Suspense fallback={null}>
+            <LoginForm />
+          </Suspense>
         </div>
       </div>
     </main>

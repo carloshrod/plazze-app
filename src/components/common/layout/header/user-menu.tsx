@@ -4,26 +4,32 @@ import Link from "next/link";
 import { Avatar, Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import { LuChevronDown, LuLogOut, LuUser } from "react-icons/lu";
+import { useAuthStore } from "@/stores/auth";
+import { useAuthService } from "@/service/auth";
 import { ROUTES } from "@/consts/routes";
 
-const userMenuItems: MenuProps["items"] = [
-  {
-    key: "profile",
-    label: <Link href={ROUTES.ADMIN.PROFILE}>Mi Perfil</Link>,
-    icon: <LuUser size={16} />,
-  },
-  {
-    type: "divider",
-  },
-  {
-    key: "logout",
-    label: "Cerrar Sesión",
-    icon: <LuLogOut size={16} />,
-    danger: true,
-  },
-];
-
 export function UserMenu() {
+  const user = useAuthStore((state) => state.user);
+  const { logout } = useAuthService();
+
+  const userMenuItems: MenuProps["items"] = [
+    {
+      key: "profile",
+      label: <Link href={ROUTES.ADMIN.PROFILE}>Mi Perfil</Link>,
+      icon: <LuUser size={16} />,
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "logout",
+      label: "Cerrar Sesión",
+      icon: <LuLogOut size={16} />,
+      danger: true,
+      onClick: () => logout(),
+    },
+  ];
+
   return (
     <div className="hidden md:flex items-center gap-4">
       <Link
@@ -37,7 +43,7 @@ export function UserMenu() {
           <Avatar size={32}>
             <LuUser size={40} className="text-gray-600" />
           </Avatar>
-          <span className="text-sm font-medium">John Doe</span>
+          <span className="text-sm font-medium">{user?.displayName}</span>
           <LuChevronDown size={16} className="text-gray-600" />
         </div>
       </Dropdown>

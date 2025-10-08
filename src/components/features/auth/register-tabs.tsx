@@ -18,6 +18,7 @@ const RegisterTabs = () => {
       activeKey={userType}
       onChange={handleTabChange}
       centered
+      className="register-tabs"
       items={[
         {
           key: "client",
