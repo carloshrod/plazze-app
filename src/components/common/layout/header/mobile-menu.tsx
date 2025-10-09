@@ -28,8 +28,11 @@ export function MobileMenu({ isOpen, isAuth, onClose }: MobileMenuProps) {
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    if (typeof document !== "undefined" && isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;

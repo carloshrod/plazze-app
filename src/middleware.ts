@@ -11,7 +11,17 @@ export function middleware(request: NextRequest) {
   if (isAdminRoute && !token) {
     const loginUrl = new URL(ROUTES.PUBLIC.AUTH.LOGIN, request.url);
     // Guardamos la URL original para redirigir después del login
-    loginUrl.searchParams.set("redirect_to", request.url);
+    if (request.nextUrl.pathname !== ROUTES.ADMIN.DASHBOARD) {
+      // Validar si el request.nextUrl.pathname existe en las rutas definidas
+      const allAdminRoutes = Object.values(ROUTES.ADMIN);
+      const isValidRoute = allAdminRoutes.includes(
+        request.nextUrl.pathname as any
+      );
+
+      if (isValidRoute) {
+        loginUrl.searchParams.set("redirect_to", request.nextUrl.pathname);
+      }
+    }
     return NextResponse.redirect(loginUrl);
   }
 

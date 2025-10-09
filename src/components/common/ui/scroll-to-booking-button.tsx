@@ -4,10 +4,12 @@ import { Button } from "antd";
 
 export const ScrollToBookingButton = () => {
   const scrollToBooking = () => {
-    document.getElementById("booking-form")?.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
+    if (typeof document !== "undefined") {
+      document.getElementById("booking-form")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
   };
 
   return (

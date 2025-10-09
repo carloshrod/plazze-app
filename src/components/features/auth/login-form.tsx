@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { Button, Form, Input } from "antd";
 import { FormProps } from "antd/lib";
 import { useAuthService } from "@/service/auth";
@@ -9,15 +8,14 @@ import { LoginFormFields } from "@/types/auth";
 
 interface Props {
   redirect?: boolean;
+  redirectTo?: string;
 }
 
-const LoginForm = ({ redirect = true }: Props) => {
+const LoginForm = ({ redirect = true, redirectTo = undefined }: Props) => {
   const [form] = Form.useForm();
   const { login, loading } = useAuthService();
-  const searchParams = useSearchParams();
 
   const onFinish: FormProps<LoginFormFields>["onFinish"] = async (values) => {
-    const redirectTo = searchParams.get("redirect_to") ?? undefined;
     await login(values, redirect, redirectTo);
   };
 

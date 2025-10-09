@@ -20,7 +20,7 @@ export const useAuthService = () => {
     const userDataCookie = Cookies.get("user");
 
     if (!token || !userDataCookie) {
-      logout();
+      logout(false);
       return;
     }
 
@@ -73,19 +73,18 @@ export const useAuthService = () => {
         path: "/",
       });
 
-      // Si hay una redirección específica en los parámetros, usarla
       if (redirect) {
         if (redirectTo) {
-          router.push(decodeURIComponent(redirectTo));
-          return;
+          // Si hay una redirección específica en los parámetros, usarla
+          router.push(redirectTo);
+        } else {
+          // Si no, redirigir según el rol
+          const defaultRedirect =
+            data?.role === "seller"
+              ? ROUTES.ADMIN.DASHBOARD
+              : ROUTES.ADMIN.BOOKINGS;
+          router.push(defaultRedirect);
         }
-
-        // Si no, redirigir según el rol
-        const defaultRedirect =
-          data?.role === "seller"
-            ? ROUTES.ADMIN.DASHBOARD
-            : ROUTES.ADMIN.BOOKINGS;
-        router.push(defaultRedirect);
       }
 
       setAuth(data?.token, userData);
@@ -121,8 +120,10 @@ export const useAuthService = () => {
     }
   };
 
-  const logout = () => {
-    router.push(ROUTES.PUBLIC.AUTH.LOGIN);
+  const logout = (redirect: boolean = true) => {
+    if (redirect) {
+      router.push(ROUTES.PUBLIC.AUTH.LOGIN);
+    }
 
     // Eliminar auth cookies
     Cookies.remove("token", { path: "/" });

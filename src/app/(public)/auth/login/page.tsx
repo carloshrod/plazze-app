@@ -1,10 +1,17 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import { LogoIcon } from "@/components/common/ui/logos/logo-icon";
 import LoginForm from "@/components/features/auth/login-form";
 import { ROUTES } from "@/consts/routes";
 
-export default function LoginPage() {
+interface LoginPageProps {
+  searchParams: Record<string, string | string[] | undefined>;
+}
+
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  const redirectTo = Array.isArray(searchParams.redirect_to)
+    ? searchParams.redirect_to[0]
+    : searchParams.redirect_to;
+
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -27,9 +34,7 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <Suspense fallback={null}>
-            <LoginForm />
-          </Suspense>
+          <LoginForm redirectTo={redirectTo} />
         </div>
       </div>
     </main>
