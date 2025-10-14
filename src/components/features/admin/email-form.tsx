@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input } from "antd";
 import { useAuthStore } from "@/stores/auth";
+import { useAuthService } from "@/service/auth";
 
 type EmailFormValues = {
   email: string;
@@ -11,6 +12,7 @@ type EmailFormValues = {
 const EmailForm = () => {
   const [emailForm] = Form.useForm<EmailFormValues>();
   const { user } = useAuthStore();
+  const { updateEmail, loading } = useAuthService();
 
   useEffect(() => {
     if (user?.email) {
@@ -19,13 +21,7 @@ const EmailForm = () => {
   }, [user]);
 
   const onEmailFinish = async (values: EmailFormValues) => {
-    try {
-      // TODO: Implementar actualización de email
-      console.log(values);
-      message.success("Correo electrónico actualizado correctamente");
-    } catch (error) {
-      message.error("Error al actualizar el correo electrónico");
-    }
+    await updateEmail(values.email);
   };
 
   return (
@@ -47,7 +43,7 @@ const EmailForm = () => {
       </Form.Item>
 
       <Form.Item className="mb-0">
-        <Button type="primary" htmlType="submit" size="large">
+        <Button type="primary" htmlType="submit" size="large" loading={loading}>
           Actualizar correo
         </Button>
       </Form.Item>

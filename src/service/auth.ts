@@ -132,11 +132,81 @@ export const useAuthService = () => {
     clearAuth();
   };
 
+  const updateEmail = async (newEmail: string) => {
+    try {
+      setLoading(true);
+      const token = Cookies.get("token");
+      if (!token) throw new Error("Usuario no autenticado");
+
+      const res = await authLib.updateEmail(newEmail);
+
+      if (res?.success) {
+        // Actualiza el user en el store y en la cookie
+        const userDataCookie = Cookies.get("user");
+        if (userDataCookie) {
+          const userData = JSON.parse(decodeURIComponent(userDataCookie));
+          userData.email = newEmail;
+          Cookies.set("user", JSON.stringify(userData), {
+            expires: 30,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            path: "/",
+          });
+          setAuth(token, userData);
+        }
+
+        showMessage.success("Email actualizado correctamente");
+      }
+    } catch (error) {
+      console.error("Error al actualizar el email:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al actualizar el email";
+      showMessage.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updatePassword = async (
+    currentPassword: string,
+    newPassword: string
+  ) => {
+    try {
+      setLoading(true);
+      const token = Cookies.get("token");
+      if (!token) throw new Error("Usuario no autenticado");
+
+      const res = await authLib.updatePassword(currentPassword, newPassword);
+
+      if (res?.success) {
+        logout();
+        showMessage.success(
+          `${res?.message}. Por favor, inicia sesión de nuevo.`
+        );
+
+        return res;
+      }
+    } catch (error) {
+      console.error("Error al actualizar la contraseña:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al actualizar la contraseña";
+      showMessage.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     initAuth,
     login,
     register,
     logout,
+    updateEmail,
+    updatePassword,
     loading,
   };
 };

@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input } from "antd";
+import { useAuthService } from "@/service/auth";
 
 type PasswordFormValues = {
   currentPassword: string;
@@ -10,19 +11,16 @@ type PasswordFormValues = {
 
 const PasswordForm = () => {
   const [passwordForm] = Form.useForm<PasswordFormValues>();
+  const { updatePassword, loading } = useAuthService();
 
   const onPasswordFinish = async (values: PasswordFormValues) => {
-    try {
-      if (values.newPassword !== values.confirmPassword) {
-        message.error("Las contraseñas no coinciden");
-        return;
-      }
+    const res = await updatePassword(
+      values.currentPassword,
+      values.newPassword
+    );
 
-      // TODO: Implementar actualización de contraseña
-      console.log(values);
-      message.success("Contraseña actualizada correctamente");
-    } catch (error) {
-      message.error("Error al actualizar la contraseña");
+    if (res?.success) {
+      passwordForm.resetFields();
     }
   };
 
@@ -86,7 +84,7 @@ const PasswordForm = () => {
       </Form.Item>
 
       <Form.Item className="mb-0 flex justify-end">
-        <Button type="primary" htmlType="submit" size="large">
+        <Button type="primary" htmlType="submit" size="large" loading={loading}>
           Actualizar contraseña
         </Button>
       </Form.Item>

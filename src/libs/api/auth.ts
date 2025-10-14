@@ -107,4 +107,37 @@ export const authLib = {
       throw new Error("No se pudo validar el token");
     }
   },
+
+  updateEmail: async (email: string) => {
+    try {
+      const { data } = await client.post("/plazze/v1/update-email", { email });
+
+      return data;
+    } catch (error: any) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.message || "Error al actualizar el email"
+        );
+      }
+      throw new Error("No se pudo conectar con el servidor");
+    }
+  },
+
+  updatePassword: async (currentPassword: string, newPassword: string) => {
+    try {
+      const { data } = await client.post("/plazze/v1/update-password", {
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+
+      return data;
+    } catch (error: any) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.message || "Error al actualizar la contraseña"
+        );
+      }
+      throw new Error("No se pudo conectar con el servidor");
+    }
+  },
 };
