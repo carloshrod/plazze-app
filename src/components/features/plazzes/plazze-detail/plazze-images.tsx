@@ -9,6 +9,12 @@ interface PlazzeImagesProps {
 
 export const PlazzeImages = ({ images }: PlazzeImagesProps) => {
   const [mainImage, setMainImage] = useState(images[0]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const handleImageClick = (image: string, index: number) => {
+    setMainImage(image);
+    setSelectedIndex(index);
+  };
 
   return (
     <div className="grid md:grid-cols-[5fr_4fr] gap-1 md:gap-4">
@@ -26,10 +32,12 @@ export const PlazzeImages = ({ images }: PlazzeImagesProps) => {
         {images.slice(0, 4).map((image, index) => (
           <div
             key={index}
-            className={`relative aspect-[16/9] md:aspect-auto md:h-full rounded-lg overflow-hidden cursor-pointer border-2 bg-gray-100 ${
-              index === 0 ? "border-primary" : "border-transparent"
+            className={`relative aspect-[16/9] md:aspect-auto md:h-full rounded-lg overflow-hidden cursor-pointer border-2 bg-gray-100 transition-all duration-200 ${
+              selectedIndex === index
+                ? "border-primary shadow-md"
+                : "border-transparent hover:border-gray-300"
             }`}
-            onClick={() => setMainImage(image)}
+            onClick={() => handleImageClick(image, index)}
           >
             <Image
               src={image}

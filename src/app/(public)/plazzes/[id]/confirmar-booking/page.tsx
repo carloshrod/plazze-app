@@ -1,16 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Button, Card, Steps, Tabs } from "antd";
+import { Button, Card, Steps, Tabs, Spin } from "antd";
 import { LuCreditCard, LuUser } from "react-icons/lu";
 import { RiPaypalLine } from "react-icons/ri";
 import LoginForm from "@/components/features/auth/login-form";
 import RegisterForm from "@/components/features/auth/register-form";
 import BookingSummary from "@/components/features/plazzes/plazze-detail/booking-summary";
 import { useAuthStore } from "@/stores/auth";
-import { mockPlazzes } from "@/mock/plazzes";
+import { usePlazzeService } from "@/service/plazze";
+import { Plazze } from "@/types/plazze";
 import dayjs from "dayjs";
 
 export default function ConfirmBookingPage({
@@ -21,22 +23,91 @@ export default function ConfirmBookingPage({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated } = useAuthStore();
+  const { fetchPlazzeById } = usePlazzeService();
+
+  const [plazze, setPlazze] = useState<Plazze | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const currentStep = isAuthenticated ? 1 : 0;
 
-  const plazze = mockPlazzes.find((p) => p.id === params.id);
+  useEffect(() => {
+    const loadPlazze = async () => {
+      try {
+        setLoading(true);
+        console.log("🔍 Cargando plazze para booking con ID:", params.id);
 
-  if (!plazze) {
-    router.push("/plazzes");
-    return null;
+        const data = await fetchPlazzeById(parseInt(params.id));
+        console.log("📊 Datos del plazze para booking:", data);
+
+        if (data) {
+          setPlazze(data);
+        } else {
+          console.error(
+            "❌ No se encontró plazze para booking con ID:",
+            params.id
+          );
+          router.push("/plazzes");
+          return;
+        }
+      } catch (error) {
+        console.error("❌ Error al cargar plazze para booking:", error);
+        setError(error instanceof Error ? error.message : "Error desconocido");
+        router.push("/plazzes");
+        return;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (params.id && !isNaN(parseInt(params.id))) {
+      loadPlazze();
+    } else {
+      console.error("❌ ID inválido para booking:", params.id);
+      router.push("/plazzes");
+      return;
+    }
+  }, [params.id, fetchPlazzeById, router]);
+
+  if (loading) {
+    return (
+      <div className="py-8 bg-gray-50 px-6 md:px-12">
+        <div className="max-w-3xl mx-auto flex items-center justify-center min-h-[400px]">
+          <Spin size="large" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !plazze) {
+    return (
+      <div className="py-8 bg-gray-50 px-6 md:px-12">
+        <div className="max-w-3xl mx-auto flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Error</h1>
+            <p className="text-gray-600 mb-4">
+              {error || "No se pudo cargar el plazze"}
+            </p>
+            <Button onClick={() => router.push("/plazzes")}>
+              Volver a plazzes
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const bookingData = {
-    plazzeName: plazze.name,
-    address: plazze.location,
-    date: searchParams.get("date") || dayjs(),
+    plazzeName: plazze.name.replace(/<[^>]*>/g, ""), // Remover HTML del nombre para el booking
+    address:
+      plazze.region ||
+      plazze.friendly_address ||
+      plazze.address ||
+      "Ubicación no especificada",
+    date: searchParams.get("date") || dayjs().format("YYYY-MM-DD"),
     time: searchParams.get("time") || "19:00",
     guests: searchParams.get("guests") || "5",
-    price: plazze.price || 0,
+    price: plazze.price_min || 0,
     image: plazze.image,
   };
 

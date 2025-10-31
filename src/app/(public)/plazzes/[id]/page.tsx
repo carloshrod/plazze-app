@@ -1,11 +1,14 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
-import { Button } from "antd";
+import { Button, Spin } from "antd";
 import { LuBookmark, LuMapPin } from "react-icons/lu";
 import { PlazzeImages } from "@/components/features/plazzes/plazze-detail/plazze-images";
 import { BookingForm } from "@/components/features/plazzes/plazze-detail/booking-form";
 import { PlazzeInfo } from "@/components/features/plazzes/plazze-detail/plazze-info";
 import { ScrollToBookingButton } from "@/components/common/ui/scroll-to-booking-button";
-import { mockPlazzes } from "@/mock/plazzes";
+import { usePlazzeService } from "@/service/plazze";
 import { Plazze } from "@/types/plazze";
 
 interface PlazzeDetailPageProps {
@@ -15,17 +18,92 @@ interface PlazzeDetailPageProps {
 }
 
 export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
-  const plazze = mockPlazzes.find((plz: Plazze) => plz.id === params.id);
+  const [plazze, setPlazze] = useState<Plazze | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { fetchPlazzeById } = usePlazzeService();
 
   // Simular autenticación
   const isAuthenticated = false;
+
+  useEffect(() => {
+    const loadPlazze = async () => {
+      try {
+        setLoading(true);
+
+        const data = await fetchPlazzeById(parseInt(params.id));
+
+        if (data) {
+          setPlazze(data);
+        } else {
+          console.error("❌ No se encontró plazze con ID:", params.id);
+          notFound();
+        }
+      } catch (error) {
+        console.error("❌ Error al cargar plazze:", error);
+        setError(error instanceof Error ? error.message : "Error desconocido");
+        notFound();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (params.id && !isNaN(parseInt(params.id))) {
+      loadPlazze();
+    } else {
+      console.error("❌ ID inválido:", params.id);
+      notFound();
+    }
+  }, [params.id, fetchPlazzeById]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Spin size="large" />
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Error</h1>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </main>
+    );
+  }
 
   if (!plazze) {
     notFound();
   }
 
-  // Simular múltiples imágenes (en producción vendrían de la API)
-  const images = [plazze.image, plazze.image, plazze.image, plazze.image];
+  // Usar imágenes reales del plazze (galería completa)
+  const images: string[] = [];
+
+  // Agregar todas las imágenes de la galería si existen
+  if (plazze.gallery && Array.isArray(plazze.gallery)) {
+    const galleryUrls = plazze.gallery.map((img) =>
+      typeof img === "string" ? img : img.url
+    );
+    images.push(...galleryUrls);
+  }
+
+  // Fallback a imagen principal si existe
+  if (images.length === 0 && plazze.image) {
+    images.push(plazze.image);
+  }
+
+  // Filtrar valores vacíos o undefined
+  const finalImages = images.filter(Boolean);
+
+  // Si no hay imágenes, usar una imagen por defecto
+  if (finalImages.length === 0) {
+    finalImages.push(
+      "https://images.unsplash.com/photo-1464808322410-1a934aab61e5?w=800"
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 px-6 md:px-12">
@@ -33,7 +111,10 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
       <div className="pt-8 space-y-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-3xl font-bold text-gray-900">{plazze.name}</h1>
+            <h1
+              className="text-3xl font-bold text-gray-900"
+              dangerouslySetInnerHTML={{ __html: plazze.name }}
+            />
             {isAuthenticated ? (
               <Button
                 type="text"
@@ -58,11 +139,13 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <LuMapPin size={20} />
-            <span>{plazze.location}</span>
+            <span>{`${plazze?.address}${
+              plazze?.friendly_address ? `, ${plazze.friendly_address}` : ""
+            }`}</span>
           </div>
         </div>
 
-        <PlazzeImages images={images} />
+        <PlazzeImages images={finalImages} />
       </div>
 
       {/* Contenido principal */}

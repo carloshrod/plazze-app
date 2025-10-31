@@ -1,10 +1,14 @@
+"use client";
+
 import dynamic from "next/dynamic";
+import { usePlazzeStore } from "@/stores/plazze";
 import { Plazze } from "@/types/plazze";
 
 interface PlazzesMapProps {
-  plazzes: Plazze[];
   center?: [number, number];
   zoom?: number;
+  singleMarker?: boolean; // Nueva prop para indicar si es un mapa de plazze individual
+  singlePlazze?: Plazze; // Plazze específico para mostrar en modo singleMarker
 }
 
 const MapClient = dynamic(() => import("./map-client"), {
@@ -18,19 +22,70 @@ const MapClient = dynamic(() => import("./map-client"), {
   ),
 });
 
-const PlazzesMap = ({ plazzes, center, zoom = 12 }: PlazzesMapProps) => {
-  const defaultCenter: [number, number] =
-    plazzes.length > 0
-      ? [plazzes[0].coordinates.lat, plazzes[0].coordinates.lng]
-      : [9.0746, -79.4455];
+const PlazzesMap = ({
+  center,
+  zoom = 12,
+  singleMarker = false,
+  singlePlazze,
+}: PlazzesMapProps) => {
+  const { plazzes } = usePlazzeStore();
+
+  // Función helper para validar y parsear coordenadas de forma segura
+  const parseCoordinates = (
+    lat: string,
+    lng: string
+  ): [number, number] | null => {
+    try {
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lng);
+
+      // Validar que son números válidos
+      if (isNaN(latitude) || isNaN(longitude)) {
+        return null;
+      }
+
+      // Validar rangos válidos de coordenadas
+      if (
+        latitude < -90 ||
+        latitude > 90 ||
+        longitude < -180 ||
+        longitude > 180
+      ) {
+        return null;
+      }
+
+      return [latitude, longitude];
+    } catch {
+      return null;
+    }
+  };
+
+  const defaultCenter: [number, number] = (() => {
+    // Si hay un centro especificado, usarlo
+    if (center) {
+      return center;
+    }
+
+    // Buscar el primer plazze con coordenadas válidas
+    for (const plazze of plazzes) {
+      const coords = parseCoordinates(plazze.latitude, plazze.longitude);
+      if (coords) {
+        return coords;
+      }
+    }
+
+    // Fallback a coordenadas de Panamá si no hay plazzes válidos
+    return [9.0746, -79.4455];
+  })();
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 h-full">
       <div className="h-full rounded-lg overflow-hidden">
         <MapClient
-          plazzes={plazzes}
-          center={center || defaultCenter}
+          center={defaultCenter}
           zoom={zoom}
+          singleMarker={singleMarker}
+          singlePlazze={singlePlazze}
         />
       </div>
     </div>

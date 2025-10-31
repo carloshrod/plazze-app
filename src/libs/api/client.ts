@@ -1,11 +1,10 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const API_URL = "https://plazze.app/wp-json";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const client = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
