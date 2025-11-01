@@ -10,6 +10,7 @@ import { PlazzeInfo } from "@/components/features/plazzes/plazze-detail/plazze-i
 import { ScrollToBookingButton } from "@/components/common/ui/scroll-to-booking-button";
 import { usePlazzeService } from "@/service/plazze";
 import { Plazze } from "@/types/plazze";
+import { useAuthStore } from "@/stores/auth";
 
 interface PlazzeDetailPageProps {
   params: {
@@ -22,9 +23,7 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { fetchPlazzeById } = usePlazzeService();
-
-  // Simular autenticación
-  const isAuthenticated = false;
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     const loadPlazze = async () => {

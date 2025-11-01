@@ -1,30 +1,5 @@
+import { LoginResponse, RegisterData, RegisterResponse } from "@/types/auth";
 import { client } from "./client";
-
-interface LoginResponse {
-  token: string;
-  user_email: string;
-  user_nicename: string;
-  user_display_name: string;
-  role: "guest" | "seller";
-}
-
-interface RegisterResponse {
-  message: string;
-  user_id: number;
-}
-
-type UserRole = "guest" | "seller";
-
-interface RegisterData {
-  name: string;
-  lastName: string;
-  username: string;
-  email: string;
-  password: string;
-  role?: UserRole;
-  businessName?: string;
-  phone?: string;
-}
 
 export const authLib = {
   login: async (email: string, password: string) => {

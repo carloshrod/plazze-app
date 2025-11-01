@@ -56,7 +56,10 @@ export const Sidebar = () => {
   const { user, isLoadingAuth } = useAuthStore();
 
   // Seleccionar los items del menú según el rol del usuario
-  const menuItems = user?.role === "seller" ? sellerMenuItems : guestMenuItems;
+  const menuItems =
+    user?.role === "seller" || user?.role === "administrator"
+      ? sellerMenuItems
+      : guestMenuItems;
 
   return (
     <aside className="w-full md:w-48 bg-white border-b md:border-b-0 md:border-r border-gray-200 md:min-h-[calc(100vh-64px)]">

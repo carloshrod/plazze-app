@@ -44,8 +44,8 @@ export function middleware(request: NextRequest) {
         );
       }
 
-      // Si es seller, permitir acceso a todas las rutas de admin
-      if (userRole === "seller") {
+      // Si es seller o admin, permitir acceso a todas las rutas de admin
+      if (userRole === "seller" || userRole === "administrator") {
         return NextResponse.next();
       }
     } catch (error) {
@@ -68,7 +68,7 @@ export function middleware(request: NextRequest) {
         : null;
 
       const redirectUrl =
-        userData?.role === "seller"
+        userData?.role === "seller" || userData?.role === "administrator"
           ? ROUTES.ADMIN.DASHBOARD
           : ROUTES.ADMIN.BOOKINGS;
 

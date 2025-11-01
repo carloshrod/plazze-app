@@ -13,13 +13,30 @@ export interface RegisterFormFields {
   confirmPassword: string;
 }
 
+export interface LoginResponse {
+  token: string;
+  user_email: string;
+  user_nicename: string;
+  user_display_name: string;
+  role: "guest" | "seller" | "administrator";
+}
+
+export interface RegisterResponse {
+  message: string;
+  user_id: number;
+}
+
+export type UserRole = "guest" | "seller" | "administrator";
+
 export interface RegisterData {
   name: string;
   lastName: string;
   username: string;
   email: string;
   password: string;
-  role?: "seller" | "guest";
+  role?: UserRole;
+  businessName?: string;
+  phone?: string;
 }
 
 export interface User {

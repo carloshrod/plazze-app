@@ -80,7 +80,7 @@ export const useAuthService = () => {
         } else {
           // Si no, redirigir según el rol
           const defaultRedirect =
-            data?.role === "seller"
+            data?.role === "seller" || data?.role === "administrator"
               ? ROUTES.ADMIN.DASHBOARD
               : ROUTES.ADMIN.BOOKINGS;
           router.push(defaultRedirect);
