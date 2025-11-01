@@ -5,7 +5,6 @@ import Link from "next/link";
 import { LuPen, LuTrash2 } from "react-icons/lu";
 import { capitalizeWords, formatCurrency } from "@/utils/format";
 import { ROUTES } from "@/consts/routes";
-import { mockPlazzes } from "@/mock/plazzes";
 import PlazzeModal from "./plazze-modal";
 import { type Plazze } from "@/types/plazze";
 
@@ -27,7 +26,7 @@ export function PlazzesTable() {
       title: "Plazze",
       dataIndex: "name",
       key: "name",
-      render: (text: string, record: (typeof mockPlazzes)[0]) => (
+      render: (text: string, record: any) => (
         <div className="flex items-center gap-3">
           <Avatar src={record.image} />
           <Link
@@ -64,7 +63,7 @@ export function PlazzesTable() {
       title: "Acciones",
       fixed: "right" as const,
       key: "actions",
-      render: (_: unknown, record: (typeof mockPlazzes)[0]) => {
+      render: (_: unknown, record: any) => {
         const handleEditPlazze = async (values: Partial<Plazze>) => {
           // TODO: Implementar la lógica para actualizar el plazze
           console.log("Editando plazze:", record.id, values);
@@ -105,7 +104,7 @@ export function PlazzesTable() {
       <div className="overflow-x-auto -mx-4 md:mx-0">
         <Table
           columns={columns}
-          dataSource={mockPlazzes}
+          dataSource={[]}
           rowKey="id"
           scroll={{ x: 820 }}
           className="min-w-[820px]"
