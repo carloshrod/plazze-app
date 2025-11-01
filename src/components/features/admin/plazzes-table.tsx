@@ -1,55 +1,77 @@
 "use client";
 
-import { Avatar, Button, Card, Table, Tag } from "antd";
+import { Avatar, Button, Card, Table, Tag, Spin, Alert } from "antd";
 import Link from "next/link";
 import { LuPen, LuTrash2 } from "react-icons/lu";
-import { capitalizeWords, formatCurrency } from "@/utils/format";
-import { ROUTES } from "@/consts/routes";
-import PlazzeModal from "./plazze-modal";
-import { type Plazze } from "@/types/plazze";
+import { type PlazzeWP } from "@/types/plazze";
+import { useUserPlazzes } from "@/hooks/useUserPlazzes";
+import { useCategories } from "@/hooks/useCategories";
 
 const statusColors = {
-  active: "success",
-  maintenance: "warning",
-  inactive: "error",
+  publish: "success",
+  pending: "warning",
+  draft: "default",
+  private: "error",
 } as const;
 
 const statusLabels = {
-  active: "Activo",
-  maintenance: "En Mantenimiento",
-  inactive: "Inactivo",
+  publish: "Publicado",
+  pending: "Pendiente",
+  draft: "Borrador",
+  private: "Privado",
 } as const;
 
 export function PlazzesTable() {
+  const { plazzes, loading, error } = useUserPlazzes({
+    order: "desc",
+  });
+
+  const { getCategoryName } = useCategories();
+
   const columns = [
     {
       title: "Plazze",
-      dataIndex: "name",
-      key: "name",
-      render: (text: string, record: any) => (
+      dataIndex: "title",
+      key: "title",
+      render: (title: { rendered: string }, record: PlazzeWP) => (
         <div className="flex items-center gap-3">
-          <Avatar src={record.image} />
+          <Avatar src={record.featured_image?.thumbnail} />
           <Link
-            href={ROUTES.PUBLIC.PLAZZES.DETAIL(record.id)}
+            href={record.permalink || "#"}
             className="text-primary hover:text-primary/80"
+            target="_blank"
           >
-            {text}
+            {title.rendered}
           </Link>
         </div>
       ),
       width: 300,
     },
     {
-      title: "Categoría",
-      dataIndex: "category",
-      key: "category",
-      render: (category: string) => capitalizeWords(category),
+      title: "Dirección",
+      dataIndex: "address",
+      key: "address",
+      render: (address: string) => address || "Sin dirección",
     },
     {
-      title: "Precio/hora",
-      dataIndex: "price",
-      key: "price",
-      render: (price: number) => formatCurrency(price),
+      title: "Categoría",
+      dataIndex: "listing_category",
+      key: "listing_category",
+      render: (categories: number[] | undefined) => {
+        if (!categories || categories.length === 0) {
+          return <Tag color="default">Sin categoría</Tag>;
+        }
+        // Mostrar todas las categorías como Tags
+        return (
+          <div className="flex flex-wrap gap-1">
+            {categories.map((categoryId) => (
+              <Tag key={categoryId} color="blue">
+                {getCategoryName(categoryId)}
+              </Tag>
+            ))}
+          </div>
+        );
+      },
     },
     {
       title: "Estado",
@@ -63,25 +85,17 @@ export function PlazzesTable() {
       title: "Acciones",
       fixed: "right" as const,
       key: "actions",
-      render: (_: unknown, record: any) => {
-        const handleEditPlazze = async (values: Partial<Plazze>) => {
-          // TODO: Implementar la lógica para actualizar el plazze
-          console.log("Editando plazze:", record.id, values);
-        };
-
+      render: (_: unknown, record: PlazzeWP) => {
         return (
           <div className="flex items-center gap-2">
-            <PlazzeModal
-              mode="edit"
-              plazze={record}
-              onSubmit={handleEditPlazze}
-              trigger={
-                <Button
-                  type="text"
-                  className="hover:!text-primary"
-                  icon={<LuPen size={18} />}
-                />
-              }
+            <Button
+              type="text"
+              className="hover:!text-primary"
+              icon={<LuPen size={18} />}
+              onClick={() => {
+                // TODO: Implementar edición
+                console.log("Editar plazze:", record.id);
+              }}
             />
             <Button
               type="text"
@@ -99,15 +113,34 @@ export function PlazzesTable() {
     },
   ];
 
+  if (loading) {
+    return (
+      <Card>
+        <div className="flex justify-center py-8">
+          <Spin size="large" />
+        </div>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <Alert message="Error" description={error} type="error" showIcon />
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <div className="overflow-x-auto -mx-4 md:mx-0">
         <Table
           columns={columns}
-          dataSource={[]}
+          dataSource={plazzes}
           rowKey="id"
           scroll={{ x: 820 }}
           className="min-w-[820px]"
+          pagination={false}
         />
       </div>
     </Card>

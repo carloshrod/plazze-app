@@ -19,6 +19,7 @@ export interface LoginResponse {
   user_nicename: string;
   user_display_name: string;
   role: "guest" | "seller" | "administrator";
+  user_id: number;
 }
 
 export interface RegisterResponse {
@@ -40,6 +41,7 @@ export interface RegisterData {
 }
 
 export interface User {
+  id: number;
   email: string;
   username: string;
   displayName: string;

@@ -1,6 +1,7 @@
 import { mapPlazzeFromWP } from "@/helpers/plazze";
 import { client } from "./client";
 import { PlazzeWP, Plazze } from "@/types/plazze";
+import Cookies from "js-cookie";
 
 // Tipos simplificados para los filtros específicos
 export interface PlazzeSearchParams {
@@ -11,6 +12,29 @@ export interface PlazzeSearchParams {
   category?: string; // ID de categoría
   per_page?: number; // Paginación
   page?: number; // Página
+}
+
+// Nuevos tipos para plazzes del usuario
+export interface UserPlazzeFilters {
+  status?: "publish" | "pending" | "draft" | "private";
+  page?: number;
+  per_page?: number;
+  search?: string;
+  order?: "asc" | "desc";
+}
+
+export interface UserPlazzesResponse {
+  plazzes: PlazzeWP[];
+  totalFound: number;
+  totalPages: number;
+  currentPage: number;
+}
+
+export interface UserPlazzeStats {
+  totalPlazzes: number;
+  publishedPlazzes: number;
+  pendingPlazzes: number;
+  draftPlazzes: number;
 }
 
 export const plazzeLib = {
@@ -112,6 +136,85 @@ export const plazzeLib = {
         );
       }
       throw new Error("No se pudo conectar con el servidor");
+    }
+  },
+
+  // 🏪 NUEVO: Obtener plazzes del usuario autenticado
+  getUserPlazzes: async (
+    filters: UserPlazzeFilters = {}
+  ): Promise<UserPlazzesResponse> => {
+    const token = Cookies.get("token");
+    const userDataCookie = Cookies.get("user");
+
+    if (!token || !userDataCookie) {
+      throw new Error("Usuario no autenticado");
+    }
+
+    const userData = JSON.parse(decodeURIComponent(userDataCookie));
+    const userId = userData.id;
+
+    if (!userId) {
+      throw new Error("ID de usuario no encontrado");
+    }
+
+    try {
+      const params = {
+        author: userId.toString(),
+        per_page: filters.per_page || 10,
+        page: filters.page || 1,
+        orderby: "date",
+        order: filters.order || "desc",
+        _embed: true,
+        ...(filters.status && { status: filters.status }),
+        ...(filters.search && { search: filters.search }),
+      };
+
+      const response = await client.get(`/wp/v2/listing`, {
+        params,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const plazzes = response.data as PlazzeWP[];
+
+      return {
+        plazzes,
+        totalFound: parseInt(response.headers["x-wp-total"] || "0"),
+        totalPages: parseInt(response.headers["x-wp-totalpages"] || "1"),
+        currentPage: filters.page || 1,
+      };
+    } catch (error: any) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.message ||
+            "Error al obtener los plazzes del usuario"
+        );
+      }
+      throw new Error("No se pudo conectar con el servidor");
+    }
+  },
+
+  getCategories: async (): Promise<
+    { id: number; name: string; slug: string }[]
+  > => {
+    try {
+      const response = await client.get("/wp/v2/listing_category", {
+        params: {
+          per_page: 100, // Obtener todas las categorías
+          orderby: "name",
+          order: "asc",
+        },
+      });
+
+      return response.data.map((category: any) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+      }));
+    } catch (error: any) {
+      console.error("Error al obtener categorías:", error);
+      return [];
     }
   },
 };

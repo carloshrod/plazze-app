@@ -59,6 +59,7 @@ export const useAuthService = () => {
 
       // Datos del usuario
       const userData = {
+        id: data.user_id,
         email: data.user_email,
         username: data.user_nicename,
         displayName: data.user_display_name,
