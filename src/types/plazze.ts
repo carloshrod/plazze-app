@@ -164,6 +164,43 @@ export interface PlazzePricing {
   discount_monthly: number;
 }
 
+// 🆕 NUEVO: Interfaz para el formulario de creación/edición de plazzes
+export interface PlazzeFormData {
+  // Basic Information
+  title: string;
+  category: number[];
+
+  // Location
+  address: string;
+  friendly_address?: string;
+  region?: number[];
+  latitude: number;
+  longitude: number;
+
+  // Gallery
+  gallery: any[];
+
+  // Details
+  description: string;
+  price_min?: number;
+  price_max?: number;
+
+  // Bookable Services
+  bookable_services: Array<{
+    title: string;
+    description: string;
+    price: number;
+    bookable_options: "onetime" | "byguest";
+  }>;
+
+  // Schedule Groups (New Structure)
+  schedule_groups: Array<{
+    open_time: any; // dayjs object or string
+    close_time: any; // dayjs object or string
+    days: string[];
+  }>;
+}
+
 export interface Plazze {
   id: string;
   name: string;

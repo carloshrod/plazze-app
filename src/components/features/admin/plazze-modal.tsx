@@ -4,13 +4,12 @@ import { Button, Modal } from "antd";
 import { LuPlus } from "react-icons/lu";
 import PlazzeForm from "./plazze-form";
 import { useState } from "react";
-import { type Plazze } from "@/types/plazze";
+import { PlazzeFormData } from "@/types/plazze";
 
 interface PlazzeModalProps {
   trigger?: React.ReactNode;
-  plazze?: Partial<Plazze>;
+  plazze?: Partial<PlazzeFormData>;
   mode?: "create" | "edit";
-  onSubmit?: (values: Partial<Plazze>) => Promise<void>;
 }
 
 export default function PlazzeModal({
@@ -52,8 +51,19 @@ export default function PlazzeModal({
         open={isModalOpen}
         onCancel={handleCloseModal}
         footer={null}
-        width={640}
-        centered
+        width="95vw"
+        style={{
+          maxWidth: "1400px",
+          top: 20,
+        }}
+        styles={{
+          body: {
+            maxHeight: "85vh",
+            overflow: "auto",
+            padding: "24px",
+          },
+        }}
+        destroyOnHidden={true}
       >
         <PlazzeForm initialValues={plazze} />
       </Modal>

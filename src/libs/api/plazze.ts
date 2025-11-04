@@ -205,6 +205,7 @@ export const plazzeLib = {
           orderby: "name",
           order: "asc",
         },
+        timeout: 10000, // Timeout de 10 segundos
       });
 
       return response.data.map((category: any) => ({
@@ -214,6 +215,46 @@ export const plazzeLib = {
       }));
     } catch (error: any) {
       console.error("Error al obtener categorías:", error);
+
+      // Si es rate limiting (429), retornar array vacío para usar fallback
+      if (error?.response?.status === 429) {
+        console.warn("Rate limit alcanzado para categorías");
+        return [];
+      }
+
+      // Para otros errores, también retornar array vacío
+      return [];
+    }
+  },
+
+  getRegions: async (): Promise<
+    { id: number; name: string; slug: string }[]
+  > => {
+    try {
+      const response = await client.get("/wp/v2/region", {
+        params: {
+          per_page: 100, // Obtener todas las regiones
+          orderby: "name",
+          order: "asc",
+        },
+        timeout: 10000, // Timeout de 10 segundos
+      });
+
+      return response.data.map((region: any) => ({
+        id: region.id,
+        name: region.name,
+        slug: region.slug,
+      }));
+    } catch (error: any) {
+      console.error("Error al obtener regiones:", error);
+
+      // Si es rate limiting (429), retornar array vacío para usar fallback
+      if (error?.response?.status === 429) {
+        console.warn("Rate limit alcanzado para regiones");
+        return [];
+      }
+
+      // Para otros errores, también retornar array vacío
       return [];
     }
   },

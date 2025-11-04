@@ -5,7 +5,7 @@ import Link from "next/link";
 import { LuPen, LuTrash2 } from "react-icons/lu";
 import { type PlazzeWP } from "@/types/plazze";
 import { useUserPlazzes } from "@/hooks/useUserPlazzes";
-import { useCategories } from "@/hooks/useCategories";
+import { useAppData } from "@/hooks/useAppData";
 
 const statusColors = {
   publish: "success",
@@ -26,7 +26,7 @@ export function PlazzesTable() {
     order: "desc",
   });
 
-  const { getCategoryName } = useCategories();
+  const { getCategoryName } = useAppData();
 
   const columns = [
     {
