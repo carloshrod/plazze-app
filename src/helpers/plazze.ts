@@ -3,7 +3,9 @@ import {
   PlazzeWP,
   BookableService,
   PlazzePricing,
+  PlazzeFormData,
 } from "@/types/plazze";
+import { CreateListingData } from "@/libs/api/plazze";
 
 // Helper function para mapear PlazzeWP a Plazze
 export const mapPlazzeFromWP = (listing: PlazzeWP): Plazze => {
@@ -103,3 +105,233 @@ export const mapPlazzeFromWP = (listing: PlazzeWP): Plazze => {
     price_max: pricing.price_max,
   };
 };
+
+/**
+ * Helpers para formatear datos del formulario al formato que espera Listeo
+ */
+
+/**
+ * Convierte los horarios del formulario al formato que espera Listeo
+ */
+export function convertScheduleToListeoFormat(
+  scheduleGroups: any[]
+): Record<string, string> {
+  if (!scheduleGroups || scheduleGroups.length === 0) {
+    return {};
+  }
+
+  const openingHours: Record<string, string> = {};
+
+  // Inicializar todos los días como vacíos
+  const days = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+  ];
+  days.forEach((day) => {
+    openingHours[`${day}_opening_hour`] = "";
+    openingHours[`${day}_closing_hour`] = "";
+  });
+
+  // Aplicar horarios de cada grupo
+  scheduleGroups.forEach((group) => {
+    const openTime =
+      group.open_time?.format?.("HH:mm") || group.open_time || "";
+    const closeTime =
+      group.close_time?.format?.("HH:mm") || group.close_time || "";
+
+    if (group.days && Array.isArray(group.days)) {
+      group.days.forEach((day: string) => {
+        openingHours[`${day}_opening_hour`] = openTime;
+        openingHours[`${day}_closing_hour`] = closeTime;
+      });
+    }
+  });
+
+  return openingHours;
+}
+
+/**
+ * Convierte los servicios reservables al formato de menú de Listeo
+ */
+export function convertServicesToListeoMenu(bookableServices: any[]): any[] {
+  if (!bookableServices || bookableServices.length === 0) {
+    return [];
+  }
+
+  // Formato del menú de Listeo
+  const menuSection = {
+    menu_section_name: "Servicios Adicionales",
+    menu_section_description:
+      "Servicios opcionales disponibles para tu reserva",
+    menu_elements: bookableServices.map((service, index) => ({
+      menu_element_title: service.title || "",
+      menu_element_description: service.description || "",
+      menu_element_price: parseFloat(service.price) || 0,
+      menu_element_id: `service_${index}`,
+      multiply_by_guests: service.bookable_options === "byguest",
+      one_time_fee: service.bookable_options === "onetime",
+      bookable_quantity_max: 1,
+    })),
+  };
+
+  return [menuSection];
+}
+
+/**
+ * Formatear datos del formulario para enviar a la API de WordPress/Listeo
+ */
+export function formatFormDataForListeo(
+  formData: PlazzeFormData,
+  coordinates?: { lat: number; lng: number } | null
+): CreateListingData {
+  // Datos básicos
+  const listingData: CreateListingData = {
+    // Campos básicos de WordPress
+    title: formData.title,
+    content: formData.description || "",
+    status: "publish", // Cambiar a publish para que sea visible inmediatamente
+
+    // Campos de ubicación (WordPress los guardará con prefijo _)
+    address: formData.address,
+    friendly_address: formData.friendly_address || "",
+    latitude: (coordinates?.lat || formData.latitude)?.toString() || "",
+    longitude: (coordinates?.lng || formData.longitude)?.toString() || "",
+
+    // Taxonomías (IDs como arrays)
+    listing_category: formData.category || [],
+    region: Array.isArray(formData.region)
+      ? formData.region
+      : formData.region
+      ? [formData.region]
+      : [],
+
+    // Información del venue
+    listing_type: "service", // Usar 'service' que es lo que aparece en el debug
+    capacity: 1, // Valor por defecto, ya que no está en PlazzeFormData
+
+    // Precios - usar los nombres exactos que WordPress espera
+    currency: "USD",
+    price_type: "fixed",
+  };
+
+  // Agregar precios si están definidos
+  if (formData.price_min) {
+    listingData.price_min = formData.price_min.toString();
+    listingData.price = formData.price_min.toString(); // Precio base
+  }
+
+  if (formData.price_max) {
+    listingData.price_max = formData.price_max.toString();
+  }
+
+  // Convertir horarios al formato de Listeo (WordPress los guardará con prefijo _)
+  if (formData.schedule_groups && formData.schedule_groups.length > 0) {
+    const openingHours = convertScheduleToListeoFormat(
+      formData.schedule_groups
+    );
+    Object.assign(listingData, openingHours);
+
+    // También agregar el estado de opening_hours
+    (listingData as any).opening_hours_status = "on";
+  }
+
+  // Convertir servicios reservables al formato de menú de Listeo
+  if (formData.bookable_services && formData.bookable_services.length > 0) {
+    listingData.menu = convertServicesToListeoMenu(formData.bookable_services);
+    // También agregar el estado del menú
+    (listingData as any).menu_status = "on";
+  }
+
+  // Agregar galería de imágenes si está presente
+  if (formData.gallery && formData.gallery.length > 0) {
+    // Para IDs directos (ya subidos a WordPress)
+    const galleryIds = formData.gallery
+      .filter((item: any) => typeof item === "number")
+      .map((id: number) => id);
+
+    if (galleryIds.length > 0) {
+      listingData.gallery = galleryIds;
+    }
+  }
+
+  return listingData;
+}
+
+/**
+ * Validar datos antes de enviar
+ */
+export function validateFormData(formData: PlazzeFormData): {
+  isValid: boolean;
+  errors: string[];
+} {
+  const errors: string[] = [];
+
+  // Validaciones básicas
+  if (!formData.title?.trim()) {
+    errors.push("El título es requerido");
+  }
+
+  if (!formData.description?.trim()) {
+    errors.push("La descripción es requerida");
+  }
+
+  if (!formData.address?.trim()) {
+    errors.push("La dirección es requerida");
+  }
+
+  if (!formData.category || formData.category.length === 0) {
+    errors.push("Debe seleccionar al menos una categoría");
+  }
+
+  if (!formData.latitude || !formData.longitude) {
+    errors.push("Las coordenadas son requeridas");
+  }
+
+  // Validar horarios si están presentes
+  if (formData.schedule_groups && formData.schedule_groups.length > 0) {
+    formData.schedule_groups.forEach((schedule, index) => {
+      if (!schedule.open_time || !schedule.close_time) {
+        errors.push(
+          `Horario ${index + 1}: Debe especificar hora de apertura y cierre`
+        );
+      }
+
+      if (!schedule.days || schedule.days.length === 0) {
+        errors.push(`Horario ${index + 1}: Debe seleccionar al menos un día`);
+      }
+    });
+  }
+
+  // Validar servicios si están presentes
+  if (formData.bookable_services && formData.bookable_services.length > 0) {
+    formData.bookable_services.forEach((service, index) => {
+      if (!service.title?.trim()) {
+        errors.push(`Servicio ${index + 1}: El título es requerido`);
+      }
+
+      if (!service.description?.trim()) {
+        errors.push(`Servicio ${index + 1}: La descripción es requerida`);
+      }
+
+      if (!service.price || service.price <= 0) {
+        errors.push(`Servicio ${index + 1}: El precio debe ser mayor a 0`);
+      }
+
+      if (!service.bookable_options) {
+        errors.push(
+          `Servicio ${index + 1}: Debe seleccionar el tipo de reserva`
+        );
+      }
+    });
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}

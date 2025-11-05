@@ -3,6 +3,62 @@ import { client } from "./client";
 import { PlazzeWP, Plazze } from "@/types/plazze";
 import Cookies from "js-cookie";
 
+// Interfaz para los datos que se envían a la API de WordPress/Listeo
+export interface CreateListingData {
+  title: string;
+  content: string;
+  status?: "publish" | "draft" | "pending" | "private";
+
+  // Campos de ubicación
+  address?: string;
+  friendly_address?: string;
+  latitude?: string;
+  longitude?: string;
+
+  // Taxonomías
+  listing_category?: number[];
+  region?: number[];
+
+  // Campos específicos de Listeo
+  listing_type?: string;
+  capacity?: number;
+
+  // Precios
+  price?: string;
+  price_min?: string;
+  price_max?: string;
+  price_per_hour?: string;
+  price_per_day?: string;
+  currency?: string;
+  price_type?: string;
+
+  // Horarios de apertura (formato Listeo)
+  monday_opening_hour?: string;
+  monday_closing_hour?: string;
+  tuesday_opening_hour?: string;
+  tuesday_closing_hour?: string;
+  wednesday_opening_hour?: string;
+  wednesday_closing_hour?: string;
+  thursday_opening_hour?: string;
+  thursday_closing_hour?: string;
+  friday_opening_hour?: string;
+  friday_closing_hour?: string;
+  saturday_opening_hour?: string;
+  saturday_closing_hour?: string;
+  sunday_opening_hour?: string;
+  sunday_closing_hour?: string;
+
+  // Estados de configuración
+  opening_hours_status?: string;
+  menu_status?: string;
+
+  // Servicios reservables (formato Listeo menu)
+  menu?: any[];
+
+  // Galería de imágenes
+  gallery?: number[] | any;
+}
+
 // Tipos simplificados para los filtros específicos
 export interface PlazzeSearchParams {
   location?: string; // Búsqueda por ubicación (texto libre)
@@ -171,9 +227,6 @@ export const plazzeLib = {
 
       const response = await client.get(`/wp/v2/listing`, {
         params,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       const plazzes = response.data as PlazzeWP[];
@@ -256,6 +309,86 @@ export const plazzeLib = {
 
       // Para otros errores, también retornar array vacío
       return [];
+    }
+  },
+
+  createListing: async (data: CreateListingData): Promise<PlazzeWP> => {
+    const token = Cookies.get("token");
+
+    if (!token) {
+      throw new Error("Usuario no autenticado");
+    }
+
+    try {
+      // 1. Crear el listing usando la API estándar de WordPress
+      const response = await client.post("/wp/v2/listing", data);
+
+      const createdListingId = response.data.id;
+
+      // 2. Obtener el listing completo usando nuestra API custom que procesa todos los campos
+      try {
+        const { data: completeListing } = await client.get(
+          `/wp/v2/listing/${createdListingId}`
+        );
+
+        return completeListing;
+      } catch (fetchError) {
+        console.warn(
+          "⚠️ No se pudo obtener el listing completo, devolviendo datos básicos"
+        );
+        // Si no podemos obtener el listing completo, devolvemos lo que tenemos
+        return response.data;
+      }
+    } catch (error: any) {
+      console.error("❌ Error creando listing:", error);
+
+      if (error.response?.status === 401) {
+        throw new Error("No tienes permisos para crear listings");
+      }
+
+      if (error.response?.status === 403) {
+        throw new Error(
+          "Acceso denegado. Verifica que tu usuario tenga los permisos correctos."
+        );
+      }
+
+      if (error.response?.status === 400) {
+        const errorMessage = error.response?.data?.message || "Datos inválidos";
+        throw new Error(errorMessage);
+      }
+
+      throw new Error(
+        error.response?.data?.message || "Error al crear el listing"
+      );
+    }
+  },
+
+  updateListingGallery: async (
+    listingId: number,
+    galleryIds: number[]
+  ): Promise<void> => {
+    try {
+      // Intentar con endpoint personalizado directamente (más confiable)
+      try {
+        await client.post(`/plazze/v1/update-gallery/${listingId}`, {
+          gallery_ids: galleryIds,
+        });
+      } catch (customError: any) {
+        console.warn(
+          "❌ Endpoint personalizado falló:",
+          customError.response?.data
+        );
+
+        // Si el endpoint personalizado falla, intentar con PUT estándar
+        await client.put(`/wp/v2/listing/${listingId}`, {
+          gallery: galleryIds,
+        });
+      }
+    } catch (error: any) {
+      console.error("❌ Error actualizando galería:", error);
+      throw new Error(
+        error.response?.data?.message || "Error al actualizar la galería"
+      );
     }
   },
 };

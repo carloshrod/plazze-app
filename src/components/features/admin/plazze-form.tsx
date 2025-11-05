@@ -16,7 +16,9 @@ import {
 } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import dynamic from "next/dynamic";
+import dayjs from "dayjs";
 import { useAppData } from "@/hooks/useAppData";
+import { usePlazzeService } from "@/services/plazze";
 import { PlazzeFormData } from "@/types/plazze";
 
 // Cargar el mapa dinámicamente para evitar errores de SSR
@@ -27,15 +29,21 @@ const { Option } = Select;
 
 export default function PlazzeForm({
   initialValues,
+  onSuccess,
 }: {
   initialValues?: Partial<PlazzeFormData>;
+  onSuccess?: () => void;
 }) {
   const [form] = Form.useForm();
   const { categories, regions } = useAppData();
+  const { createPlazze, loading } = usePlazzeService();
   const [coordinates, setCoordinates] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
+
+  // Observar cambios en schedule_groups para actualizar días disponibles
+  const scheduleGroups = Form.useWatch("schedule_groups", form) || [];
 
   useEffect(() => {
     if (initialValues) {
@@ -50,25 +58,50 @@ export default function PlazzeForm({
   }, [initialValues, form]);
 
   const onFinish = async (values: PlazzeFormData) => {
-    // Convertir los objetos dayjs a strings para la API
-    const processedValues = {
-      ...values,
-      schedule_groups: values.schedule_groups?.map((schedule: any) => ({
-        ...schedule,
-        open_time: schedule.open_time?.format("HH:mm") || "",
-        close_time: schedule.close_time?.format("HH:mm") || "",
-      })),
-    };
+    try {
+      await createPlazze(values, coordinates);
 
-    // Incluir las coordenadas del mapa
-    const formData = {
-      ...processedValues,
-      latitude: coordinates?.lat,
-      longitude: coordinates?.lng,
-    };
+      // Limpiar el formulario después del éxito
+      form.resetFields();
+      setCoordinates(null);
 
-    // TODO: Implementar la lógica para guardar o editar el plazze
-    console.log("Form data:", formData);
+      // Llamar a la función onSuccess si existe (para cerrar modal y actualizar lista)
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // TODO: Redirigir a la página de listings o mostrar el listing creado
+    } catch (error) {
+      console.error("Error en onFinish:", error);
+    }
+  };
+
+  // Función para obtener días ya seleccionados en otros horarios
+  const getSelectedDays = (currentFieldIndex: number) => {
+    const selectedDays: string[] = [];
+
+    scheduleGroups.forEach((group: any, index: number) => {
+      // Comparar con el índice real del array, no con el name del field
+      if (
+        index !== currentFieldIndex &&
+        group?.days &&
+        Array.isArray(group.days)
+      ) {
+        selectedDays.push(...group.days);
+      }
+    });
+
+    return selectedDays;
+  };
+
+  // Función para obtener el título del horario
+  const getScheduleTitle = (fieldIndex: number, fieldsLength: number) => {
+    // Si solo hay un horario, no mostrar número
+    if (fieldsLength === 1) {
+      return "Horario";
+    }
+    // Mostrar número consecutivo basado en la posición actual
+    return `Horario ${fieldIndex + 1}`;
   };
 
   // Función para manejar la selección de ubicación en el mapa
@@ -93,6 +126,26 @@ export default function PlazzeForm({
       className="space-y-6"
       initialValues={{
         gallery: [], // Inicializar galería como array vacío
+        bookable_services: [
+          {
+            title: "",
+            description: "",
+            price: "",
+            bookable_options: "onetime",
+          },
+        ],
+        schedule_groups: [
+          {
+            open_time: dayjs("09:00 am", "h:mm a"),
+            close_time: dayjs("10:00 pm", "h:mm a"),
+            days: ["monday", "tuesday", "wednesday", "thursday"],
+          },
+          {
+            open_time: dayjs("12:00 pm", "h:mm a"),
+            close_time: dayjs("08:00 pm", "h:mm a"),
+            days: ["friday", "saturday", "sunday"],
+          },
+        ],
       }}
     >
       {/* Basic Information */}
@@ -117,7 +170,7 @@ export default function PlazzeForm({
                 mode="multiple"
                 placeholder="Selecciona categorías"
                 options={categories.map((cat) => ({
-                  label: cat.name,
+                  label: cat.name.replace(/&amp;/g, "&"),
                   value: cat.id,
                 }))}
               />
@@ -209,6 +262,7 @@ export default function PlazzeForm({
           name="gallery"
           valuePropName="fileList"
           getValueFromEvent={(e) => {
+            console.log("🖼️ Upload event:", e);
             if (Array.isArray(e)) {
               return e;
             }
@@ -220,11 +274,11 @@ export default function PlazzeForm({
             maxCount={4}
             multiple
             beforeUpload={() => false} // Prevenir upload automático
-            fileList={[]} // Inicializar con array vacío
             showUploadList={{
-              showPreviewIcon: false,
+              showPreviewIcon: true,
               showRemoveIcon: true,
             }}
+            accept="image/*"
           >
             <div>
               <PlusOutlined />
@@ -368,104 +422,143 @@ export default function PlazzeForm({
         <Form.List name="schedule_groups">
           {(fields, { add, remove }) => (
             <>
-              {fields.map(({ key, name, ...restField }) => (
-                <Card
-                  key={key}
-                  size="small"
-                  className="!mb-4"
-                  title={`Horario ${key + 1}`}
-                  extra={
-                    fields.length > 1 && (
-                      <Button
-                        type="text"
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => remove(name)}
-                        size="small"
-                      />
-                    )
-                  }
-                >
-                  <Row gutter={16} className="mb-4">
-                    <Col span={8}>
-                      <Form.Item
-                        {...restField}
-                        label="Hora de Apertura"
-                        name={[name, "open_time"]}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Hora de apertura requerida",
-                          },
-                        ]}
-                      >
-                        <TimePicker
-                          format="HH:mm"
-                          placeholder="09:00"
-                          className="!w-full"
-                          showNow={false}
-                          needConfirm={false}
-                          minuteStep={15}
-                          use12Hours
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                      <Form.Item
-                        {...restField}
-                        label="Hora de Cierre"
-                        name={[name, "close_time"]}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Hora de cierre requerida",
-                          },
-                        ]}
-                      >
-                        <TimePicker
-                          format="HH:mm"
-                          placeholder="18:00"
-                          className="!w-full"
-                          showNow={false}
-                          needConfirm={false}
-                          minuteStep={15}
-                          use12Hours
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                      <Form.Item
-                        {...restField}
-                        label="Días de la Semana"
-                        name={[name, "days"]}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Selecciona al menos un día",
-                          },
-                        ]}
-                      >
-                        <Select
-                          mode="multiple"
-                          placeholder="Selecciona días"
-                          className="!w-full"
-                          options={[
-                            { label: "Lunes", value: "monday" },
-                            { label: "Martes", value: "tuesday" },
-                            { label: "Miércoles", value: "wednesday" },
-                            { label: "Jueves", value: "thursday" },
-                            { label: "Viernes", value: "friday" },
-                            { label: "Sábado", value: "saturday" },
-                            { label: "Domingo", value: "sunday" },
-                          ]}
-                        />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                </Card>
-              ))}
+              {fields.map(({ key, name, ...restField }, fieldIndex) => {
+                const selectedDays = getSelectedDays(fieldIndex);
+                const scheduleTitle = getScheduleTitle(
+                  fieldIndex,
+                  fields.length
+                );
 
-              <Form.Item className="text-center !mt-4">
+                return (
+                  <Card
+                    key={key}
+                    size="small"
+                    className="!mb-4"
+                    title={scheduleTitle}
+                    extra={
+                      fields.length > 1 && (
+                        <Button
+                          type="text"
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={() => remove(name)}
+                          size="small"
+                        />
+                      )
+                    }
+                  >
+                    <Row gutter={16}>
+                      <Col span={4}>
+                        <Form.Item
+                          {...restField}
+                          label="Hora de Apertura"
+                          name={[name, "open_time"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Hora de apertura requerida",
+                            },
+                          ]}
+                        >
+                          <TimePicker
+                            placeholder="09:00 am"
+                            className="!w-full"
+                            format="h:mm a"
+                            showNow={false}
+                            needConfirm={false}
+                            minuteStep={15}
+                            use12Hours
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={4}>
+                        <Form.Item
+                          {...restField}
+                          label="Hora de Cierre"
+                          name={[name, "close_time"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Hora de cierre requerida",
+                            },
+                          ]}
+                        >
+                          <TimePicker
+                            placeholder="11:00 pm"
+                            className="!w-full"
+                            format="h:mm a"
+                            showNow={false}
+                            needConfirm={false}
+                            minuteStep={15}
+                            use12Hours
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={16}>
+                        <Form.Item
+                          {...restField}
+                          label="Días de la Semana"
+                          name={[name, "days"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Selecciona al menos un día",
+                            },
+                          ]}
+                        >
+                          <Select
+                            mode="multiple"
+                            placeholder="Selecciona días"
+                            className="!w-full"
+                            key={`schedule-${fieldIndex}-${JSON.stringify(
+                              selectedDays
+                            )}`}
+                            options={[
+                              {
+                                label: "Lunes",
+                                value: "monday",
+                                disabled: selectedDays.includes("monday"),
+                              },
+                              {
+                                label: "Martes",
+                                value: "tuesday",
+                                disabled: selectedDays.includes("tuesday"),
+                              },
+                              {
+                                label: "Miércoles",
+                                value: "wednesday",
+                                disabled: selectedDays.includes("wednesday"),
+                              },
+                              {
+                                label: "Jueves",
+                                value: "thursday",
+                                disabled: selectedDays.includes("thursday"),
+                              },
+                              {
+                                label: "Viernes",
+                                value: "friday",
+                                disabled: selectedDays.includes("friday"),
+                              },
+                              {
+                                label: "Sábado",
+                                value: "saturday",
+                                disabled: selectedDays.includes("saturday"),
+                              },
+                              {
+                                label: "Domingo",
+                                value: "sunday",
+                                disabled: selectedDays.includes("sunday"),
+                              },
+                            ]}
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  </Card>
+                );
+              })}
+
+              <Form.Item className="text-end !mt-4">
                 <Button
                   type="dashed"
                   size="large"
@@ -483,9 +576,20 @@ export default function PlazzeForm({
       {/* Submit Button */}
       <Form.Item>
         <Space className="w-full flex justify-between">
-          <Button size="large">Cancelar</Button>
-          <Button type="primary" size="large" htmlType="submit">
-            {initialValues ? "Actualizar Plazze" : "Crear Plazze"}
+          <Button size="large" disabled={loading}>
+            Cancelar
+          </Button>
+          <Button
+            type="primary"
+            size="large"
+            htmlType="submit"
+            loading={loading}
+          >
+            {loading
+              ? "Creando..."
+              : initialValues
+              ? "Actualizar Plazze"
+              : "Crear Plazze"}
           </Button>
         </Space>
       </Form.Item>

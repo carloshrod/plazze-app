@@ -4,8 +4,9 @@ import { Avatar, Button, Card, Table, Tag, Spin, Alert } from "antd";
 import Link from "next/link";
 import { LuPen, LuTrash2 } from "react-icons/lu";
 import { type PlazzeWP } from "@/types/plazze";
-import { useUserPlazzes } from "@/hooks/useUserPlazzes";
+import { useMyPlazzes } from "@/hooks/useMyPlazzes";
 import { useAppData } from "@/hooks/useAppData";
+import { ROUTES } from "@/consts/routes";
 
 const statusColors = {
   publish: "success",
@@ -22,10 +23,7 @@ const statusLabels = {
 } as const;
 
 export function PlazzesTable() {
-  const { plazzes, loading, error } = useUserPlazzes({
-    order: "desc",
-  });
-
+  const { plazzes, loading, error } = useMyPlazzes();
   const { getCategoryName } = useAppData();
 
   const columns = [
@@ -33,18 +31,43 @@ export function PlazzesTable() {
       title: "Plazze",
       dataIndex: "title",
       key: "title",
-      render: (title: { rendered: string }, record: PlazzeWP) => (
-        <div className="flex items-center gap-3">
-          <Avatar src={record.featured_image?.thumbnail} />
-          <Link
-            href={record.permalink || "#"}
-            className="text-primary hover:text-primary/80"
-            target="_blank"
-          >
-            {title.rendered}
-          </Link>
-        </div>
-      ),
+      render: (title: { rendered: string }, record: PlazzeWP) => {
+        // Obtener imagen: featured_image o primera imagen de galería o placeholder
+        const getImageSrc = () => {
+          if (record.featured_image?.thumbnail) {
+            return record.featured_image.thumbnail;
+          }
+
+          // Si no hay featured_image, intentar obtener de la galería
+          if (record.gallery && record.gallery.length > 0) {
+            const firstImage = record.gallery[0];
+            if (typeof firstImage === "object" && firstImage.thumbnail) {
+              return firstImage.thumbnail;
+            }
+            if (typeof firstImage === "string") {
+              return firstImage;
+            }
+          }
+
+          // Si no hay imágenes, usar placeholder
+          return undefined;
+        };
+
+        return (
+          <div className="flex items-center gap-3">
+            <Avatar src={getImageSrc()} style={{ backgroundColor: "#f5f5f5" }}>
+              {!getImageSrc() && title.rendered.charAt(0).toUpperCase()}
+            </Avatar>
+            <Link
+              href={ROUTES.PUBLIC.PLAZZES.DETAIL(String(record.id)) || "#"}
+              className="text-primary hover:text-primary/80"
+              target="_blank"
+            >
+              {title.rendered}
+            </Link>
+          </div>
+        );
+      },
       width: 300,
     },
     {

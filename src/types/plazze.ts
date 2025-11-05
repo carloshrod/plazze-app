@@ -173,9 +173,9 @@ export interface PlazzeFormData {
   // Location
   address: string;
   friendly_address?: string;
-  region?: number[];
-  latitude: number;
-  longitude: number;
+  region?: number | number[];
+  latitude?: number;
+  longitude?: number;
 
   // Gallery
   gallery: any[];

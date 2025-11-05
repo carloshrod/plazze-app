@@ -5,6 +5,7 @@ import { LuPlus } from "react-icons/lu";
 import PlazzeForm from "./plazze-form";
 import { useState } from "react";
 import { PlazzeFormData } from "@/types/plazze";
+import { useMyPlazzes } from "@/hooks/useMyPlazzes";
 
 interface PlazzeModalProps {
   trigger?: React.ReactNode;
@@ -18,6 +19,7 @@ export default function PlazzeModal({
   mode = "create",
 }: PlazzeModalProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { refreshPlazzes } = useMyPlazzes();
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -25,6 +27,11 @@ export default function PlazzeModal({
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleSuccess = () => {
+    handleCloseModal();
+    refreshPlazzes();
   };
 
   const defaultTrigger = (
@@ -65,7 +72,7 @@ export default function PlazzeModal({
         }}
         destroyOnHidden={true}
       >
-        <PlazzeForm initialValues={plazze} />
+        <PlazzeForm initialValues={plazze} onSuccess={handleSuccess} />
       </Modal>
     </>
   );
