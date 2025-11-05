@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
-import { usePlazzeService } from "@/service/plazze";
+import { usePlazzeService } from "@/services/plazze";
 import { useSearchStore } from "@/stores/search";
 
 export const useInitialPlazzesLoad = () => {

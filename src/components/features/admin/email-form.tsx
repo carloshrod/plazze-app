@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { Button, Form, Input } from "antd";
 import { useAuthStore } from "@/stores/auth";
-import { useAuthService } from "@/service/auth";
+import { useAuthService } from "@/services/auth";
 
 type EmailFormValues = {
   email: string;

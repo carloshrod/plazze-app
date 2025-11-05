@@ -11,7 +11,7 @@ import {
   LuUsers,
 } from "react-icons/lu";
 import { useSearchStore } from "@/stores/search";
-import { usePlazzeService } from "@/service/plazze";
+import { usePlazzeService } from "@/services/plazze";
 import { ROUTES } from "@/consts/routes";
 import { useState } from "react";
 

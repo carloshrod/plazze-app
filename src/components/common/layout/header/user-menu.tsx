@@ -5,7 +5,7 @@ import { Avatar, Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import { LuChevronDown, LuLogOut, LuUser } from "react-icons/lu";
 import { useAuthStore } from "@/stores/auth";
-import { useAuthService } from "@/service/auth";
+import { useAuthService } from "@/services/auth";
 import { ROUTES } from "@/consts/routes";
 
 export function UserMenu() {

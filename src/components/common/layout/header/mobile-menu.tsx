@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button } from "antd";
 import { LuLogOut, LuUser } from "react-icons/lu";
-import { useAuthService } from "@/service/auth";
+import { useAuthService } from "@/services/auth";
 import { ROUTES } from "@/consts/routes";
 
 interface MobileMenuProps {

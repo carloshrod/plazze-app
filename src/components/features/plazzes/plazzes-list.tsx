@@ -6,35 +6,10 @@ import { Button, Spin, Empty } from "antd";
 import { LuClock, LuMapPin } from "react-icons/lu";
 import { ROUTES } from "@/consts/routes";
 import { usePlazzeStore } from "@/stores/plazze";
+import { getTodayHours } from "@/utils";
 
 const PlazzesList = () => {
   const { plazzes, loading, error } = usePlazzeStore();
-
-  // Obtener el día actual
-  const getCurrentDay = () => {
-    const days = [
-      "sunday",
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-    ] as const;
-    const today = new Date().getDay();
-    return days[today];
-  };
-
-  // Obtener horarios del día actual de forma segura
-  const getTodayHours = (plazze: (typeof plazzes)[0]) => {
-    const currentDay = getCurrentDay();
-    if (!plazze.opening_hours) return "No especificado";
-
-    const todayHours = plazze.opening_hours[currentDay];
-    return todayHours && todayHours.open && todayHours.close
-      ? `${todayHours.open} - ${todayHours.close}`
-      : "No especificado";
-  };
 
   if (loading) {
     return (
@@ -130,10 +105,11 @@ const PlazzesList = () => {
               <div className="flex flex-wrap gap-4 mt-auto">
                 <span className="text-sm text-gray-600 flex items-center gap-1">
                   <LuClock size={16} />
-                  {getTodayHours(plazze)}
+                  {getTodayHours(plazze.opening_hours)}
                 </span>
-                <span className="text-lg font-semibold text-primary">
-                  ${plazze.pricing.price_min} - ${plazze.pricing.price_max}
+                <span className="font-semibold text-primary">
+                  ${plazze.pricing.price_min} - ${plazze.pricing.price_max}{" "}
+                  {plazze.pricing.currency || "USD"}
                 </span>
               </div>
             </div>

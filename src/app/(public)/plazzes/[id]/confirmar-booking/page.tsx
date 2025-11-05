@@ -11,7 +11,7 @@ import LoginForm from "@/components/features/auth/login-form";
 import RegisterForm from "@/components/features/auth/register-form";
 import BookingSummary from "@/components/features/plazzes/plazze-detail/booking-summary";
 import { useAuthStore } from "@/stores/auth";
-import { usePlazzeService } from "@/service/plazze";
+import { usePlazzeService } from "@/services/plazze";
 import { Plazze } from "@/types/plazze";
 import dayjs from "dayjs";
 

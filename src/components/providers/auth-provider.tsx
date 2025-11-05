@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAuthService } from "@/service/auth";
+import { useAuthService } from "@/services/auth";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { initAuth } = useAuthService();

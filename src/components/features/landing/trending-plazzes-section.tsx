@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Spin } from "antd";
 import { LuArrowUpRight } from "react-icons/lu";
 import { ROUTES } from "@/consts/routes";
-import { usePlazzeService } from "@/service/plazze";
+import { usePlazzeService } from "@/services/plazze";
 import { Plazze } from "@/types/plazze";
 
 export const TrendingPlazzesSection = () => {
@@ -90,10 +90,11 @@ export const TrendingPlazzesSection = () => {
                     dangerouslySetInnerHTML={{ __html: plazze.name }}
                   />
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-semibold">
-                      ${(plazze.pricing.price_min || 0).toLocaleString()}
+                    <span className="text-white/80">A partir de </span>
+                    <span className="font-semibold">
+                      ${(plazze.pricing.price_min || 0).toLocaleString()}{" "}
+                      {plazze.pricing.currency || "USD"}
                     </span>
-                    <span className="text-white/80">/ día</span>
                   </div>
                   <p className="text-white/90 text-sm mt-2">
                     {plazze.region ||

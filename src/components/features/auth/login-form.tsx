@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button, Form, Input } from "antd";
 import { FormProps } from "antd/lib";
-import { useAuthService } from "@/service/auth";
+import { useAuthService } from "@/services/auth";
 import { LoginFormFields } from "@/types/auth";
 
 interface Props {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Form, Input } from "antd";
-import { useAuthService } from "@/service/auth";
+import { useAuthService } from "@/services/auth";
 import { RegisterFormFields } from "@/types/auth";
 
 const RegisterForm = ({

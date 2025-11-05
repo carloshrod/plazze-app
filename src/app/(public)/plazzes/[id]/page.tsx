@@ -8,7 +8,7 @@ import { PlazzeImages } from "@/components/features/plazzes/plazze-detail/plazze
 import { BookingForm } from "@/components/features/plazzes/plazze-detail/booking-form";
 import { PlazzeInfo } from "@/components/features/plazzes/plazze-detail/plazze-info";
 import { ScrollToBookingButton } from "@/components/common/ui/scroll-to-booking-button";
-import { usePlazzeService } from "@/service/plazze";
+import { usePlazzeService } from "@/services/plazze";
 import { Plazze } from "@/types/plazze";
 import { useAuthStore } from "@/stores/auth";
 

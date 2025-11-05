@@ -2,8 +2,10 @@ import { useState, useCallback } from "react";
 import { usePlazzeStore } from "@/stores/plazze";
 import { useSearchStore } from "@/stores/search";
 import { plazzeLib, PlazzeSearchParams } from "@/libs/api/plazze";
+import { uploadFiles } from "@/libs/api/upload";
+import { formatFormDataForListeo, validateFormData } from "@/helpers/plazze";
 import showMessage from "@/libs/message";
-import { Plazze } from "@/types/plazze";
+import { Plazze, PlazzeFormData } from "@/types/plazze";
 import dayjs from "dayjs";
 
 export const usePlazzeService = () => {
@@ -140,11 +142,88 @@ export const usePlazzeService = () => {
     clearPlazzes();
   }, [clearPlazzes]);
 
+  const createPlazze = useCallback(
+    async (
+      values: PlazzeFormData,
+      coordinates: { lat: number; lng: number } | null
+    ) => {
+      try {
+        setLocalLoading(true);
+
+        // 1. Validar datos del formulario
+        const validation = validateFormData(values);
+        if (!validation.isValid) {
+          const errorMessage = `Errores en el formulario: ${validation.errors.join(
+            ", "
+          )}`;
+          showMessage.error(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        // 2. Subir archivos de galería si existen
+        let galleryIds: number[] = [];
+        if (values.gallery && values.gallery.length > 0) {
+          // Extraer archivos File del Upload component
+          const filesToUpload = values.gallery
+            .filter((item: any) => item.originFileObj instanceof File)
+            .map((item: any) => item.originFileObj as File);
+
+          if (filesToUpload.length > 0) {
+            try {
+              const uploadResults = await uploadFiles(filesToUpload);
+              galleryIds = uploadResults.map((result) => result.id);
+            } catch (uploadError: any) {
+              const errorMessage = `Error subiendo imágenes: ${uploadError.message}`;
+              showMessage.error(errorMessage);
+              throw new Error(errorMessage);
+            }
+          }
+        }
+
+        // 3. Formatear datos para Listeo (SIN galería por ahora)
+        const listingData = formatFormDataForListeo(values, coordinates);
+
+        // Remover gallery temporalmente para evitar errores
+        const listingDataWithoutGallery = { ...listingData };
+        delete listingDataWithoutGallery.gallery;
+
+        // 4. Crear el listing usando la API
+        const result = await plazzeLib.createListing(listingDataWithoutGallery);
+
+        // 5. Si hay imágenes, actualizarlas usando un endpoint separado
+        if (galleryIds.length > 0) {
+          try {
+            // Intentar actualizar usando el endpoint de WordPress directamente
+            await plazzeLib.updateListingGallery(result.id, galleryIds);
+          } catch (galleryError: any) {
+            console.warn("⚠️ Error actualizando galería:", galleryError);
+            // No fallar completamente, solo mostrar warning
+            showMessage.error(
+              "Listing creado pero hubo un problema con las imágenes"
+            );
+          }
+        }
+
+        showMessage.success("Plazze creado exitosamente!");
+        return result;
+      } catch (error: any) {
+        console.error("❌ Error creando plazze:", error);
+        const errorMessage = error.message || "Error al crear el plazze";
+        showMessage.error(errorMessage);
+        throw error;
+      } finally {
+        setLocalLoading(false);
+      }
+    },
+    []
+  );
+
   return {
     fetchPlazzes,
     fetchPlazzeById,
     searchWithFilters,
     clearData,
+    createPlazze,
     loading: localLoading,
   };
 };

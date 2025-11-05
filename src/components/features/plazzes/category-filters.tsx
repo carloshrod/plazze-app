@@ -10,7 +10,7 @@ import {
   LuPalette,
 } from "react-icons/lu";
 import { useSearchStore } from "@/stores/search";
-import { usePlazzeService } from "@/service/plazze";
+import { usePlazzeService } from "@/services/plazze";
 
 const CategoryFilters = () => {
   const { filters, setFilters, setHasSearched } = useSearchStore();

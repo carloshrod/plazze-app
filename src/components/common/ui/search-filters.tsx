@@ -3,7 +3,7 @@
 import { Button, Tag } from "antd";
 import { LuX } from "react-icons/lu";
 import { useSearchStore } from "@/stores/search";
-import { usePlazzeService } from "@/service/plazze";
+import { usePlazzeService } from "@/services/plazze";
 
 const SearchFilters = () => {
   const {
