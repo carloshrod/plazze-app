@@ -2,7 +2,7 @@
 
 import { usePlazzeStore } from "@/stores/plazze";
 import { useSearchStore } from "@/stores/search";
-import { getCategoryName } from "@/utils/categories";
+import { getCategoryName } from "@/helpers/categories";
 
 const SearchResults = () => {
   const { plazzes, loading } = usePlazzeStore();

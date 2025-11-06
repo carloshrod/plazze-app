@@ -1,5 +1,23 @@
 import { Plazze } from "@/types/plazze";
 
+// Función para convertir hora de 24h a 12h
+const formatTo12Hour = (time24: string): string => {
+  if (!time24) return time24;
+
+  const [hours, minutes] = time24.split(":");
+  const hour24 = parseInt(hours, 10);
+
+  if (hour24 === 0) {
+    return `12:${minutes} am`;
+  } else if (hour24 < 12) {
+    return `${hour24}:${minutes} am`;
+  } else if (hour24 === 12) {
+    return `12:${minutes} pm`;
+  } else {
+    return `${hour24 - 12}:${minutes} pm`;
+  }
+};
+
 // Tipo para los horarios de un día
 interface DayHours {
   open: string;
@@ -49,9 +67,11 @@ export const getTodayHours = (openingHours?: OpeningHours): string => {
   // Si está marcado como 24h, mostrar "24 horas"
   if (todayHours.is_24h === true) return "24 horas";
 
-  // Si tiene horarios de apertura y cierre
+  // Si tiene horarios de apertura y cierre, convertir a formato 12h
   if (todayHours.open && todayHours.close) {
-    return `${todayHours.open} - ${todayHours.close}`;
+    const openTime = formatTo12Hour(todayHours.open);
+    const closeTime = formatTo12Hour(todayHours.close);
+    return `${openTime} - ${closeTime}`;
   }
 
   return "No especificado";
@@ -75,9 +95,11 @@ export const getDayHours = (
   // Si está marcado como 24h, mostrar "24 horas"
   if (dayHours.is_24h === true) return "24 horas";
 
-  // Si tiene horarios de apertura y cierre
+  // Si tiene horarios de apertura y cierre, convertir a formato 12h
   if (dayHours.open && dayHours.close) {
-    return `${dayHours.open} - ${dayHours.close}`;
+    const openTime = formatTo12Hour(dayHours.open);
+    const closeTime = formatTo12Hour(dayHours.close);
+    return `${openTime} - ${closeTime}`;
   }
 
   return "No especificado";
@@ -153,11 +175,18 @@ export const getAllHours = (plazze: Plazze) => {
   return Object.entries(daysLabels).map(([key, label]) => {
     const dayHours =
       plazze.opening_hours?.[key as keyof typeof plazze.opening_hours];
-    const hours = dayHours?.is_closed
-      ? "Cerrado"
-      : dayHours?.open && dayHours?.close
-      ? `${dayHours.open} - ${dayHours.close}`
-      : "No especificado";
+
+    let hours = "No especificado";
+
+    if (dayHours?.is_closed) {
+      hours = "Cerrado";
+    } else if (dayHours?.is_24h) {
+      hours = "24 horas";
+    } else if (dayHours?.open && dayHours?.close) {
+      const openTime = formatTo12Hour(dayHours.open);
+      const closeTime = formatTo12Hour(dayHours.close);
+      hours = `${openTime} - ${closeTime}`;
+    }
 
     return { day: label, hours };
   });
