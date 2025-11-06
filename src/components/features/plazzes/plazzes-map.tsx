@@ -7,8 +7,8 @@ import { Plazze } from "@/types/plazze";
 interface PlazzesMapProps {
   center?: [number, number];
   zoom?: number;
-  singleMarker?: boolean; // Nueva prop para indicar si es un mapa de plazze individual
-  singlePlazze?: Plazze; // Plazze específico para mostrar en modo singleMarker
+  singleMarker?: boolean;
+  singlePlazze?: Plazze;
 }
 
 const MapClient = dynamic(() => import("./map-client"), {
@@ -24,7 +24,7 @@ const MapClient = dynamic(() => import("./map-client"), {
 
 const PlazzesMap = ({
   center,
-  zoom = 12,
+  zoom = 10,
   singleMarker = false,
   singlePlazze,
 }: PlazzesMapProps) => {
