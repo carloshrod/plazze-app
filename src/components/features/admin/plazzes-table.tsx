@@ -3,10 +3,13 @@
 import { Avatar, Button, Card, Table, Tag, Spin, Alert } from "antd";
 import Link from "next/link";
 import { LuPen, LuTrash2 } from "react-icons/lu";
-import { type PlazzeWP } from "@/types/plazze";
 import { useMyPlazzes } from "@/hooks/useMyPlazzes";
 import { useAppData } from "@/hooks/useAppData";
+import { usePlazzeModalStore } from "@/stores/plazze-modal";
+import { convertWPToFormData } from "@/helpers/plazze";
+import { decodeHtmlEntities } from "@/utils";
 import { ROUTES } from "@/consts/routes";
+import { type PlazzeWP } from "@/types/plazze";
 
 const statusColors = {
   publish: "success",
@@ -25,6 +28,7 @@ const statusLabels = {
 export function PlazzesTable() {
   const { plazzes, loading, error } = useMyPlazzes();
   const { getCategoryName } = useAppData();
+  const { openEditModal } = usePlazzeModalStore();
 
   const columns = [
     {
@@ -63,7 +67,7 @@ export function PlazzesTable() {
               className="text-primary hover:text-primary/80"
               target="_blank"
             >
-              {title.rendered}
+              {decodeHtmlEntities(title.rendered)}
             </Link>
           </div>
         );
@@ -116,8 +120,8 @@ export function PlazzesTable() {
               className="hover:!text-primary"
               icon={<LuPen size={18} />}
               onClick={() => {
-                // TODO: Implementar edición
-                console.log("Editar plazze:", record.id);
+                const formData = convertWPToFormData(record);
+                openEditModal(record, formData);
               }}
             />
             <Button

@@ -6,6 +6,11 @@ import {
   PlazzeFormData,
 } from "@/types/plazze";
 import { CreateListingData } from "@/libs/api/plazze";
+import {
+  cleanHtmlContent as cleanHtml,
+  convertWPGalleryToUploadFormat,
+} from "@/utils/format";
+import dayjs from "dayjs";
 
 // Helper function para mapear PlazzeWP a Plazze
 export const mapPlazzeFromWP = (listing: PlazzeWP): Plazze => {
@@ -334,4 +339,128 @@ export function validateFormData(formData: PlazzeFormData): {
     isValid: errors.length === 0,
     errors,
   };
+}
+
+/**
+ * Convertir datos de WordPress/Listeo al formato del formulario para edición
+ */
+export function convertWPToFormData(
+  listing: PlazzeWP
+): Partial<PlazzeFormData> {
+  const formData: Partial<PlazzeFormData> = {
+    title: cleanHtml(listing.title?.rendered || ""),
+    description: cleanHtml(listing.content?.rendered || ""),
+    address: listing.address || "",
+    friendly_address: listing.friendly_address || "",
+    latitude: parseFloat(listing.latitude) || 0,
+    longitude: parseFloat(listing.longitude) || 0,
+  };
+
+  // Precios
+  if (listing.pricing) {
+    formData.price_min = parseFloat(listing.pricing.price_min) || 0;
+    formData.price_max = parseFloat(listing.pricing.price_max) || 0;
+  }
+
+  // Categorías - extraer IDs desde _embedded
+  if (listing._embedded?.["wp:term"]) {
+    const terms = listing._embedded["wp:term"] || [];
+    const categoryTerms = terms.find(
+      (arr: any) =>
+        Array.isArray(arr) && arr[0]?.taxonomy === "listing_category"
+    );
+    const regionTerms = terms.find(
+      (arr: any) => Array.isArray(arr) && arr[0]?.taxonomy === "region"
+    );
+
+    if (categoryTerms && Array.isArray(categoryTerms)) {
+      formData.category = categoryTerms.map((c: any) => c.id);
+    }
+
+    if (regionTerms && Array.isArray(regionTerms)) {
+      formData.region = regionTerms.map((r: any) => r.id);
+    }
+  }
+
+  // Galería - convertir a formato Ant Design Upload
+  if (listing.gallery && listing.gallery.length > 0) {
+    formData.gallery = convertWPGalleryToUploadFormat(listing.gallery);
+  } else {
+    formData.gallery = [];
+  }
+
+  // Horarios - convertir desde opening_hours
+  if (listing.opening_hours) {
+    const scheduleGroups: any[] = [];
+    const days = [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+    ];
+
+    // Agrupar días por horarios similares
+    const scheduleMap = new Map<string, string[]>();
+
+    days.forEach((dayName) => {
+      const daySchedule =
+        listing.opening_hours?.[dayName as keyof typeof listing.opening_hours];
+      if (daySchedule && daySchedule.open && daySchedule.close) {
+        const timeKey = `${daySchedule.open}-${daySchedule.close}`;
+        if (!scheduleMap.has(timeKey)) {
+          scheduleMap.set(timeKey, []);
+        }
+        scheduleMap.get(timeKey)!.push(dayName);
+      }
+    });
+
+    // Convertir el mapa a grupos de horarios
+    scheduleMap.forEach((groupDays, timeKey) => {
+      const [openTime, closeTime] = timeKey.split("-");
+
+      // Convertir strings de tiempo a objetos dayjs válidos
+      const openDayjs = openTime ? dayjs(openTime, "HH:mm") : null;
+      const closeDayjs = closeTime ? dayjs(closeTime, "HH:mm") : null;
+
+      // Solo agregar si ambos horarios son válidos
+      if (
+        openDayjs &&
+        openDayjs.isValid() &&
+        closeDayjs &&
+        closeDayjs.isValid()
+      ) {
+        scheduleGroups.push({
+          days: groupDays,
+          open_time: openDayjs,
+          close_time: closeDayjs,
+        });
+      }
+    });
+
+    formData.schedule_groups = scheduleGroups;
+  } else {
+    formData.schedule_groups = [];
+  }
+
+  // Servicios reservables - convertir desde bookable_services
+  if (
+    listing.bookable_services?.services &&
+    listing.bookable_services.services.length > 0
+  ) {
+    formData.bookable_services = listing.bookable_services.services.map(
+      (service: any) => ({
+        title: cleanHtml(service.title || service.name || ""),
+        description: cleanHtml(service.description || ""),
+        price: parseFloat(service.price) || 0,
+        bookable_options: service.bookable_options || "onetime",
+      })
+    );
+  } else {
+    formData.bookable_services = [];
+  }
+
+  return formData;
 }

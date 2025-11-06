@@ -3,30 +3,20 @@
 import { Button, Modal } from "antd";
 import { LuPlus } from "react-icons/lu";
 import PlazzeForm from "./plazze-form";
-import { useState } from "react";
-import { PlazzeFormData } from "@/types/plazze";
 import { useMyPlazzes } from "@/hooks/useMyPlazzes";
+import { usePlazzeModalStore } from "@/stores/plazze-modal";
 
-interface PlazzeModalProps {
-  trigger?: React.ReactNode;
-  plazze?: Partial<PlazzeFormData>;
-  mode?: "create" | "edit";
-}
-
-export default function PlazzeModal({
-  trigger,
-  plazze,
-  mode = "create",
-}: PlazzeModalProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const PlazzeModal = () => {
   const { refreshPlazzes } = useMyPlazzes();
+  const { isOpen, mode, initialFormData, openCreateModal, closeModal } =
+    usePlazzeModalStore();
 
   const handleOpenModal = () => {
-    setIsModalOpen(true);
+    openCreateModal();
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
+    closeModal();
   };
 
   const handleSuccess = () => {
@@ -34,28 +24,21 @@ export default function PlazzeModal({
     refreshPlazzes();
   };
 
-  const defaultTrigger = (
-    <Button
-      type="primary"
-      icon={<LuPlus size={20} />}
-      size="large"
-      onClick={handleOpenModal}
-    >
-      Nuevo Plazze
-    </Button>
-  );
-
   return (
     <>
-      {trigger ? (
-        <div onClick={handleOpenModal}>{trigger}</div>
-      ) : (
-        defaultTrigger
-      )}
+      {/* Trigger por defecto para crear plazzes */}
+      <Button
+        type="primary"
+        icon={<LuPlus size={20} />}
+        size="large"
+        onClick={handleOpenModal}
+      >
+        Nuevo Plazze
+      </Button>
 
       <Modal
         title={mode === "create" ? "Nuevo Plazze" : "Editar Plazze"}
-        open={isModalOpen}
+        open={isOpen}
         onCancel={handleCloseModal}
         footer={null}
         width="95vw"
@@ -72,8 +55,14 @@ export default function PlazzeModal({
         }}
         destroyOnHidden={true}
       >
-        <PlazzeForm initialValues={plazze} onSuccess={handleSuccess} />
+        <PlazzeForm
+          initialValues={initialFormData || undefined}
+          onSuccess={handleSuccess}
+          isModalVisible={isOpen}
+        />
       </Modal>
     </>
   );
-}
+};
+
+export default PlazzeModal;

@@ -164,8 +164,8 @@ export interface PlazzePricing {
   discount_monthly: number;
 }
 
-// 🆕 NUEVO: Interfaz para el formulario de creación/edición de plazzes
 export interface PlazzeFormData {
+  id: number;
   // Basic Information
   title: string;
   category: number[];

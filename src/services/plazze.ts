@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
 import { usePlazzeStore } from "@/stores/plazze";
 import { useSearchStore } from "@/stores/search";
+import { usePlazzeModalStore } from "@/stores/plazze-modal";
 import { plazzeLib, PlazzeSearchParams } from "@/libs/api/plazze";
 import { uploadFiles } from "@/libs/api/upload";
-import { formatFormDataForListeo, validateFormData } from "@/helpers/plazze";
 import showMessage from "@/libs/message";
+import { formatFormDataForListeo, validateFormData } from "@/helpers/plazze";
 import { Plazze, PlazzeFormData } from "@/types/plazze";
 import dayjs from "dayjs";
 
@@ -218,12 +219,139 @@ export const usePlazzeService = () => {
     []
   );
 
+  const updatePlazze = useCallback(
+    async (
+      id: number,
+      values: PlazzeFormData,
+      coordinates: { lat: number; lng: number } | null
+    ) => {
+      try {
+        setLocalLoading(true);
+
+        // 1. Validar datos del formulario
+        const validation = validateFormData(values);
+        if (!validation.isValid) {
+          const errorMessage = `Errores en el formulario: ${validation.errors.join(
+            ", "
+          )}`;
+          showMessage.error(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        // Obtener datos originales del store modal para comparar galería
+        const { editingPlazze } = usePlazzeModalStore.getState();
+        const originalGalleryIds =
+          editingPlazze?.gallery?.map((img) => img.id) || [];
+
+        // 2. Manejar galería
+        let galleryIds: number[] = [];
+
+        if (values.gallery && values.gallery.length > 0) {
+          const filesToUpload: File[] = [];
+
+          values.gallery.forEach((item: any) => {
+            if (item.originFileObj instanceof File) {
+              // Es un archivo nuevo para subir
+              filesToUpload.push(item.originFileObj);
+            } else if (
+              item.uid &&
+              typeof item.uid === "string" &&
+              item.uid.match(/^\d+$/)
+            ) {
+              // Es una imagen existente con ID numérico
+              const imageId = parseInt(item.uid);
+              if (!isNaN(imageId) && imageId > 0) {
+                galleryIds.push(imageId);
+              }
+            }
+          });
+
+          // Subir nuevas imágenes si existen
+          if (filesToUpload.length > 0) {
+            try {
+              const uploadResults = await uploadFiles(filesToUpload);
+              const newImageIds = uploadResults.map((result) => result.id);
+              galleryIds = [...galleryIds, ...newImageIds];
+            } catch (uploadError: any) {
+              const errorMessage = `Error subiendo nuevas imágenes: ${uploadError.message}`;
+              showMessage.error(errorMessage);
+              throw new Error(errorMessage);
+            }
+          }
+        }
+
+        // 3. Formatear datos para Listeo (SIN galería - se actualiza por separado)
+        const listingData = formatFormDataForListeo(values, coordinates);
+        const listingDataWithoutGallery = { ...listingData };
+        delete listingDataWithoutGallery.gallery;
+
+        // 4. Actualizar el listing
+        const result = await plazzeLib.updateListing(
+          id,
+          listingDataWithoutGallery
+        );
+
+        // 5. Detectar cambios en galería y actualizar si es necesario
+        const hasNewFiles =
+          values.gallery?.some(
+            (item: any) => item.originFileObj instanceof File
+          ) || false;
+
+        const currentFormIds =
+          values.gallery
+            ?.filter(
+              (item: any) =>
+                !item.originFileObj &&
+                item.uid &&
+                typeof item.uid === "string" &&
+                item.uid.match(/^\d+$/)
+            )
+            ?.map((item: any) => parseInt(item.uid)) || [];
+
+        const hasRemovedImages = originalGalleryIds.some(
+          (originalId: number) => !currentFormIds.includes(originalId)
+        );
+
+        // Actualizar galería SOLO si hay cambios detectables:
+        // 1. Hay archivos nuevos para subir
+        // 2. La galería está completamente vacía (eliminó todas)
+        // 3. Se eliminaron algunas imágenes existentes
+        if (
+          hasNewFiles ||
+          (values.gallery && values.gallery.length === 0) ||
+          hasRemovedImages
+        ) {
+          try {
+            await plazzeLib.updateListingGallery(result.id, galleryIds);
+          } catch (galleryError: any) {
+            console.warn("⚠️ Error actualizando galería:", galleryError);
+            showMessage.error(
+              "Plazze actualizado pero hubo un problema con las imágenes"
+            );
+          }
+        }
+
+        showMessage.success("Plazze actualizado exitosamente!");
+        return result;
+      } catch (error: any) {
+        console.error("❌ Error actualizando plazze:", error);
+        const errorMessage = error.message || "Error al actualizar el plazze";
+        showMessage.error(errorMessage);
+        throw error;
+      } finally {
+        setLocalLoading(false);
+      }
+    },
+    []
+  );
+
   return {
     fetchPlazzes,
     fetchPlazzeById,
     searchWithFilters,
     clearData,
     createPlazze,
+    updatePlazze,
     loading: localLoading,
   };
 };

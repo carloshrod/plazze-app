@@ -313,12 +313,6 @@ export const plazzeLib = {
   },
 
   createListing: async (data: CreateListingData): Promise<PlazzeWP> => {
-    const token = Cookies.get("token");
-
-    if (!token) {
-      throw new Error("Usuario no autenticado");
-    }
-
     try {
       // 1. Crear el listing usando la API estándar de WordPress
       const response = await client.post("/wp/v2/listing", data);
@@ -374,10 +368,12 @@ export const plazzeLib = {
           gallery_ids: galleryIds,
         });
       } catch (customError: any) {
-        console.warn(
+        console.error(
           "❌ Endpoint personalizado falló:",
-          customError.response?.data
+          customError.response?.data || customError.message
         );
+        console.error("❌ Status:", customError.response?.status);
+        console.error("❌ Full error:", customError);
 
         // Si el endpoint personalizado falla, intentar con PUT estándar
         await client.put(`/wp/v2/listing/${listingId}`, {
@@ -386,8 +382,66 @@ export const plazzeLib = {
       }
     } catch (error: any) {
       console.error("❌ Error actualizando galería:", error);
+      console.error("❌ Error response:", error.response?.data);
+      console.error("❌ Error status:", error.response?.status);
       throw new Error(
         error.response?.data?.message || "Error al actualizar la galería"
+      );
+    }
+  },
+
+  // NUEVO: Actualizar un listing existente
+  updateListing: async (
+    id: number,
+    data: CreateListingData
+  ): Promise<PlazzeWP> => {
+    try {
+      // 1. Actualizar el listing usando la API estándar de WordPress
+      const response = await client.put(`/wp/v2/listing/${id}`, data);
+
+      // 2. Obtener el listing actualizado completo
+      try {
+        const { data: updatedListing } = await client.get(
+          `/wp/v2/listing/${id}`,
+          {
+            params: {
+              _embed: true,
+            },
+          }
+        );
+
+        return updatedListing;
+      } catch (fetchError) {
+        console.warn(
+          "⚠️ No se pudo obtener el listing actualizado completo, devolviendo datos básicos"
+        );
+        // Si no podemos obtener el listing completo, devolvemos lo que tenemos
+        return response.data;
+      }
+    } catch (error: any) {
+      console.error(`❌ Error actualizando listing ${id}:`, error);
+
+      if (error.response?.status === 401) {
+        throw new Error("No tienes permisos para actualizar listings");
+      }
+
+      if (error.response?.status === 403) {
+        throw new Error(
+          "Acceso denegado. No tienes permisos para editar este plazze."
+        );
+      }
+
+      if (error.response?.status === 404) {
+        throw new Error("El plazze no existe o ha sido eliminado");
+      }
+
+      if (error.response?.status === 400) {
+        const errorMessage = error.response?.data?.message || "Datos inválidos";
+        throw new Error(errorMessage);
+      }
+
+      throw new Error(
+        error.response?.data?.message || "Error al actualizar el listing"
       );
     }
   },

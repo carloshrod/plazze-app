@@ -19,7 +19,9 @@ import dynamic from "next/dynamic";
 import dayjs from "dayjs";
 import { useAppData } from "@/hooks/useAppData";
 import { usePlazzeService } from "@/services/plazze";
+import { usePlazzeModalStore } from "@/stores/plazze-modal";
 import { PlazzeFormData } from "@/types/plazze";
+import { decodeHtmlEntities } from "@/utils";
 
 // Cargar el mapa dinámicamente para evitar errores de SSR
 const MapSelector = dynamic(() => import("./map-selector"), { ssr: false });
@@ -30,36 +32,61 @@ const { Option } = Select;
 export default function PlazzeForm({
   initialValues,
   onSuccess,
+  isModalVisible = true,
 }: {
   initialValues?: Partial<PlazzeFormData>;
   onSuccess?: () => void;
+  isModalVisible?: boolean;
 }) {
   const [form] = Form.useForm();
   const { categories, regions } = useAppData();
-  const { createPlazze, loading } = usePlazzeService();
+  const { createPlazze, updatePlazze, loading } = usePlazzeService();
+  const { mode, editingPlazze, initialFormData, closeModal } =
+    usePlazzeModalStore();
+
   const [coordinates, setCoordinates] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
 
+  // Determinar si estamos en modo edición
+  const isEditMode = mode === "edit" && editingPlazze;
+
   // Observar cambios en schedule_groups para actualizar días disponibles
   const scheduleGroups = Form.useWatch("schedule_groups", form) || [];
 
   useEffect(() => {
-    if (initialValues) {
-      form.setFieldsValue(initialValues);
-      if (initialValues.latitude && initialValues.longitude) {
+    // Limpiar formulario cuando cambia el modo
+    if (mode === "create") {
+      form.resetFields();
+      setCoordinates(null);
+    }
+
+    // Cargar datos para edición o valores iniciales
+    const dataToLoad = isEditMode ? initialFormData : initialValues;
+
+    if (dataToLoad) {
+      form.setFieldsValue(dataToLoad);
+
+      // Establecer coordenadas si están disponibles
+      if (dataToLoad.latitude && dataToLoad.longitude) {
         setCoordinates({
-          lat: initialValues.latitude,
-          lng: initialValues.longitude,
+          lat: dataToLoad.latitude,
+          lng: dataToLoad.longitude,
         });
       }
     }
-  }, [initialValues, form]);
+  }, [isEditMode, initialFormData, initialValues, form, mode]);
 
   const onFinish = async (values: PlazzeFormData) => {
     try {
-      await createPlazze(values, coordinates);
+      if (isEditMode && editingPlazze) {
+        // Modo edición: actualizar plazze existente
+        await updatePlazze(editingPlazze.id, values, coordinates);
+      } else {
+        // Modo creación: crear nuevo plazze
+        await createPlazze(values, coordinates);
+      }
 
       // Limpiar el formulario después del éxito
       form.resetFields();
@@ -70,7 +97,7 @@ export default function PlazzeForm({
         onSuccess();
       }
 
-      // TODO: Redirigir a la página de listings o mostrar el listing creado
+      // TODO: Redirigir a la página de listings o mostrar el listing creado/actualizado
     } catch (error) {
       console.error("Error en onFinish:", error);
     }
@@ -153,7 +180,7 @@ export default function PlazzeForm({
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Título del Listing"
+              label="Título del plazze"
               name="title"
               rules={[{ required: true, message: "El título es requerido" }]}
             >
@@ -170,7 +197,7 @@ export default function PlazzeForm({
                 mode="multiple"
                 placeholder="Selecciona categorías"
                 options={categories.map((cat) => ({
-                  label: cat.name.replace(/&amp;/g, "&"),
+                  label: decodeHtmlEntities(cat.name),
                   value: cat.id,
                 }))}
               />
@@ -251,6 +278,7 @@ export default function PlazzeForm({
           <MapSelector
             onLocationSelect={handleMapLocationSelect}
             initialCoordinates={coordinates}
+            isVisible={isModalVisible}
           />
         </div>
       </Card>
@@ -262,7 +290,6 @@ export default function PlazzeForm({
           name="gallery"
           valuePropName="fileList"
           getValueFromEvent={(e) => {
-            console.log("🖼️ Upload event:", e);
             if (Array.isArray(e)) {
               return e;
             }
@@ -576,7 +603,7 @@ export default function PlazzeForm({
       {/* Submit Button */}
       <Form.Item>
         <Space className="w-full flex justify-between">
-          <Button size="large" disabled={loading}>
+          <Button size="large" danger disabled={loading} onClick={closeModal}>
             Cancelar
           </Button>
           <Button
@@ -586,8 +613,10 @@ export default function PlazzeForm({
             loading={loading}
           >
             {loading
-              ? "Creando..."
-              : initialValues
+              ? isEditMode
+                ? "Actualizando..."
+                : "Creando..."
+              : isEditMode
               ? "Actualizar Plazze"
               : "Crear Plazze"}
           </Button>
