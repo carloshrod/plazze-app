@@ -1,11 +1,21 @@
 "use client";
 
-import { Avatar, Button, Card, Table, Tag, Spin, Alert } from "antd";
+import {
+  Avatar,
+  Button,
+  Card,
+  Table,
+  Tag,
+  Spin,
+  Alert,
+  Popconfirm,
+} from "antd";
 import Link from "next/link";
 import { LuPen, LuTrash2 } from "react-icons/lu";
 import { useMyPlazzes } from "@/hooks/useMyPlazzes";
 import { useAppData } from "@/hooks/useAppData";
 import { usePlazzeModalStore } from "@/stores/plazze-modal";
+import { usePlazzeService } from "@/services/plazze";
 import { convertWPToFormData } from "@/helpers/plazze";
 import { decodeHtmlEntities } from "@/utils";
 import { ROUTES } from "@/consts/routes";
@@ -29,6 +39,7 @@ export function PlazzesTable() {
   const { plazzes, loading, error } = useMyPlazzes();
   const { getCategoryName } = useAppData();
   const { openEditModal } = usePlazzeModalStore();
+  const { deletePlazze } = usePlazzeService();
 
   const columns = [
     {
@@ -124,15 +135,23 @@ export function PlazzesTable() {
                 openEditModal(record, formData);
               }}
             />
-            <Button
-              type="text"
-              className="hover:!text-red-500"
-              icon={<LuTrash2 size={18} />}
-              onClick={() => {
-                // TODO: Implementar eliminación
-                console.log("Eliminar", record.id);
-              }}
-            />
+            <Popconfirm
+              title="Eliminar plazze"
+              description={`¿Estás seguro de que quieres eliminar "${decodeHtmlEntities(
+                record.title.rendered
+              )}"?`}
+              onConfirm={() => deletePlazze(record.id)}
+              okText="Sí, eliminar"
+              cancelText="Cancelar"
+              okType="danger"
+              placement="topRight"
+            >
+              <Button
+                type="text"
+                className="hover:!text-red-500"
+                icon={<LuTrash2 size={18} />}
+              />
+            </Popconfirm>
           </div>
         );
       },

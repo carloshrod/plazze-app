@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
-import { Button, Spin } from "antd";
-import { LuBookmark, LuMapPin } from "react-icons/lu";
+import { Spin } from "antd";
+import { LuMapPin } from "react-icons/lu";
 import { PlazzeImages } from "@/components/features/plazzes/plazze-detail/plazze-images";
 import { BookingForm } from "@/components/features/plazzes/plazze-detail/booking-form";
 import { PlazzeInfo } from "@/components/features/plazzes/plazze-detail/plazze-info";
 import { ScrollToBookingButton } from "@/components/common/ui/scroll-to-booking-button";
 import { usePlazzeService } from "@/services/plazze";
 import { Plazze } from "@/types/plazze";
-import { useAuthStore } from "@/stores/auth";
 
 interface PlazzeDetailPageProps {
   params: {
@@ -23,7 +22,6 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { fetchPlazzeById } = usePlazzeService();
-  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     const loadPlazze = async () => {
@@ -100,7 +98,7 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
   // Si no hay imágenes, usar una imagen por defecto
   if (finalImages.length === 0) {
     finalImages.push(
-      "https://images.unsplash.com/photo-1464808322410-1a934aab61e5?w=800"
+      "https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1074"
     );
   }
 
@@ -114,27 +112,6 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
               className="text-3xl font-bold text-gray-900"
               dangerouslySetInnerHTML={{ __html: plazze.name }}
             />
-            {isAuthenticated ? (
-              <Button
-                type="text"
-                icon={
-                  <LuBookmark
-                    size={20}
-                    className="text-gray-500 group-hover:text-primary"
-                  />
-                }
-                className="group flex items-center gap-2 px-3 !py-6 h-auto hover:bg-gray-100 hover:text-primary rounded-full"
-              >
-                <span className="text-sm text-gray-500 group-hover:text-primary transition-colors">
-                  Guardar sitio
-                </span>
-              </Button>
-            ) : (
-              <div className="flex items-center gap-2 text-gray-500">
-                <LuBookmark size={20} />
-                <span className="text-sm">Inicia sesión para guardar</span>
-              </div>
-            )}
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <LuMapPin size={20} />

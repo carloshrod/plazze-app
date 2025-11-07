@@ -107,13 +107,6 @@ export const BookableServices = ({ services }: BookableServicesProps) => {
                         {getServiceTypeLabel(service.bookable_options)}
                       </Tag>
                     </div>
-
-                    {/* Información adicional */}
-                    {service.bookable_quantity_max && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        Máximo: {service.bookable_quantity_max}
-                      </div>
-                    )}
                   </div>
                 </Card>
               ))}

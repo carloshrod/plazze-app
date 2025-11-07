@@ -80,7 +80,7 @@ export default function MapSelector({
       <MapContainer
         key={key} // Forzar re-render cuando sea necesario
         center={defaultPosition}
-        zoom={13}
+        zoom={10}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
         ref={mapRef}

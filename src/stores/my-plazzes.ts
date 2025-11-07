@@ -14,8 +14,8 @@ interface MyPlazzesStore {
   setError: (error: string | null) => void;
   clearPlazzes: () => void;
   addPlazze: (plazze: PlazzeWP) => void;
-  removePlazze: (plazzeId: number) => void;
   updatePlazze: (plazzeId: number, updatedPlazze: Partial<PlazzeWP>) => void;
+  removePlazze: (plazzeId: number) => void;
 }
 
 export const useMyPlazzesStore = create<MyPlazzesStore>((set, get) => ({
@@ -36,12 +36,6 @@ export const useMyPlazzesStore = create<MyPlazzesStore>((set, get) => ({
     set({ plazzes: [newPlazze, ...plazzes] });
   },
 
-  // Remover un plazze de la lista
-  removePlazze: (plazzeId: number) => {
-    const { plazzes } = get();
-    set({ plazzes: plazzes.filter((plazze) => plazze.id !== plazzeId) });
-  },
-
   // Actualizar un plazze existente
   updatePlazze: (plazzeId: number, updatedPlazze: Partial<PlazzeWP>) => {
     const { plazzes } = get();
@@ -50,5 +44,11 @@ export const useMyPlazzesStore = create<MyPlazzesStore>((set, get) => ({
         plazze.id === plazzeId ? { ...plazze, ...updatedPlazze } : plazze
       ),
     });
+  },
+
+  // Remover un plazze de la lista
+  removePlazze: (plazzeId: number) => {
+    const { plazzes } = get();
+    set({ plazzes: plazzes.filter((plazze) => plazze.id !== plazzeId) });
   },
 }));

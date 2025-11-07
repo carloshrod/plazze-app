@@ -445,4 +445,30 @@ export const plazzeLib = {
       );
     }
   },
+
+  deleteListing: async (id: number): Promise<void> => {
+    try {
+      await client.delete(`/wp/v2/listing/${id}`);
+    } catch (error: any) {
+      console.error(`❌ Error eliminando listing ${id}:`, error);
+
+      if (error.response?.status === 401) {
+        throw new Error("No tienes permisos para eliminar listings");
+      }
+
+      if (error.response?.status === 403) {
+        throw new Error(
+          "Acceso denegado. No tienes permisos para eliminar este plazze."
+        );
+      }
+
+      if (error.response?.status === 404) {
+        throw new Error("El plazze no existe o ya ha sido eliminado");
+      }
+
+      throw new Error(
+        error.response?.data?.message || "Error al eliminar el listing"
+      );
+    }
+  },
 };

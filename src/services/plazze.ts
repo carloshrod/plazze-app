@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { usePlazzeStore } from "@/stores/plazze";
 import { useSearchStore } from "@/stores/search";
 import { usePlazzeModalStore } from "@/stores/plazze-modal";
+import { useMyPlazzesStore } from "@/stores/my-plazzes";
 import { plazzeLib, PlazzeSearchParams } from "@/libs/api/plazze";
 import { uploadFiles } from "@/libs/api/upload";
 import showMessage from "@/libs/message";
@@ -12,6 +13,7 @@ import dayjs from "dayjs";
 export const usePlazzeService = () => {
   const { setPlazzes, setLoading, setError, clearPlazzes } = usePlazzeStore();
   const { setAppliedFilters } = useSearchStore();
+  const { removePlazze } = useMyPlazzesStore();
   const [localLoading, setLocalLoading] = useState(false);
 
   const fetchPlazzes = useCallback(
@@ -345,6 +347,31 @@ export const usePlazzeService = () => {
     []
   );
 
+  const deletePlazze = useCallback(
+    async (id: number) => {
+      try {
+        setLocalLoading(true);
+
+        // Eliminar el plazze usando la API
+        await plazzeLib.deleteListing(id);
+
+        // Eliminar del estado
+        removePlazze(id);
+
+        showMessage.success("Plazze eliminado exitosamente!");
+        return true;
+      } catch (error: any) {
+        console.error("❌ Error eliminando plazze:", error);
+        const errorMessage = error.message || "Error al eliminar el plazze";
+        showMessage.error(errorMessage);
+        throw error;
+      } finally {
+        setLocalLoading(false);
+      }
+    },
+    [removePlazze]
+  );
+
   return {
     fetchPlazzes,
     fetchPlazzeById,
@@ -352,6 +379,7 @@ export const usePlazzeService = () => {
     clearData,
     createPlazze,
     updatePlazze,
+    deletePlazze,
     loading: localLoading,
   };
 };
