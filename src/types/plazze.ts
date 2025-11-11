@@ -41,7 +41,7 @@ export interface PlazzeWP {
   // 🛎️ NUEVO: Servicios reservables desde el menú de Listeo
   bookable_services?: {
     services: Array<{
-      id: number;
+      id: string;
       title: string;
       description: string;
       price: number;

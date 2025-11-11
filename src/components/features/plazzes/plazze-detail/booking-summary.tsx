@@ -27,8 +27,6 @@ const BookingSummary = ({ booking, plazze }: BookingSummaryProps) => {
   const formattedDate = dayjs(booking.date)
     .locale("es")
     .format("dddd, D [de] MMMM [de] YYYY");
-  console.log(booking);
-  console.log(plazze);
 
   const guestCount = parseInt(booking.guests) || 1;
 
@@ -39,8 +37,6 @@ const BookingSummary = ({ booking, plazze }: BookingSummaryProps) => {
           (service) => service.id === booking.serviceId
         )
       : null;
-
-  console.log({ selectedService });
 
   const isOneTimePayment = selectedService?.bookable_options === "onetime";
 

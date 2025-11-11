@@ -113,8 +113,6 @@ export default function ConfirmBookingPage({
     serviceId: searchParams.get("service"),
   };
 
-  console.log({ bookingData });
-
   const handleBack = () => {
     router.back();
   };
