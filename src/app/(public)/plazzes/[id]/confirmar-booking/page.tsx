@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Button, Card, Steps, Tabs, Spin } from "antd";
+import { Button, Card, Steps, Tabs, Spin, message } from "antd";
 import { LuCreditCard, LuUser } from "react-icons/lu";
 import { RiPaypalLine } from "react-icons/ri";
 import LoginForm from "@/components/features/auth/login-form";
@@ -13,6 +13,9 @@ import BookingSummary from "@/components/features/plazzes/plazze-detail/booking-
 import { useAuthStore } from "@/stores/auth";
 import { usePlazzeService } from "@/services/plazze";
 import { Plazze } from "@/types/plazze";
+import { createBooking } from "@/libs/api/booking";
+import { prepareBookingData, calculateEndTime } from "@/helpers/booking";
+import { ROUTES } from "@/consts/routes";
 import dayjs from "dayjs";
 import { decodeHtmlEntities } from "@/utils";
 
@@ -23,12 +26,13 @@ export default function ConfirmBookingPage({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const { fetchPlazzeById } = usePlazzeService();
 
   const [plazze, setPlazze] = useState<Plazze | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const currentStep = isAuthenticated ? 1 : 0;
 
@@ -115,6 +119,67 @@ export default function ConfirmBookingPage({
 
   const handleBack = () => {
     router.back();
+  };
+
+  const handlePayment = async () => {
+    if (!user || !bookingData.serviceId) {
+      message.error("Faltan datos requeridos para crear la reserva");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      // Preparar datos de la reserva
+      const startTime = dayjs(`${bookingData.date} ${bookingData.time}`);
+      const endTime = calculateEndTime(startTime);
+
+      const bookingParams = prepareBookingData({
+        listingId: parseInt(params.id),
+        userId: user.id,
+        date: bookingData.date,
+        startTime: startTime,
+        endTime: endTime,
+        guests: parseInt(bookingData.guests),
+        serviceId: bookingData.serviceId,
+        firstName: user.displayName || user.username,
+        email: user.email,
+      });
+
+      // Crear la reserva
+      const response = await createBooking(bookingParams);
+
+      if (response.success) {
+        message.success("Reserva creada exitosamente!");
+
+        // Guardar datos en sessionStorage para la página de éxito
+        if (response.data) {
+          sessionStorage.setItem(
+            "bookingSuccess",
+            JSON.stringify({
+              bookingId: response.booking_id,
+              listingName: response.data.listing_name,
+              dateStart: response.data.date_start,
+              guests: response.data.guests,
+              totalPrice: response.data.total_price,
+              services: response.data.services,
+            })
+          );
+        }
+
+        // Redireccionar a página de éxito
+        router.push(ROUTES.PUBLIC.BOOKINGS.SUCCESS(response.booking_id));
+      }
+    } catch (error) {
+      console.error("❌ Error al crear reserva:", error);
+      message.error(
+        error instanceof Error
+          ? error.message
+          : "Error al crear la reserva. Por favor intenta de nuevo."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -207,24 +272,28 @@ export default function ConfirmBookingPage({
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
                       <p className="text-sm text-gray-500 text-center">
-                        Al hacer clic en &ldquo;Pagar con PayPal&rdquo;, serás
-                        redirigido a PayPal para completar tu pago de forma
-                        segura.
+                        Al hacer clic en &ldquo;Confirmar reserva&rdquo;, se
+                        creará tu reserva en el sistema.
                       </p>
                       <Button
                         type="primary"
                         size="large"
                         block
+                        loading={submitting}
+                        onClick={handlePayment}
                         icon={<RiPaypalLine size={20} />}
                         className="flex items-center justify-center h-12 !bg-[#0070ba] hover:!bg-[#005ea6]"
                       >
-                        Pagar con PayPal
+                        {submitting
+                          ? "Creando reserva..."
+                          : "Confirmar reserva"}
                       </Button>
                     </div>
                     <Button
                       type="text"
                       size="large"
                       onClick={handleBack}
+                      disabled={submitting}
                       className="hover:!bg-primary/10"
                     >
                       Volver atrás

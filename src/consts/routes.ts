@@ -6,6 +6,9 @@ export const ROUTES = {
       DETAIL: (id: string) => `/plazzes/${id}`,
       CONFIRM: (id: string) => `/plazzes/${id}/confirmar-booking`,
     },
+    BOOKINGS: {
+      SUCCESS: (id: string | number) => `/reservas/${id}/exito`,
+    },
     AUTH: {
       LOGIN: "/auth/login",
       REGISTER: "/auth/registro",
