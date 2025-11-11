@@ -135,7 +135,7 @@ export interface PlazzeWP {
 }
 
 export interface BookableService {
-  id: number;
+  id: string;
   title: string;
   description: string;
   price: number;

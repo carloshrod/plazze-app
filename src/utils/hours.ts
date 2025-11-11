@@ -1,21 +1,12 @@
 import { Plazze } from "@/types/plazze";
+import dayjs from "dayjs";
 
-// Función para convertir hora de 24h a 12h
-const formatTo12Hour = (time24: string): string => {
+// Función para convertir hora de 24h a 12h usando dayjs
+export const formatTo12Hour = (time24: string): string => {
   if (!time24) return time24;
 
-  const [hours, minutes] = time24.split(":");
-  const hour24 = parseInt(hours, 10);
-
-  if (hour24 === 0) {
-    return `12:${minutes} am`;
-  } else if (hour24 < 12) {
-    return `${hour24}:${minutes} am`;
-  } else if (hour24 === 12) {
-    return `12:${minutes} pm`;
-  } else {
-    return `${hour24 - 12}:${minutes} pm`;
-  }
+  // Crear un objeto dayjs con la hora (usando una fecha arbitraria)
+  return dayjs(`2000-01-01 ${time24}`).format("h:mm a");
 };
 
 // Tipo para los horarios de un día
@@ -190,4 +181,107 @@ export const getAllHours = (plazze: Plazze) => {
 
     return { day: label, hours };
   });
+};
+
+// Función para verificar disponibilidad en fecha y hora específicas
+export const checkAvailability = (
+  plazze: Plazze,
+  date: dayjs.Dayjs | null,
+  time: dayjs.Dayjs | null
+): string | null => {
+  if (!date || !time) {
+    return null;
+  }
+
+  // Obtener el nombre del día en inglés usando dayjs
+  const dayIndex = date.day(); // 0 = domingo, 1 = lunes, etc.
+  const daysMapping = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+  ];
+  const englishDay = daysMapping[dayIndex] as keyof NonNullable<
+    typeof plazze.opening_hours
+  >;
+
+  const dayHours = plazze.opening_hours?.[englishDay];
+
+  if (!dayHours) {
+    return "No hay horarios establecidos para este día";
+  }
+
+  if (dayHours.is_closed) {
+    return "El plazze está cerrado este día";
+  }
+
+  if (dayHours.is_24h) {
+    return null; // Disponible 24h
+  }
+
+  if (!dayHours.open || !dayHours.close) {
+    return "Horarios no especificados para este día";
+  }
+
+  const selectedTimeStr = time.format("HH:mm");
+  const openTime = dayHours.open;
+  const closeTime = dayHours.close;
+
+  // Verificar si el horario cruza medianoche (ej: 18:00 - 03:00)
+  const crossesMidnight = closeTime < openTime;
+
+  let isOutsideHours = false;
+
+  if (crossesMidnight) {
+    // Si cruza medianoche, está cerrado si está entre closeTime y openTime
+    isOutsideHours = selectedTimeStr > closeTime && selectedTimeStr < openTime;
+  } else {
+    // Horario normal, está cerrado si está fuera del rango
+    isOutsideHours = selectedTimeStr < openTime || selectedTimeStr > closeTime;
+  }
+
+  if (isOutsideHours) {
+    return `El plazze está cerrado a esta hora. Horario: ${formatTo12Hour(
+      openTime
+    )} - ${formatTo12Hour(closeTime)}`;
+  }
+
+  return null; // Disponible
+};
+
+// Función para deshabilitar horas pasadas cuando es el día actual
+export const getDisabledTime = (selectedDate: dayjs.Dayjs | null) => {
+  // Si no hay fecha seleccionada o no es el día actual, no deshabilitar nada
+  if (!selectedDate || !selectedDate.isSame(dayjs(), "day")) {
+    return {};
+  }
+
+  const now = dayjs();
+  const currentHour = now.hour();
+  const currentMinute = now.minute();
+
+  return {
+    disabledHours: () => {
+      // Deshabilitar todas las horas anteriores a la actual
+      const hours = [];
+      for (let i = 0; i < currentHour; i++) {
+        hours.push(i);
+      }
+      return hours;
+    },
+    disabledMinutes: (selectedHour: number) => {
+      // Si es la hora actual, deshabilitar los minutos que ya pasaron
+      if (selectedHour === currentHour) {
+        const minutes = [];
+        for (let i = 0; i <= currentMinute; i++) {
+          minutes.push(i);
+        }
+        return minutes;
+      }
+      return [];
+    },
+  };
 };

@@ -14,6 +14,7 @@ import { useAuthStore } from "@/stores/auth";
 import { usePlazzeService } from "@/services/plazze";
 import { Plazze } from "@/types/plazze";
 import dayjs from "dayjs";
+import { decodeHtmlEntities } from "@/utils";
 
 export default function ConfirmBookingPage({
   params,
@@ -35,10 +36,8 @@ export default function ConfirmBookingPage({
     const loadPlazze = async () => {
       try {
         setLoading(true);
-        console.log("🔍 Cargando plazze para booking con ID:", params.id);
 
         const data = await fetchPlazzeById(parseInt(params.id));
-        console.log("📊 Datos del plazze para booking:", data);
 
         if (data) {
           setPlazze(data);
@@ -98,7 +97,7 @@ export default function ConfirmBookingPage({
   }
 
   const bookingData = {
-    plazzeName: plazze.name.replace(/<[^>]*>/g, ""), // Remover HTML del nombre para el booking
+    plazzeName: decodeHtmlEntities(plazze.name),
     address:
       plazze.region ||
       plazze.friendly_address ||
@@ -106,10 +105,15 @@ export default function ConfirmBookingPage({
       "Ubicación no especificada",
     date: searchParams.get("date") || dayjs().format("YYYY-MM-DD"),
     time: searchParams.get("time") || "19:00",
-    guests: searchParams.get("guests") || "5",
-    price: plazze.price_min || 0,
+    guests: searchParams.get("guests") || "1",
+    price: searchParams.get("totalPrice")
+      ? parseInt(searchParams.get("totalPrice")!)
+      : plazze.price_min || 0,
     image: plazze.image,
+    serviceId: searchParams.get("service"),
   };
+
+  console.log({ bookingData });
 
   const handleBack = () => {
     router.back();
@@ -200,7 +204,7 @@ export default function ConfirmBookingPage({
                     </p>
                   </div>
 
-                  <BookingSummary booking={bookingData} />
+                  <BookingSummary booking={bookingData} plazze={plazze} />
 
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">

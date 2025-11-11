@@ -1,13 +1,21 @@
 "use client";
 
-import { DatePicker, InputNumber, Button, TimePicker, Select } from "antd";
+import {
+  DatePicker,
+  InputNumber,
+  Button,
+  TimePicker,
+  Select,
+  Alert,
+} from "antd";
 import { Plazze } from "@/types/plazze";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import { LuCalendarDays, LuClock, LuUsers, LuPackage } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/consts/routes";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { checkAvailability, getDisabledTime } from "@/utils/hours";
 
 dayjs.locale("es");
 
@@ -20,7 +28,23 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
   const [selectedTime, setSelectedTime] = useState<dayjs.Dayjs | null>(null);
   const [guestCount, setGuestCount] = useState<number>(1);
-  const [selectedService, setSelectedService] = useState<number | null>(null);
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [availabilityError, setAvailabilityError] = useState<string | null>(
+    null
+  );
+
+  // Verificar disponibilidad cuando cambien fecha o hora
+  useEffect(() => {
+    const error = checkAvailability(plazze, selectedDate, selectedTime);
+    setAvailabilityError(error);
+  }, [selectedDate, selectedTime, plazze.opening_hours]);
+
+  // Resetear número de invitados cuando se selecciona un servicio de pago único
+  useEffect(() => {
+    if (isOneTimePayment()) {
+      setGuestCount(1);
+    }
+  }, [selectedService]);
 
   const formatDate = (date: dayjs.Dayjs) => {
     if (!date) return "";
@@ -42,13 +66,16 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
       params.append("time", selectedTime.format("HH:mm"));
     }
 
-    if (guestCount) {
-      params.append("guests", guestCount.toString());
-    }
+    // Siempre incluir número de invitados (será 1 para pago único)
+    params.append("guests", guestCount.toString());
 
     if (selectedService) {
       params.append("service", selectedService.toString());
     }
+
+    // Agregar el precio total calculado
+    const totalPrice = calculateTotalPrice();
+    params.append("totalPrice", totalPrice.toString());
 
     const confirmUrl = `${ROUTES.PUBLIC.PLAZZES.CONFIRM(
       plazze.id
@@ -87,16 +114,68 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
     });
   };
 
+  // Función para obtener el servicio seleccionado
+  const getSelectedService = () => {
+    if (!selectedService || !plazze.bookable_services) return null;
+    return plazze.bookable_services.find(
+      (service) => service.id === selectedService
+    );
+  };
+
+  // Verificar si el servicio seleccionado es de pago único
+  const isOneTimePayment = () => {
+    const service = getSelectedService();
+    return service?.bookable_options === "onetime";
+  };
+
+  // Función para calcular el precio total de la reserva
+  const calculateTotalPrice = () => {
+    const service = getSelectedService();
+
+    if (service) {
+      // Si hay un servicio seleccionado, usar su precio
+      if (service.bookable_options === "onetime") {
+        // Pago único: precio fijo independiente del número de personas
+        return service.price;
+      } else {
+        // Por persona: precio por el número de invitados
+        return service.price * guestCount;
+      }
+    } else {
+      // Si no hay servicio seleccionado, usar precio base del plazze
+      const basePrice = plazze.pricing?.price_min || plazze.price_min || 0;
+      return basePrice * guestCount;
+    }
+  };
+
+  // Función para mostrar el precio actual en la UI
+  const getCurrentPrice = () => {
+    if (selectedService) {
+      const totalPrice = calculateTotalPrice();
+      return `$${totalPrice.toLocaleString()}`;
+    }
+    return getBasePrice();
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
       <div className="flex flex-col gap-6">
         <div>
           <p className="text-2xl font-bold text-primary">
-            {getBasePrice()}{" "}
+            {getCurrentPrice()}{" "}
             <span className="text-sm text-gray-500 font-normal">
-              {plazze?.pricing?.currency}
+              {plazze?.pricing?.currency ?? "USD"}
             </span>
           </p>
+          {selectedService && (
+            <p className="text-sm text-gray-500">
+              {isOneTimePayment()
+                ? "Pago único"
+                : `$${getSelectedService()?.price.toLocaleString()} × ${guestCount} persona${
+                    guestCount > 1 ? "s" : ""
+                  }`}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-4">
@@ -140,26 +219,45 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
               needConfirm={false}
               value={selectedTime}
               onChange={(time) => setSelectedTime(time)}
+              disabledTime={() => getDisabledTime(selectedDate)}
             />
 
-            <InputNumber
-              size="large"
-              placeholder="Personas"
-              min={1}
-              max={plazze.capacity || 50}
-              prefix={<LuUsers size={20} className="text-gray-400" />}
-              className="!w-full"
-              controls={true}
-              value={guestCount}
-              onChange={(value) => setGuestCount(value || 1)}
-            />
+            {!isOneTimePayment() && (
+              <InputNumber
+                size="large"
+                placeholder="Personas"
+                min={1}
+                max={plazze.capacity || 50}
+                prefix={<LuUsers size={20} className="text-gray-400" />}
+                className="!w-full"
+                controls={true}
+                value={guestCount}
+                onChange={(value) => setGuestCount(value || 1)}
+              />
+            )}
           </div>
+
+          {availabilityError && (
+            <Alert
+              message="No disponible"
+              description={availabilityError}
+              type="warning"
+              showIcon
+              className="mb-2"
+            />
+          )}
 
           <Button
             type="primary"
             size="large"
             className="w-full"
             onClick={handleBooking}
+            disabled={
+              !!availabilityError ||
+              !selectedDate ||
+              !selectedTime ||
+              (!isOneTimePayment() && !guestCount)
+            }
           >
             Reservar ahora
           </Button>
