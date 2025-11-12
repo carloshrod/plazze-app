@@ -15,6 +15,55 @@ export interface CreateBookingParams {
   message?: string;
 }
 
+export interface BookingService {
+  name: string;
+  price: number;
+  total: number;
+  guests: string;
+  option: string; // "byguest" o "onetime"
+}
+
+export interface BookingCustomer {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export interface BookingOwner {
+  id: number;
+  name: string;
+}
+
+export interface Booking {
+  id: number;
+  listing_id: number;
+  listing_title: string;
+  listing_permalink: string;
+  listing_image: string;
+  date_start: string; // "2025-11-15 19:00:00"
+  date_end: string; // "2025-11-15 21:00:00"
+  status: "waiting" | "confirmed" | "cancelled" | "completed" | "paid";
+  type: string;
+  created: string;
+  price: number;
+  guests: number;
+  customer: BookingCustomer;
+  owner: BookingOwner;
+  services: BookingService[];
+  message: string;
+  order_id: number | null;
+}
+
+export interface BookingsResponse {
+  success: boolean;
+  bookings: Booking[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
 export interface BookingResponse {
   success: boolean;
   booking_id: number;
@@ -41,6 +90,42 @@ export interface BookingResponse {
     admin_url: string;
   };
 }
+
+export interface GetBookingsParams {
+  status?: "waiting" | "confirmed" | "cancelled" | "completed" | "paid";
+  page?: number;
+  per_page?: number;
+}
+
+export interface GetOwnerBookingsParams extends GetBookingsParams {
+  listing_id?: number;
+}
+
+/**
+ * Obtener reservas del usuario como COMPRADOR
+ */
+export const getMyBookings = async (
+  params?: GetBookingsParams
+): Promise<BookingsResponse> => {
+  const response = await client.get<BookingsResponse>(
+    "/plazze/v1/my-bookings",
+    { params }
+  );
+  return response.data;
+};
+
+/**
+ * Obtener reservas de los listings del usuario como VENDEDOR
+ */
+export const getMyListingsBookings = async (
+  params?: GetOwnerBookingsParams
+): Promise<BookingsResponse> => {
+  const response = await client.get<BookingsResponse>(
+    "/plazze/v1/my-listings-bookings",
+    { params }
+  );
+  return response.data;
+};
 
 /**
  * Crear una reserva directamente en Listeo

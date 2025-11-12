@@ -77,7 +77,7 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
     const totalPrice = calculateTotalPrice();
     params.append("totalPrice", totalPrice.toString());
 
-    const confirmUrl = `${ROUTES.PUBLIC.PLAZZES.CONFIRM(
+    const confirmUrl = `${ROUTES.PUBLIC.PLAZZES.CONFIRM_BOOKING(
       plazze.id
     )}?${params.toString()}`;
     router.push(confirmUrl);

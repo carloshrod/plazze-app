@@ -4,7 +4,7 @@ export const ROUTES = {
     PLAZZES: {
       LIST: "/plazzes",
       DETAIL: (id: string) => `/plazzes/${id}`,
-      CONFIRM: (id: string) => `/plazzes/${id}/confirmar-booking`,
+      CONFIRM_BOOKING: (id: string) => `/plazzes/${id}/confirmar-booking`,
     },
     BOOKINGS: {
       SUCCESS: (id: string | number) => `/reservas/${id}/exito`,

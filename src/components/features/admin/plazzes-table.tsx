@@ -162,7 +162,7 @@ export function PlazzesTable() {
   if (loading) {
     return (
       <Card>
-        <div className="flex justify-center py-8">
+        <div className="flex justify-center items-center min-h-[300px]">
           <Spin size="large" />
         </div>
       </Card>

@@ -1,5 +1,8 @@
 import dayjs from "dayjs";
+import "dayjs/locale/es";
 import { CreateBookingParams } from "@/libs/api/booking";
+
+dayjs.locale("es");
 
 interface PrepareBookingDataParams {
   listingId: number;
@@ -65,4 +68,33 @@ export const prepareBookingData = (
  */
 export const calculateEndTime = (startTime: dayjs.Dayjs): dayjs.Dayjs => {
   return startTime.add(2, "hour");
+};
+
+/**
+ * Formatea la fecha de un booking para mostrar en UI
+ * De "2025-11-15 19:00:00" a "15 Nov 2025"
+ */
+export const formatBookingDate = (dateString: string): string => {
+  return dayjs(dateString).format("DD MMM YYYY");
+};
+
+/**
+ * Formatea la hora de un booking para mostrar en UI
+ * De "2025-11-15 19:00:00" a "19:00"
+ */
+export const formatBookingTime = (dateString: string): string => {
+  return dayjs(dateString).format("HH:mm");
+};
+
+/**
+ * Formatea el rango de tiempo de un booking
+ * De date_start y date_end a "19:00 - 21:00"
+ */
+export const formatBookingTimeRange = (
+  dateStart: string,
+  dateEnd: string
+): string => {
+  const start = formatBookingTime(dateStart);
+  const end = formatBookingTime(dateEnd);
+  return `${start} - ${end}`;
 };

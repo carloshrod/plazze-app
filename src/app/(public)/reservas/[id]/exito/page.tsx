@@ -18,6 +18,7 @@ interface BookingSuccessData {
     name: string;
     price: number;
     is_byguest: boolean;
+    option: string;
   }>;
 }
 
@@ -77,7 +78,7 @@ export default function BookingSuccessPage({
               </Button>,
               <Button
                 key="profile"
-                onClick={() => router.push(ROUTES.ADMIN.DASHBOARD)}
+                onClick={() => router.push(ROUTES.ADMIN.BOOKINGS)}
               >
                 Mis reservas
               </Button>,
@@ -93,12 +94,17 @@ export default function BookingSuccessPage({
                   <Paragraph className="mb-1">
                     <Text strong>Plazze:</Text> {bookingData.listingName}
                   </Paragraph>
+
                   <Paragraph className="mb-1">
                     <Text strong>Fecha:</Text> {bookingData.dateStart}
                   </Paragraph>
-                  <Paragraph className="mb-1">
-                    <Text strong>Invitados:</Text> {bookingData.guests}
-                  </Paragraph>
+
+                  {bookingData.services[0].option === "byguest" && (
+                    <Paragraph className="mb-1">
+                      <Text strong>Personas:</Text> {bookingData.guests}
+                    </Paragraph>
+                  )}
+
                   <Paragraph className="mb-1">
                     <Text strong>Total:</Text> $
                     {bookingData.totalPrice.toLocaleString("es-CO")}
@@ -112,7 +118,10 @@ export default function BookingSuccessPage({
                           <li key={index} className="text-gray-700">
                             {service.name} - $
                             {service.price.toLocaleString("es-CO")}
-                            {service.is_byguest && " por persona"}
+                            {service.option === "byguest" &&
+                              ` × ${bookingData.guests} persona${
+                                bookingData.guests > 1 ? "s" : ""
+                              }`}
                           </li>
                         ))}
                       </ul>
