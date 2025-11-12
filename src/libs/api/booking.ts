@@ -143,7 +143,6 @@ export const checkBookingPaymentStatus = async (
   const response = await client.get(
     `/plazze/v1/booking/${bookingId}/payment-status`
   );
-  console.log(response);
   return response.data;
 };
 

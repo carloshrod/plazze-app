@@ -48,8 +48,8 @@ export default function PaymentStatusPage({
 
     initialCheck();
 
-    // Verificar estado cada 10 segundos
-    const interval = setInterval(checkPaymentStatus, 10000);
+    // Verificar estado cada 30 segundos
+    const interval = setInterval(checkPaymentStatus, 30000);
 
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps

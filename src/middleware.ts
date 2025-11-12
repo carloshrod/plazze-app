@@ -37,8 +37,11 @@ export function middleware(request: NextRequest) {
         (route) => request.nextUrl.pathname === route
       );
 
-      // Si es guest y trata de acceder a una ruta no permitida
-      if (userRole === "guest" && !isAllowedRoute) {
+      // Si es guest o customer y trata de acceder a una ruta no permitida
+      if (
+        (userRole === "guest" || userRole === "customer") &&
+        !isAllowedRoute
+      ) {
         return NextResponse.redirect(
           new URL(ROUTES.ADMIN.BOOKINGS, request.url)
         );

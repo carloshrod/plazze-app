@@ -20,7 +20,7 @@ interface UseBookingsReturn {
 
 /**
  * Hook para obtener bookings según el rol del usuario
- * - guest: obtiene sus reservas como comprador
+ * - guest/customer: obtiene sus reservas como comprador
  * - seller/administrator: obtiene reservas de sus listings como vendedor
  */
 export const useBookings = (params?: GetBookingsParams): UseBookingsReturn => {
@@ -49,7 +49,7 @@ export const useBookings = (params?: GetBookingsParams): UseBookingsReturn => {
       if (user.role === "seller" || user.role === "administrator") {
         response = await getMyListingsBookings(params);
       } else {
-        // Si es guest, obtiene sus reservas como comprador
+        // Si es guest/customer, obtiene sus reservas como comprador
         response = await getMyBookings(params);
       }
 

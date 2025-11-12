@@ -27,7 +27,7 @@ export interface RegisterResponse {
   user_id: number;
 }
 
-export type UserRole = "guest" | "seller" | "administrator";
+export type UserRole = "guest" | "customer" | "seller" | "administrator";
 
 export interface RegisterData {
   name: string;
