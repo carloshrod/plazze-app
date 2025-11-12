@@ -68,6 +68,8 @@ export interface BookingResponse {
   success: boolean;
   booking_id: number;
   message: string;
+  payment_url?: string;
+  order_id?: number;
   data: {
     listing_id: number;
     listing_name: string;
@@ -124,6 +126,24 @@ export const getMyListingsBookings = async (
     "/plazze/v1/my-listings-bookings",
     { params }
   );
+  return response.data;
+};
+
+/**
+ * Verificar estado de pago de un booking
+ */
+export const checkBookingPaymentStatus = async (
+  bookingId: number
+): Promise<{
+  booking_id: number;
+  status: string;
+  order_id: number | null;
+  payment_completed: boolean;
+}> => {
+  const response = await client.get(
+    `/plazze/v1/booking/${bookingId}/payment-status`
+  );
+  console.log(response);
   return response.data;
 };
 

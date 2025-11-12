@@ -39,7 +39,7 @@ export function BookingsTable() {
           <span>{decodeHtmlEntities(record.listing_title)}</span>
         </div>
       ),
-      width: 300,
+      width: 250,
     },
     {
       title: "Fecha",
@@ -126,8 +126,8 @@ export function BookingsTable() {
           columns={columns}
           dataSource={bookings}
           rowKey="id"
-          scroll={{ x: 1200 }}
-          className="min-w-[1200px]"
+          scroll={{ x: 820 }}
+          className="min-w-[820px]"
         />
       </div>
     </Card>

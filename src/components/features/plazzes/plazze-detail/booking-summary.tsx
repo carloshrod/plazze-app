@@ -100,14 +100,12 @@ const BookingSummary = ({ booking, plazze }: BookingSummaryProps) => {
           )}
 
           {selectedService && (
-            <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-              <p className="font-medium text-blue-900">
-                {selectedService.title}
-              </p>
-              <p className="text-sm text-blue-700">
+            <div className="bg-primary/5 p-3 rounded-lg border border-primary/30">
+              <p className="font-semibold">{selectedService.title}</p>
+              <p className="text-sm">
                 {isOneTimePayment ? "Pago único" : "Por persona"}
               </p>
-              <p className="text-sm text-blue-600 mt-1">
+              <p className="text-sm mt-1 ">
                 {formatCurrency(selectedService.price)}
               </p>
             </div>
@@ -151,14 +149,6 @@ const BookingSummary = ({ booking, plazze }: BookingSummaryProps) => {
             <span>{formatCurrency(totalPrice)}</span>
           </div>
         </div>
-      </div>
-
-      <div className="bg-primary/5 p-4 rounded-lg">
-        <h3 className="font-medium mb-2">Políticas de cancelación</h3>
-        <ul className="text-sm text-gray-600 space-y-1">
-          <li>• Cancelación gratuita hasta 48 horas antes del evento</li>
-          <li>• 50% de reembolso hasta 24 horas antes del evento</li>
-        </ul>
       </div>
     </div>
   );

@@ -6,7 +6,6 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button, Card, Steps, Tabs, Spin, message } from "antd";
 import { LuCreditCard, LuUser } from "react-icons/lu";
-import { RiPaypalLine } from "react-icons/ri";
 import LoginForm from "@/components/features/auth/login-form";
 import RegisterForm from "@/components/features/auth/register-form";
 import BookingSummary from "@/components/features/plazzes/plazze-detail/booking-summary";
@@ -150,9 +149,11 @@ export default function ConfirmBookingPage({
       const response = await createBooking(bookingParams);
 
       if (response.success) {
-        message.success("Reserva creada exitosamente!");
+        message.success(
+          "Reserva creada exitosamente! Redirigiendo a PayPal..."
+        );
 
-        // Guardar datos en sessionStorage para la página de éxito
+        // Guardar datos en sessionStorage para cuando regrese del pago
         if (response.data) {
           sessionStorage.setItem(
             "bookingSuccess",
@@ -163,12 +164,24 @@ export default function ConfirmBookingPage({
               guests: response.data.guests,
               totalPrice: response.data.total_price,
               services: response.data.services,
+              orderId: response.order_id,
             })
           );
         }
 
-        // Redireccionar a página de éxito
-        router.push(ROUTES.PUBLIC.BOOKINGS.SUCCESS(response.booking_id));
+        // Redireccionar a PayPal si hay payment_url
+        if (response.payment_url) {
+          // Abrir en nueva pestaña
+          window.open(response.payment_url, "_blank");
+
+          // También redireccionar a página de estado de pago
+          router.push(
+            `/reservas/${response.booking_id}/payment-status?order_id=${response.order_id}`
+          );
+        } else {
+          // Redireccionar a página de éxito (fallback)
+          router.push(ROUTES.PUBLIC.BOOKINGS.SUCCESS(response.booking_id));
+        }
       }
     } catch (error) {
       console.error("❌ Error al crear reserva:", error);
@@ -272,8 +285,8 @@ export default function ConfirmBookingPage({
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
                       <p className="text-sm text-gray-500 text-center">
-                        Al hacer clic en &ldquo;Confirmar reserva&rdquo;, se
-                        creará tu reserva en el sistema.
+                        Al hacer clic en &ldquo;Ir al pago&rdquo;, serás
+                        redirigido a la pantalla de pago
                       </p>
                       <Button
                         type="primary"
@@ -281,12 +294,9 @@ export default function ConfirmBookingPage({
                         block
                         loading={submitting}
                         onClick={handlePayment}
-                        icon={<RiPaypalLine size={20} />}
-                        className="flex items-center justify-center h-12 !bg-[#0070ba] hover:!bg-[#005ea6]"
+                        className="flex items-center justify-center h-12 !bg-primary hover:!bg-primary/90"
                       >
-                        {submitting
-                          ? "Creando reserva..."
-                          : "Confirmar reserva"}
+                        {submitting ? "Creando reserva..." : "Ir al pago"}
                       </Button>
                     </div>
                     <Button
