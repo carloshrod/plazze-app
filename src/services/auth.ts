@@ -102,13 +102,13 @@ export const useAuthService = () => {
     }
   };
 
-  const register = async (data: RegisterData) => {
+  const register = async (data: RegisterData, redirect: boolean = true) => {
     try {
       setLoading(true);
       await authLib.register(data);
       showMessage.success("Registro exitoso");
 
-      await login({ email: data.email, password: data.password });
+      await login({ email: data.email, password: data.password }, redirect);
     } catch (error) {
       console.error("Error durante el registro:", error);
       const errorMessage =

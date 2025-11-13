@@ -4,23 +4,27 @@ import { Button, Form, Input } from "antd";
 import { useAuthService } from "@/services/auth";
 import { RegisterFormFields } from "@/types/auth";
 
-const RegisterForm = ({
-  userType = "client",
-}: {
+type Props = {
   userType?: "client" | "plazzer";
-}) => {
+  redirect?: boolean;
+};
+
+const RegisterForm = ({ userType = "client", redirect = true }: Props) => {
   const [form] = Form.useForm();
   const { register, loading } = useAuthService();
 
   const onFinish = async (values: RegisterFormFields) => {
-    await register({
-      name: values.name,
-      lastName: values.lastName,
-      username: values.userName,
-      email: values.email,
-      password: values.password,
-      role: userType === "plazzer" ? "seller" : "guest",
-    });
+    await register(
+      {
+        name: values.name,
+        lastName: values.lastName,
+        username: values.userName,
+        email: values.email,
+        password: values.password,
+        role: userType === "plazzer" ? "seller" : "guest",
+      },
+      redirect
+    );
   };
 
   return (

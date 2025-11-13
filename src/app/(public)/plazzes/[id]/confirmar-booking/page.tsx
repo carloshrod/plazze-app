@@ -244,7 +244,7 @@ export default function ConfirmBookingPage({
                         label: "Registrarse",
                         children: (
                           <div>
-                            <RegisterForm />
+                            <RegisterForm redirect={false} />
                             <p className="text-sm text-gray-500 mt-6 text-center">
                               Al crear una cuenta, aceptas nuestros{" "}
                               <Link
