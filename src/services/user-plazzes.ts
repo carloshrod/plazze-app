@@ -6,7 +6,7 @@ import {
 } from "@/libs/api/plazze";
 import { PlazzeWP } from "@/types/plazze";
 
-export const useUserPlazzes = (filters: UserPlazzeFilters = {}) => {
+export const useUserPlazzesService = (filters: UserPlazzeFilters = {}) => {
   const [plazzes, setPlazzes] = useState<PlazzeWP[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

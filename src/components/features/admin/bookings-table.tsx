@@ -3,7 +3,7 @@
 import { Avatar, Card, Table, Tag, Alert, Spin } from "antd";
 import { LuBuilding } from "react-icons/lu";
 import { decodeHtmlEntities, formatCurrency } from "@/utils/format";
-import { useBookings } from "@/hooks/useBookings";
+import { useBookingsService } from "@/services/bookings";
 import { formatBookingDate, formatBookingTimeRange } from "@/helpers/booking";
 import type { Booking } from "@/libs/api/booking";
 
@@ -24,7 +24,7 @@ const statusLabels = {
 } as const;
 
 export function BookingsTable() {
-  const { bookings, loading, error } = useBookings({
+  const { bookings, loading, error } = useBookingsService({
     per_page: 20,
   });
 

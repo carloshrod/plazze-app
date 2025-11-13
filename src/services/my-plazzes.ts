@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useMyPlazzesStore } from "@/stores/my-plazzes";
 import { plazzeLib } from "@/libs/api/plazze";
 
-export const useMyPlazzes = () => {
+export const useMyPlazzesService = () => {
   const {
     plazzes,
     loading,

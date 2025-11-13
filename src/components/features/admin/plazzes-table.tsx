@@ -12,7 +12,7 @@ import {
 } from "antd";
 import Link from "next/link";
 import { LuPen, LuTrash2 } from "react-icons/lu";
-import { useMyPlazzes } from "@/hooks/useMyPlazzes";
+import { useMyPlazzesService } from "@/services/my-plazzes";
 import { useAppData } from "@/hooks/useAppData";
 import { usePlazzeModalStore } from "@/stores/plazze-modal";
 import { usePlazzeService } from "@/services/plazze";
@@ -36,7 +36,7 @@ const statusLabels = {
 } as const;
 
 export function PlazzesTable() {
-  const { plazzes, loading, error } = useMyPlazzes();
+  const { plazzes, loading, error } = useMyPlazzesService();
   const { getCategoryName } = useAppData();
   const { openEditModal } = usePlazzeModalStore();
   const { deletePlazze } = usePlazzeService();

@@ -23,7 +23,9 @@ interface UseBookingsReturn {
  * - guest/customer: obtiene sus reservas como comprador
  * - seller/administrator: obtiene reservas de sus listings como vendedor
  */
-export const useBookings = (params?: GetBookingsParams): UseBookingsReturn => {
+export const useBookingsService = (
+  params?: GetBookingsParams
+): UseBookingsReturn => {
   const { user } = useAuthStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);

@@ -3,11 +3,11 @@
 import { Button, Modal } from "antd";
 import { LuPlus } from "react-icons/lu";
 import PlazzeForm from "./plazze-form";
-import { useMyPlazzes } from "@/hooks/useMyPlazzes";
+import { useMyPlazzesService } from "@/services/my-plazzes";
 import { usePlazzeModalStore } from "@/stores/plazze-modal";
 
 const PlazzeModal = () => {
-  const { refreshPlazzes } = useMyPlazzes();
+  const { refreshPlazzes } = useMyPlazzesService();
   const { isOpen, mode, initialFormData, openCreateModal, closeModal } =
     usePlazzeModalStore();
 
