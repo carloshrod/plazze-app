@@ -120,7 +120,7 @@ export default function PaymentStatusPage({
               <div className="space-y-4">
                 <Alert
                   message="Proceso de pago"
-                  description="Una vez que completes el pago en PayPal, tu reserva será confirmada automáticamente."
+                  description="Una vez que completes el pago, tu reserva será confirmada automáticamente."
                   type="info"
                   showIcon
                 />
