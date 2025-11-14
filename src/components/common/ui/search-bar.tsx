@@ -111,7 +111,7 @@ const SearchBar = () => {
   return (
     <div className="max-w-4xl mx-auto mb-8">
       <div className="flex flex-col sm:flex-row gap-4 p-4 bg-white rounded-lg shadow-lg border border-gray-200">
-        <div className="sm:w-[40%]">
+        <div className="sm:w-[60%]">
           <Input
             size="large"
             placeholder="¿Dónde quieres ir?"
@@ -151,7 +151,6 @@ const SearchBar = () => {
             needConfirm={false}
           />
         </div>
-
         <Button
           type="primary"
           size="large"
