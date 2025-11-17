@@ -2,62 +2,55 @@ import { ROUTES } from "@/consts/routes";
 import Link from "next/link";
 import {
   LuBeer,
-  LuMusic,
-  LuBuilding,
-  LuUsers,
-  LuTrees,
   LuPalette,
+  LuHeartPulse,
+  LuBriefcaseBusiness,
+  LuPartyPopper,
+  LuArrowUpRight,
 } from "react-icons/lu";
 
 const CategoriesSection = () => {
-  const categories = [
+  const mainCategories = [
     {
-      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?category=38`,
+      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?category=20`,
       icon: <LuBeer size={32} className="text-primary" />,
       bgColor: "bg-primary/5",
-      title: "Bares",
-      description: "Relájate con los mejores cócteles y ambiente",
-      categoryId: 38,
+      title: "Bares & Discotecas",
+      description:
+        "Relájate con los mejores cócteles y baila toda la noche en los mejores lugares",
+      categoryId: 20,
     },
     {
-      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?category=42`,
-      icon: <LuMusic size={32} className="text-primary" />,
+      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?category=41`,
+      icon: <LuHeartPulse size={32} className="text-primary" />,
       bgColor: "bg-primary/5",
-      title: "Discotecas",
-      description: "Baila toda la noche en los mejores lugares",
-      categoryId: 42,
+      title: "Bienestar & Fitness",
+      description: "Encuentra espacios para cuidar tu cuerpo y mente",
+      categoryId: 41,
     },
     {
-      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?category=30`,
-      icon: <LuBuilding size={32} className="text-primary" />,
+      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?category=114`,
+      icon: <LuBriefcaseBusiness size={32} className="text-primary" />,
       bgColor: "bg-primary/5",
-      title: "Sala de Eventos",
-      description: "Salones elegantes para tus ocasiones especiales",
-      categoryId: 30,
+      title: "Corporativo",
+      description: "Espacios ideales para reuniones y eventos empresariales",
+      categoryId: 114,
     },
     {
-      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?category=119`,
-      icon: <LuTrees size={32} className="text-primary" />,
+      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?category=124`,
+      icon: <LuPalette size={32} className="text-primary" />,
       bgColor: "bg-primary/5",
-      title: "Outdoor",
-      description: "Disfruta de la naturaleza en espacios abiertos",
-      categoryId: 119,
+      title: "Cultura & Artes",
+      description: "Espacios perfectos para eventos culturales y artísticos",
+      categoryId: 124,
     },
     {
       href: `${ROUTES.PUBLIC.PLAZZES.LIST}?category=35`,
-      icon: <LuPalette size={32} className="text-primary" />,
+      icon: <LuPartyPopper size={32} className="text-primary" />,
       bgColor: "bg-primary/5",
-      title: "Cultura y Artes",
-      description: "Espacios perfectos para eventos culturales y artísticos",
+      title: "Eventos",
+      description: "Encuentra lugares para tus eventos y celebraciones",
       categoryId: 35,
-    },
-    {
-      href: `${ROUTES.PUBLIC.PLAZZES.LIST}?category=115`,
-      icon: <LuUsers size={32} className="text-primary" />,
-      bgColor: "bg-primary/5",
-      title: "Reuniones",
-      description: "Espacios profesionales para tu equipo",
-      categoryId: 115,
     },
   ];
 
@@ -74,7 +67,7 @@ const CategoriesSection = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((category, index) => (
+          {mainCategories.map((category, index) => (
             <Link key={index} href={category.href} className="group h-full">
               <div className="bg-white rounded-lg p-6 hover:shadow-lg transition-all group h-full flex flex-col">
                 <div
@@ -91,6 +84,17 @@ const CategoriesSection = () => {
               </div>
             </Link>
           ))}
+          {mainCategories.length > 0 && (
+            <div className="flex items-center justify-center md:aspect-[4/3]">
+              <Link
+                href={ROUTES.PUBLIC.PLAZZES.LIST}
+                className="text-xl text-primary hover:text-primary/80 font-semibold transition-colors group flex items-center hover:bg-primary/10 px-4 py-2 rounded-md"
+              >
+                Ver todos los plazzes
+                <LuArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </section>

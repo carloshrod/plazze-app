@@ -2,13 +2,10 @@
 
 import { usePlazzeStore } from "@/stores/plazze";
 import { useSearchStore } from "@/stores/search";
-import { getCategoryName } from "@/helpers/categories";
 
 const SearchResults = () => {
   const { plazzes, loading } = usePlazzeStore();
   const { appliedFilters, hasSearched } = useSearchStore();
-
-  const categoryName = getCategoryName(appliedFilters.category);
 
   const hasActiveSearch =
     appliedFilters.location.trim() ||
@@ -36,27 +33,11 @@ const SearchResults = () => {
                 plazzes.length > 1 ? "s" : ""
               } encontrado${plazzes.length > 1 ? "s" : ""}`}
         </h2>
-        {plazzes.length === 0 ? (
+        {plazzes.length === 0 && (
           <p className="text-gray-600">
             {appliedFilters.category && !hasOtherFilters
-              ? `No se encontraron plazzes en la categoría "${categoryName}"`
+              ? "No se encontraron plazzes en la categoría seleccionada"
               : "Intenta ajustar tus filtros de búsqueda para encontrar más opciones"}
-          </p>
-        ) : (
-          <p className="text-gray-600">
-            {appliedFilters.category && `Categoría: ${categoryName}`}
-            {appliedFilters.location.trim() &&
-              `${appliedFilters.category ? " | " : ""}en "${
-                appliedFilters.location
-              }"`}
-            {appliedFilters.date &&
-              ` para el ${appliedFilters.date.format("DD/MM/YYYY")}`}
-            {appliedFilters.time &&
-              ` a las ${appliedFilters.time.format("h:mm a")}`}
-            {appliedFilters.people &&
-              ` para ${appliedFilters.people} persona${
-                appliedFilters.people > 1 ? "s" : ""
-              }`}
           </p>
         )}
       </div>
@@ -85,11 +66,6 @@ const SearchResults = () => {
           {plazzes.length} plazze{plazzes.length !== 1 ? "s" : ""} encontrado
           {plazzes.length !== 1 ? "s" : ""}
         </h2>
-        <p className="text-gray-600">
-          {appliedFilters.category
-            ? `Resultados para la categoría "${categoryName}"`
-            : "Resultados de tu búsqueda"}
-        </p>
       </div>
     );
   }

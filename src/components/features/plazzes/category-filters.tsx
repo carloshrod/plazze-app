@@ -1,53 +1,64 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "antd";
-import {
-  LuBeer,
-  LuMusic,
-  LuBuilding,
-  LuTrees,
-  LuUsers,
-  LuPalette,
-} from "react-icons/lu";
 import { useSearchStore } from "@/stores/search";
 import { usePlazzeService } from "@/services/plazze";
+import { plazzeLib } from "@/libs/api/plazze";
 
 const CategoryFilters = () => {
   const { filters, setFilters, setHasSearched } = useSearchStore();
   const { searchWithFilters, fetchPlazzes } = usePlazzeService();
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [allCategories, setAllCategories] = useState<
+    Array<{ id: number; name: string; slug: string }>
+  >([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
 
-  const categories = [
+  const mainCategories = [
     {
-      id: "38",
-      name: "Bares",
-      icon: <LuBeer size={18} />,
+      id: "20",
+      name: "Bares & Discotecas",
     },
     {
-      id: "42",
-      name: "Discotecas",
-      icon: <LuMusic size={18} />,
+      id: "41",
+      name: "Bienestar & Fitness",
     },
     {
-      id: "30",
-      name: "Sala de Eventos",
-      icon: <LuBuilding size={18} />,
+      id: "114",
+      name: "Corporativo",
     },
     {
-      id: "119",
-      name: "Outdoor",
-      icon: <LuTrees size={18} />,
+      id: "124",
+      name: "Cultura & Artes",
     },
     {
       id: "35",
-      name: "Cultura y Artes",
-      icon: <LuPalette size={18} />,
-    },
-    {
-      id: "115",
-      name: "Reuniones",
-      icon: <LuUsers size={18} />,
+      name: "Eventos",
     },
   ];
+
+  const loadAllCategories = async () => {
+    if (allCategories.length > 0) {
+      setShowAllCategories(true);
+      return;
+    }
+
+    try {
+      setLoadingCategories(true);
+      const categories = await plazzeLib.getCategories();
+      setAllCategories(categories);
+      setShowAllCategories(true);
+    } catch (error) {
+      console.error("Error al cargar categorías:", error);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  const displayedCategories = showAllCategories
+    ? allCategories.map((cat) => ({ id: String(cat.id), name: cat.name }))
+    : mainCategories;
 
   const handleCategoryClick = async (categoryId: string) => {
     // Si ya está seleccionada la misma categoría, deseleccionar
@@ -90,7 +101,7 @@ const CategoryFilters = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
       <div className="flex justify-center flex-wrap gap-2">
-        {categories.map((category) => {
+        {displayedCategories.map((category) => {
           const isActive = filters.category === category.id;
 
           return (
@@ -104,11 +115,33 @@ const CategoryFilters = () => {
               }`}
               onClick={() => handleCategoryClick(category.id)}
             >
-              {category.icon}
               <span className="font-medium">{category.name}</span>
             </Button>
           );
         })}
+
+        {/* Botón para mostrar todas las categorías */}
+        {!showAllCategories && (
+          <Button
+            type="dashed"
+            loading={loadingCategories}
+            className="flex items-center gap-2 h-10 px-4 rounded-full border-2 border-dashed border-primary/50 text-primary hover:border-primary hover:bg-primary/5 transition-all duration-200"
+            onClick={loadAllCategories}
+          >
+            <span className="font-semibold">Todas las categorías</span>
+          </Button>
+        )}
+
+        {/* Botón para volver a las categorías principales */}
+        {showAllCategories && (
+          <Button
+            type="dashed"
+            className="flex items-center gap-2 h-10 px-4 rounded-full border-2 border-dashed border-gray-400 text-gray-600 hover:border-gray-600 hover:bg-gray-50 transition-all duration-200"
+            onClick={() => setShowAllCategories(false)}
+          >
+            <span className="font-semibold">Menos categorías</span>
+          </Button>
+        )}
       </div>
     </div>
   );
