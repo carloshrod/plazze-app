@@ -1,15 +1,9 @@
 "use client";
 
-import { Button, DatePicker, Input, InputNumber, TimePicker } from "antd";
+import { Button, DatePicker, Input, TimePicker } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { useRouter, usePathname } from "next/navigation";
-import {
-  LuCalendarDays,
-  LuClock,
-  LuMapPin,
-  LuSearch,
-  LuUsers,
-} from "react-icons/lu";
+import { LuCalendarDays, LuClock, LuMapPin, LuSearch } from "react-icons/lu";
 import { useSearchStore } from "@/stores/search";
 import { usePlazzeService } from "@/services/plazze";
 import { ROUTES } from "@/consts/routes";
@@ -36,10 +30,6 @@ const SearchBar = () => {
 
   const handleTimeChange = (time: Dayjs | null) => {
     setFilters({ time });
-  };
-
-  const handlePeopleChange = (people: number | null) => {
-    setFilters({ people });
   };
 
   const handleSearch = async () => {
@@ -132,7 +122,7 @@ const SearchBar = () => {
             onKeyPress={handleKeyPress}
           />
         </div>
-        <div className="sm:w-[20%]">
+        <div className="sm:w-[25%]">
           <DatePicker
             size="large"
             format="DD/MM/YYYY"
@@ -146,7 +136,7 @@ const SearchBar = () => {
             }
           />
         </div>
-        <div className="sm:w-[15%]">
+        <div className="sm:w-[20%]">
           <TimePicker
             size="large"
             use12Hours
@@ -161,19 +151,7 @@ const SearchBar = () => {
             needConfirm={false}
           />
         </div>
-        <div className="sm:w-[15%]">
-          <InputNumber
-            size="large"
-            placeholder="Personas"
-            min={1}
-            max={99}
-            prefix={<LuUsers size={20} className="text-gray-400" />}
-            className="!w-full lg:!min-w-[120px] border-0 shadow-none"
-            controls={true}
-            value={filters.people}
-            onChange={handlePeopleChange}
-          />
-        </div>
+
         <Button
           type="primary"
           size="large"
