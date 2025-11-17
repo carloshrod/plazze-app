@@ -234,7 +234,7 @@ export default function ConfirmBookingPage({
                         key: "login",
                         label: "Iniciar sesión",
                         children: (
-                          <div className="px-24">
+                          <div className="sm:px-24">
                             <LoginForm redirect={false} />
                           </div>
                         ),
@@ -248,14 +248,18 @@ export default function ConfirmBookingPage({
                             <p className="text-sm text-gray-500 mt-6 text-center">
                               Al crear una cuenta, aceptas nuestros{" "}
                               <Link
-                                href="#"
+                                href="https://plazze.app/refund_returns"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="text-primary hover:text-primary/90"
                               >
                                 Términos y condiciones
                               </Link>{" "}
                               y{" "}
                               <Link
-                                href="#"
+                                href="https://plazze.app/privacy-policy"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="text-primary hover:text-primary/90"
                               >
                                 Política de privacidad

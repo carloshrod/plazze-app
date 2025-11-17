@@ -1,28 +1,11 @@
 import { ROUTES } from "@/consts/routes";
-import {
-  LuFacebook,
-  LuInstagram,
-  LuMail,
-  LuMapPin,
-  LuPhone,
-  LuTwitter,
-} from "react-icons/lu";
+import { LuInstagram, LuMail, LuMapPin, LuPhone } from "react-icons/lu";
 
 export const socialLinks = [
   {
-    name: "Facebook",
-    href: "#",
-    icon: LuFacebook,
-  },
-  {
     name: "Instagram",
-    href: "#",
+    href: "https://www.instagram.com/heyplazze?igsh=MW5naHF6cDdwZWZ1Yg%3D%3D&utm_source=qr",
     icon: LuInstagram,
-  },
-  {
-    name: "Twitter",
-    href: "#",
-    icon: LuTwitter,
   },
 ];
 

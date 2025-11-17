@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, Result, Spin, Button, Alert } from "antd";
-import { CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import { checkBookingPaymentStatus } from "@/libs/api/booking";
 import { ROUTES } from "@/consts/routes";
 
@@ -66,16 +70,31 @@ export default function PaymentStatusPage({
   const isPaymentCompleted =
     paymentStatus === "confirmed" || paymentStatus === "paid";
 
+  const paymentStatusMap: Record<string, string> = {
+    waiting: "En espera",
+    pending: "Pendiente",
+    confirmed: "Confirmado",
+    paid: "Pagado",
+    failed: "Fallido",
+    cancelled: "Cancelado",
+    processing: "Procesando",
+    refunded: "Reembolsado",
+  };
+
   return (
-    <div className="py-8 bg-gray-50 px-6 md:px-12 min-h-screen">
-      <div className="max-w-2xl mx-auto">
-        <Card>
+    <div className="py-8 bg-gray-50 px-2 sm:px-6 md:px-12 min-h-screen">
+      <div className="w-full md:max-w-2xl mx-auto">
+        <Card styles={{ body: { padding: "16px 8px" } }}>
           {isPaymentCompleted ? (
             <Result
               status="success"
               icon={<CheckCircleOutlined style={{ color: "#52c41a" }} />}
-              title="¡Pago Confirmado!"
-              subTitle={`Tu reserva #${bookingId} ha sido confirmada exitosamente`}
+              title={
+                <span className="text-base md:text-lg">¡Pago Confirmado!</span>
+              }
+              subTitle={
+                <span className="text-sm md:text-base">{`Tu reserva #${bookingId} ha sido confirmada exitosamente`}</span>
+              }
               extra={[
                 <Button
                   type="primary"
@@ -83,10 +102,12 @@ export default function PaymentStatusPage({
                   onClick={() =>
                     router.push(ROUTES.PUBLIC.BOOKINGS.SUCCESS(bookingId))
                   }
+                  className="w-full sm:w-auto"
                 >
                   Ver detalles de la reserva
                 </Button>,
               ]}
+              style={{ padding: "8px 0" }}
             >
               <div className="text-center">
                 <p className="text-gray-600">
@@ -98,35 +119,54 @@ export default function PaymentStatusPage({
             <Result
               status="info"
               icon={<ClockCircleOutlined style={{ color: "#1890ff" }} />}
-              title="Esperando confirmación de pago"
-              subTitle={`Reserva #${bookingId} - Estado: ${paymentStatus}`}
-              extra={[
-                <Button
-                  type="primary"
-                  key="refresh"
-                  loading={checking}
-                  onClick={checkPaymentStatus}
-                >
-                  Verificar pago
-                </Button>,
-                <Button
-                  key="back"
-                  onClick={() => router.push(ROUTES.PUBLIC.PLAZZES.LIST)}
-                >
-                  Volver a plazzes
-                </Button>,
-              ]}
+              title={
+                <span className="text-base md:text-lg">
+                  Esperando confirmación de pago
+                </span>
+              }
+              subTitle={
+                <span className="text-sm md:text-base">{`Reserva #${bookingId} - Estado: ${paymentStatusMap[paymentStatus]}`}</span>
+              }
+              extra={
+                <div className="flex flex-col justify-center gap-2 w-full sm:flex-row sm:gap-3">
+                  <Button
+                    type="primary"
+                    key="refresh"
+                    loading={checking}
+                    onClick={checkPaymentStatus}
+                    className="w-full max-w-[200px] max-sm:m-auto sm:w-auto"
+                  >
+                    Verificar pago
+                  </Button>
+                  <Button
+                    key="back"
+                    onClick={() => router.push(ROUTES.PUBLIC.PLAZZES.LIST)}
+                    className="w-full max-w-[200px] max-sm:m-auto sm:w-auto"
+                  >
+                    Volver a plazzes
+                  </Button>
+                </div>
+              }
+              style={{ padding: "8px 0" }}
             >
               <div className="space-y-4">
                 <Alert
-                  message="Proceso de pago"
-                  description="Una vez que completes el pago, tu reserva será confirmada automáticamente."
+                  message={
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-2">
+                      <InfoCircleOutlined className="!text-blue-500 !text-xl" />
+                      <span>Proceso de pago</span>
+                    </div>
+                  }
+                  description={
+                    <div className="sm:px-8">
+                      Una vez que completes el pago, tu reserva será confirmada
+                    </div>
+                  }
                   type="info"
-                  showIcon
                 />
 
                 {orderId && (
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-500 text-center">
                     <p>
                       <strong>ID de la reserva:</strong> {bookingId}
                     </p>
@@ -134,7 +174,8 @@ export default function PaymentStatusPage({
                       <strong>ID de la orden:</strong> {orderId}
                     </p>
                     <p>
-                      <strong>Estado actual:</strong> {paymentStatus}
+                      <strong>Estado actual:</strong>{" "}
+                      {paymentStatusMap[paymentStatus]}
                     </p>
                   </div>
                 )}

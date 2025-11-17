@@ -19,6 +19,8 @@ const FooterBrand = () => {
             <Link
               key={name}
               href={href}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-gray-500 hover:text-primary transition-colors"
             >
               <Icon size={20} />

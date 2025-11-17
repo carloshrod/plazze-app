@@ -178,7 +178,7 @@ export default function PlazzeForm({
       {/* Basic Information */}
       <Card title="Información Básica" className="mb-4">
         <Row gutter={16}>
-          <Col span={12}>
+          <Col xs={24} sm={12}>
             <Form.Item
               label="Título del plazze"
               name="title"
@@ -187,7 +187,7 @@ export default function PlazzeForm({
               <Input placeholder="Ej: Terraza Verde con Vista Panorámica" />
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col xs={24} sm={12}>
             <Form.Item
               label="Categoría"
               name="category"
@@ -209,7 +209,7 @@ export default function PlazzeForm({
       {/* Location */}
       <Card title="Ubicación" className="mb-4">
         <Row gutter={16}>
-          <Col span={12}>
+          <Col xs={24} sm={12}>
             <Form.Item
               label="Dirección"
               name="address"
@@ -218,7 +218,7 @@ export default function PlazzeForm({
               <Input placeholder="Ej: Calle 50, Obarrio, Ciudad de Panamá" />
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col xs={24} sm={12}>
             <Form.Item
               label="Dirección Amigable (Opcional)"
               name="friendly_address"
@@ -229,7 +229,7 @@ export default function PlazzeForm({
         </Row>
 
         <Row gutter={16}>
-          <Col span={8}>
+          <Col xs={24} sm={8}>
             <Form.Item label="Región" name="region">
               <Select
                 placeholder="Selecciona región"
@@ -240,7 +240,7 @@ export default function PlazzeForm({
               />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col xs={24} sm={8}>
             <Form.Item
               label="Latitud"
               name="latitude"
@@ -254,7 +254,7 @@ export default function PlazzeForm({
               />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col xs={24} sm={8}>
             <Form.Item
               label="Longitud"
               name="longitude"
@@ -329,7 +329,7 @@ export default function PlazzeForm({
         </Form.Item>
 
         <Row gutter={16}>
-          <Col span={12}>
+          <Col xs={24} sm={12}>
             <Form.Item label="Precio Mínimo (Opcional)" name="price_min">
               <InputNumber
                 className="!w-full"
@@ -339,7 +339,7 @@ export default function PlazzeForm({
               />
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col xs={24} sm={12}>
             <Form.Item label="Precio Máximo (Opcional)" name="price_max">
               <InputNumber
                 className="!w-full"
@@ -374,7 +374,7 @@ export default function PlazzeForm({
                   }
                 >
                   <Row gutter={16}>
-                    <Col span={6}>
+                    <Col xs={24} sm={12} lg={6}>
                       <Form.Item
                         {...restField}
                         name={[name, "title"]}
@@ -386,7 +386,7 @@ export default function PlazzeForm({
                         <Input placeholder="Ej: Servicio de Catering" />
                       </Form.Item>
                     </Col>
-                    <Col span={6}>
+                    <Col xs={24} sm={12} lg={6}>
                       <Form.Item
                         {...restField}
                         name={[name, "description"]}
@@ -398,7 +398,7 @@ export default function PlazzeForm({
                         <Input placeholder="Describe el servicio..." />
                       </Form.Item>
                     </Col>
-                    <Col span={6}>
+                    <Col xs={24} sm={12} lg={6}>
                       <Form.Item
                         {...restField}
                         name={[name, "price"]}
@@ -410,7 +410,7 @@ export default function PlazzeForm({
                         <InputNumber className="!w-full" prefix="$" min={0} />
                       </Form.Item>
                     </Col>
-                    <Col span={6}>
+                    <Col xs={24} sm={12} lg={6}>
                       <Form.Item
                         {...restField}
                         name={[name, "bookable_options"]}
@@ -436,7 +436,7 @@ export default function PlazzeForm({
                   onClick={() => add()}
                   icon={<PlusOutlined />}
                 >
-                  Agregar Servicio
+                  <span className="hidden sm:block">Agregar Servicio</span>
                 </Button>
               </Form.Item>
             </>
@@ -475,7 +475,7 @@ export default function PlazzeForm({
                     }
                   >
                     <Row gutter={16}>
-                      <Col span={4}>
+                      <Col xs={24} lg={4}>
                         <Form.Item
                           {...restField}
                           label="Hora de Apertura"
@@ -498,7 +498,7 @@ export default function PlazzeForm({
                           />
                         </Form.Item>
                       </Col>
-                      <Col span={4}>
+                      <Col xs={24} lg={4}>
                         <Form.Item
                           {...restField}
                           label="Hora de Cierre"
@@ -521,7 +521,7 @@ export default function PlazzeForm({
                           />
                         </Form.Item>
                       </Col>
-                      <Col span={16}>
+                      <Col xs={24} lg={16}>
                         <Form.Item
                           {...restField}
                           label="Días de la Semana"
@@ -592,7 +592,7 @@ export default function PlazzeForm({
                   onClick={() => add()}
                   icon={<PlusOutlined />}
                 >
-                  Agregar Horario
+                  <span className="hidden sm:block">Agregar Horario</span>
                 </Button>
               </Form.Item>
             </>
@@ -602,7 +602,7 @@ export default function PlazzeForm({
 
       {/* Submit Button */}
       <Form.Item>
-        <Space className="w-full flex justify-between">
+        <Space className="w-full flex flex-col-reverse sm:flex-row justify-between">
           <Button size="large" danger disabled={loading} onClick={closeModal}>
             Cancelar
           </Button>

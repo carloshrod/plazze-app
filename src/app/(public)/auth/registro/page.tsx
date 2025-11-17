@@ -30,11 +30,21 @@ export default function RegisterPage() {
 
           <p className="text-sm text-gray-500 mt-6 text-center">
             Al crear una cuenta, aceptas nuestros{" "}
-            <Link href="#" className="text-primary hover:text-primary/90">
+            <Link
+              href="https://plazze.app/refund_returns"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:text-primary/90"
+            >
               Términos y condiciones
             </Link>{" "}
             y{" "}
-            <Link href="#" className="text-primary hover:text-primary/90">
+            <Link
+              href="https://plazze.app/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:text-primary/90"
+            >
               Política de privacidad
             </Link>
           </p>

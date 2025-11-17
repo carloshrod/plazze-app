@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Button, Form, Input } from "antd";
 import { FormProps } from "antd/lib";
 import { useAuthService } from "@/services/auth";
@@ -57,19 +56,13 @@ const LoginForm = ({ redirect = true, redirectTo = undefined }: Props) => {
           <Input.Password size="large" placeholder="••••••••" />
         </Form.Item>
 
-        <div className="flex justify-end mb-6">
-          <Link href="#" className="text-sm text-primary hover:text-primary/90">
-            ¿Olvidaste tu contraseña?
-          </Link>
-        </div>
-
         <div className="text-end">
           <Button
             type="primary"
             htmlType="submit"
             size="large"
             block
-            className="h-11 !w-[45%]"
+            className="mt-4 sm:!w-[50%]"
             loading={loading}
           >
             Iniciar sesión

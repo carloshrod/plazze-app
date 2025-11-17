@@ -34,7 +34,7 @@ const RegisterForm = ({ userType = "client", redirect = true }: Props) => {
       onFinish={onFinish}
       requiredMark={false}
     >
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid sm:grid-cols-2 gap-4">
         <Form.Item
           label="Nombre"
           name="name"
@@ -139,7 +139,7 @@ const RegisterForm = ({ userType = "client", redirect = true }: Props) => {
           htmlType="submit"
           size="large"
           block
-          className="mt-4 !w-[30%]"
+          className="mt-4 sm:!w-[30%]"
           loading={loading}
         >
           Crear cuenta

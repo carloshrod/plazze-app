@@ -41,6 +41,8 @@
       border-radius: 0.5rem !important;
       font-weight: 500 !important;
       transition: all 0.2s !important;
+      min-width: 0 !important;
+      white-space: normal !important;
     }
 
     & :where(.ant-tabs-tab.ant-tabs-tab-active) {
@@ -50,6 +52,17 @@
 
     & :where(.ant-tabs-ink-bar) {
       display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      & :where(.ant-tabs-nav-list) {
+        gap: 0.5rem !important;
+      }
+
+      & :where(.ant-tabs-tab) {
+        padding: 0.5rem 0.5rem !important;
+        font-size: 0.95rem !important;
+      }
     }
   }
 }
