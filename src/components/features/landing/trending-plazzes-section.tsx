@@ -1,46 +1,14 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { Spin } from "antd";
 import { LuArrowUpRight } from "react-icons/lu";
 import { ROUTES } from "@/consts/routes";
-import { usePlazzeService } from "@/services/plazze";
 import { Plazze } from "@/types/plazze";
 
-export const TrendingPlazzesSection = () => {
-  const [trendingPlazzes, setTrendingPlazzes] = useState<Plazze[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { fetchPlazzes } = usePlazzeService();
-
-  useEffect(() => {
-    const loadTrendingPlazzes = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Buscar plazzes sin filtros para obtener los "trending" (primeros 5)
-        const response = await fetchPlazzes({
-          per_page: 5,
-          page: 1,
-        });
-
-        if (response) {
-          setTrendingPlazzes(response);
-        }
-      } catch (err) {
-        console.error("Error al cargar plazzes trending:", err);
-        setError("Error al cargar los plazzes");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadTrendingPlazzes();
-  }, [fetchPlazzes]);
-
+export const TrendingPlazzesSection = ({
+  trendingPlazzes,
+}: {
+  trendingPlazzes: Plazze[];
+}) => {
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,21 +22,7 @@ export const TrendingPlazzesSection = () => {
           </p>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <Spin size="large" />
-          </div>
-        ) : error ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 mb-4">{error}</p>
-            <Link
-              href={ROUTES.PUBLIC.PLAZZES.LIST}
-              className="text-primary hover:text-primary/80 font-medium"
-            >
-              Ver todos los plazzes
-            </Link>
-          </div>
-        ) : (
+        {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {trendingPlazzes.map((plazze) => (
               <Link
@@ -117,7 +71,7 @@ export const TrendingPlazzesSection = () => {
               </div>
             )}
           </div>
-        )}
+        }
       </div>
     </section>
   );
