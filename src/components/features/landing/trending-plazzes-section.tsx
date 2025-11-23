@@ -1,14 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { LuArrowUpRight } from "react-icons/lu";
 import { ROUTES } from "@/consts/routes";
-import { Plazze } from "@/types/plazze";
+import { usePlazzeStore } from "@/stores/plazze";
 
-export const TrendingPlazzesSection = ({
-  trendingPlazzes,
-}: {
-  trendingPlazzes: Plazze[];
-}) => {
+export const TrendingPlazzesSection = () => {
+  const { trendingPlazzes, loading } = usePlazzeStore();
+
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,7 +22,13 @@ export const TrendingPlazzesSection = ({
           </p>
         </div>
 
-        {
+        {loading || trendingPlazzes.length === 0 ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-pulse text-xl text-gray-600">
+              Cargando plazzes...
+            </div>
+          </div>
+        ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {trendingPlazzes.map((plazze) => (
               <Link
@@ -71,7 +77,7 @@ export const TrendingPlazzesSection = ({
               </div>
             )}
           </div>
-        }
+        )}
       </div>
     </section>
   );

@@ -11,7 +11,8 @@ import { Plazze, PlazzeFormData } from "@/types/plazze";
 import dayjs from "dayjs";
 
 export const usePlazzeService = () => {
-  const { setPlazzes, setLoading, setError, clearPlazzes } = usePlazzeStore();
+  const { setPlazzes, setTrendingPlazzes, setLoading, setError, clearPlazzes } =
+    usePlazzeStore();
   const { setAppliedFilters } = useSearchStore();
   const { removePlazze } = useMyPlazzesStore();
   const [localLoading, setLocalLoading] = useState(false);
@@ -53,6 +54,33 @@ export const usePlazzeService = () => {
     },
     [setPlazzes, setLoading, setError, setAppliedFilters]
   );
+
+  const fetchTrendingPlazzes = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const data = await plazzeLib.getPlazzes({
+        per_page: 5,
+        page: 1,
+      });
+      setTrendingPlazzes(data || []);
+
+      return data;
+    } catch (error) {
+      console.error("Error al obtener trending plazzes:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al obtener los trending plazzes";
+
+      setError(errorMessage);
+      showMessage.error(errorMessage);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [setPlazzes, setLoading, setError, setAppliedFilters]);
 
   const fetchPlazzeById = useCallback(
     async (id: number): Promise<Plazze | null> => {
@@ -374,6 +402,7 @@ export const usePlazzeService = () => {
 
   return {
     fetchPlazzes,
+    fetchTrendingPlazzes,
     fetchPlazzeById,
     searchWithFilters,
     clearData,

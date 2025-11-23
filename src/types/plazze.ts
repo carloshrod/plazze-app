@@ -286,9 +286,11 @@ export interface Plazze {
 
 export interface PlazzeStore {
   plazzes: Plazze[];
+  trendingPlazzes: Plazze[];
   loading: boolean;
   error: string | null;
   setPlazzes: (plazzes: Plazze[]) => void;
+  setTrendingPlazzes: (trendingPlazzes: Plazze[]) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearPlazzes: () => void;

@@ -5,13 +5,20 @@ import Link from "next/link";
 import { LuArrowUpRight } from "react-icons/lu";
 import SearchBar from "@/components/common/ui/search-bar";
 import { ROUTES } from "@/consts/routes";
-import { Plazze } from "@/types/plazze";
+import { usePlazzeService } from "@/services/plazze";
+import { usePlazzeStore } from "@/stores/plazze";
 
-const HeroSection = ({ plazzes }: { plazzes: Plazze[] }) => {
+const HeroSection = () => {
+  const { trendingPlazzes } = usePlazzeStore();
+  const { fetchTrendingPlazzes } = usePlazzeService();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  useEffect(() => {
+    fetchTrendingPlazzes();
+  }, []);
+
   // Obtener imágenes de los plazzes
-  const backgroundImages = plazzes
+  const backgroundImages = trendingPlazzes
     .filter((plazze) => plazze.image)
     .map((plazze) => plazze.image);
 
