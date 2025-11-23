@@ -11,7 +11,7 @@ import {
 import { Plazze } from "@/types/plazze";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
-import { LuCalendarDays, LuClock, LuUsers, LuPackage } from "react-icons/lu";
+import { LuCalendarDays, LuClock, LuPackage } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/consts/routes";
 import { useState, useEffect } from "react";
@@ -27,8 +27,10 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
   const [selectedTime, setSelectedTime] = useState<dayjs.Dayjs | null>(null);
-  const [guestCount, setGuestCount] = useState<number>(1);
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [serviceQuantities, setServiceQuantities] = useState<
+    Record<string, number>
+  >({});
   const [availabilityError, setAvailabilityError] = useState<string | null>(
     null
   );
@@ -39,12 +41,27 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
     setAvailabilityError(error);
   }, [selectedDate, selectedTime, plazze.opening_hours]);
 
-  // Resetear número de invitados cuando se selecciona un servicio de pago único
+  // Inicializar cantidades cuando se seleccionan servicios
   useEffect(() => {
-    if (isOneTimePayment()) {
-      setGuestCount(1);
-    }
-  }, [selectedService]);
+    const services = getSelectedServicesList();
+    const newQuantities: Record<string, number> = { ...serviceQuantities };
+
+    // Agregar cantidades para nuevos servicios
+    services.forEach((service) => {
+      if (!(service.id in newQuantities)) {
+        newQuantities[service.id] = 1;
+      }
+    });
+
+    // Remover cantidades de servicios deseleccionados
+    Object.keys(newQuantities).forEach((serviceId) => {
+      if (!selectedServices.includes(serviceId)) {
+        delete newQuantities[serviceId];
+      }
+    });
+
+    setServiceQuantities(newQuantities);
+  }, [selectedServices]);
 
   const formatDate = (date: dayjs.Dayjs) => {
     if (!date) return "";
@@ -66,11 +83,10 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
       params.append("time", selectedTime.format("HH:mm"));
     }
 
-    // Siempre incluir número de invitados (será 1 para pago único)
-    params.append("guests", guestCount.toString());
-
-    if (selectedService) {
-      params.append("service", selectedService.toString());
+    if (selectedServices.length > 0) {
+      params.append("services", selectedServices.join(","));
+      // Enviar cantidades por servicio
+      params.append("serviceQuantities", JSON.stringify(serviceQuantities));
     }
 
     // Agregar el precio total calculado
@@ -114,47 +130,82 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
     });
   };
 
-  // Función para obtener el servicio seleccionado
-  const getSelectedService = () => {
-    if (!selectedService || !plazze.bookable_services) return null;
-    return plazze.bookable_services.find(
-      (service) => service.id === selectedService
+  // Función para obtener los servicios seleccionados
+  const getSelectedServicesList = () => {
+    if (
+      selectedServices.length === 0 ||
+      !plazze.bookable_services ||
+      plazze.bookable_services.length === 0
+    ) {
+      return [];
+    }
+
+    return plazze.bookable_services.filter((service) =>
+      selectedServices.includes(service.id)
     );
   };
 
-  // Verificar si el servicio seleccionado es de pago único
-  const isOneTimePayment = () => {
-    const service = getSelectedService();
-    return service?.bookable_options === "onetime";
+  // Función para actualizar cantidad de un servicio específico
+  const updateServiceQuantity = (serviceId: string, quantity: number) => {
+    setServiceQuantities((prev) => ({
+      ...prev,
+      [serviceId]: quantity,
+    }));
   };
 
   // Función para calcular el precio total de la reserva
   const calculateTotalPrice = () => {
-    const service = getSelectedService();
+    const services = getSelectedServicesList();
 
-    if (service) {
-      // Si hay un servicio seleccionado, usar su precio
-      if (service.bookable_options === "onetime") {
-        // Pago único: precio fijo independiente del número de personas
-        return service.price;
-      } else {
-        // Por persona: precio por el número de invitados
-        return service.price * guestCount;
-      }
+    if (services.length > 0) {
+      // Calcular la suma de todos los servicios seleccionados
+      let total = 0;
+      services.forEach((service) => {
+        const quantity = serviceQuantities[service.id] || 1;
+        if (service.bookable_options === "onetime") {
+          // Pago único: precio fijo independiente del número de personas
+          total += service.price;
+        } else {
+          // Por persona: precio por la cantidad específica de ese servicio
+          total += service.price * quantity;
+        }
+      });
+      return total;
     } else {
-      // Si no hay servicio seleccionado, usar precio base del plazze
+      // Si no hay servicios seleccionados, usar precio base del plazze
       const basePrice = plazze.pricing?.price_min || plazze.price_min || 0;
-      return basePrice * guestCount;
+      return basePrice;
     }
   };
 
   // Función para mostrar el precio actual en la UI
   const getCurrentPrice = () => {
-    if (selectedService) {
+    if (selectedServices.length > 0) {
       const totalPrice = calculateTotalPrice();
       return `$${totalPrice.toLocaleString()}`;
     }
     return getBasePrice();
+  };
+
+  // Función para obtener el desglose de precios
+  const getPriceBreakdown = () => {
+    const services = getSelectedServicesList();
+    if (services.length === 0) return null;
+
+    return services.map((service) => {
+      const isOneTime = service.bookable_options === "onetime";
+      const quantity = serviceQuantities[service.id] || 1;
+      const price = isOneTime ? service.price : service.price * quantity;
+
+      return {
+        id: service.id,
+        name: service.title,
+        isOneTime,
+        unitPrice: service.price,
+        quantity: isOneTime ? 1 : quantity,
+        total: price,
+      };
+    });
   };
 
   return (
@@ -167,15 +218,6 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
               {plazze?.pricing?.currency ?? "USD"}
             </span>
           </p>
-          {selectedService && (
-            <p className="text-sm text-gray-500">
-              {isOneTimePayment()
-                ? "Pago único"
-                : `$${getSelectedService()?.price.toLocaleString()} × ${guestCount} persona${
-                    guestCount > 1 ? "s" : ""
-                  }`}
-            </p>
-          )}
         </div>
 
         <div className="flex flex-col gap-4">
@@ -195,47 +237,69 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
 
           {plazze.bookable_services && plazze.bookable_services.length > 0 && (
             <Select
+              mode="multiple"
               size="large"
-              placeholder="Seleccionar servicio"
+              placeholder="Seleccionar servicio(s)"
               suffixIcon={<LuPackage size={20} className="text-gray-400" />}
               className="w-full"
-              value={selectedService}
-              onChange={setSelectedService}
+              value={selectedServices}
+              onChange={setSelectedServices}
               allowClear
               options={getServiceOptions()}
+              maxTagCount="responsive"
             />
           )}
 
-          <div className="flex gap-4">
-            <TimePicker
-              size="large"
-              use12Hours
-              format="h:mm a"
-              placeholder="Hora"
-              suffixIcon={<LuClock size={20} className="text-gray-400" />}
-              className="w-full border-0 shadow-none"
-              minuteStep={30}
-              showNow={false}
-              needConfirm={false}
-              value={selectedTime}
-              onChange={(time) => setSelectedTime(time)}
-              disabledTime={() => getDisabledTime(selectedDate)}
-            />
+          {selectedServices.length > 0 && (
+            <div className="text-sm text-gray-500 space-y-2 mt-2">
+              {getPriceBreakdown()?.map((item) => (
+                <div key={item.id}>
+                  <div className="flex justify-between items-center">
+                    <span className="flex-1">
+                      {item.name} - ${item.unitPrice.toLocaleString()}
+                      {item.isOneTime && " (pago único)"}
+                    </span>
+                    {!item.isOneTime && (
+                      <InputNumber
+                        size="small"
+                        min={1}
+                        max={plazze.capacity || 50}
+                        value={item.quantity}
+                        onChange={(value) =>
+                          updateServiceQuantity(item.id, value || 1)
+                        }
+                        className="!w-10"
+                      />
+                    )}
+                    <span className="font-medium w-20 text-right">
+                      ${item.total.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              <div className="border-t pt-1 mt-1">
+                <div className="flex justify-between font-semibold">
+                  <span>Total</span>
+                  <span>${calculateTotalPrice().toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          )}
 
-            {!isOneTimePayment() && (
-              <InputNumber
-                size="large"
-                placeholder="Personas"
-                min={1}
-                max={plazze.capacity || 50}
-                prefix={<LuUsers size={20} className="text-gray-400" />}
-                className="!w-full"
-                controls={true}
-                value={guestCount}
-                onChange={(value) => setGuestCount(value || 1)}
-              />
-            )}
-          </div>
+          <TimePicker
+            size="large"
+            use12Hours
+            format="h:mm a"
+            placeholder="Hora"
+            suffixIcon={<LuClock size={20} className="text-gray-400" />}
+            className="w-full border-0 shadow-none"
+            minuteStep={30}
+            showNow={false}
+            needConfirm={false}
+            value={selectedTime}
+            onChange={(time) => setSelectedTime(time)}
+            disabledTime={() => getDisabledTime(selectedDate)}
+          />
 
           {availabilityError && (
             <Alert
@@ -256,7 +320,7 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
               !!availabilityError ||
               !selectedDate ||
               !selectedTime ||
-              (!isOneTimePayment() && !guestCount)
+              selectedServices.length === 0
             }
           >
             Reservar ahora

@@ -17,8 +17,9 @@ interface BookingSuccessData {
   services: Array<{
     name: string;
     price: number;
-    is_byguest: boolean;
     option: string;
+    quantity: number;
+    total: number;
   }>;
 }
 
@@ -99,9 +100,10 @@ export default function BookingSuccessPage({
                     <Text strong>Fecha:</Text> {bookingData.dateStart}
                   </Paragraph>
 
-                  {bookingData.services[0].option === "byguest" && (
+                  {bookingData.guests > 0 && (
                     <Paragraph className="mb-1">
-                      <Text strong>Personas:</Text> {bookingData.guests}
+                      <Text strong>Total de personas:</Text>{" "}
+                      {bookingData.guests}
                     </Paragraph>
                   )}
 
@@ -116,12 +118,24 @@ export default function BookingSuccessPage({
                       <ul className="list-disc list-inside mt-2 space-y-1">
                         {bookingData.services.map((service, index) => (
                           <li key={index} className="text-gray-700">
-                            {service.name} - $
-                            {service.price.toLocaleString("es-CO")}
-                            {service.option === "byguest" &&
-                              ` × ${bookingData.guests} persona${
-                                bookingData.guests > 1 ? "s" : ""
-                              }`}
+                            {service.name}
+                            {service.option === "byguest" && (
+                              <span>
+                                {" "}
+                                - ${service.price.toLocaleString(
+                                  "es-CO"
+                                )} × {service.quantity} persona
+                                {service.quantity > 1 ? "s" : ""} = $
+                                {service.total.toLocaleString("es-CO")}
+                              </span>
+                            )}
+                            {service.option === "onetime" && (
+                              <span>
+                                {" "}
+                                - ${service.total.toLocaleString("es-CO")} (pago
+                                único)
+                              </span>
+                            )}
                           </li>
                         ))}
                       </ul>

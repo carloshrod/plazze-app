@@ -108,12 +108,14 @@ export default function ConfirmBookingPage({
       "Ubicación no especificada",
     date: searchParams.get("date") || dayjs().format("YYYY-MM-DD"),
     time: searchParams.get("time") || "19:00",
-    guests: searchParams.get("guests") || "1",
     price: searchParams.get("totalPrice")
       ? parseInt(searchParams.get("totalPrice")!)
       : plazze.price_min || 0,
     image: plazze.image,
-    serviceId: searchParams.get("service"),
+    serviceIds: searchParams.get("services")?.split(",") || [],
+    serviceQuantities: searchParams.get("serviceQuantities")
+      ? JSON.parse(searchParams.get("serviceQuantities")!)
+      : {},
   };
 
   const handleBack = () => {
@@ -121,7 +123,7 @@ export default function ConfirmBookingPage({
   };
 
   const handlePayment = async () => {
-    if (!user || !bookingData.serviceId) {
+    if (!user || bookingData.serviceIds.length === 0) {
       message.error("Faltan datos requeridos para crear la reserva");
       return;
     }
@@ -139,8 +141,8 @@ export default function ConfirmBookingPage({
         date: bookingData.date,
         startTime: startTime,
         endTime: endTime,
-        guests: parseInt(bookingData.guests),
-        serviceId: bookingData.serviceId,
+        serviceIds: bookingData.serviceIds,
+        serviceQuantities: bookingData.serviceQuantities,
         firstName: user.displayName || user.username,
         email: user.email,
       });

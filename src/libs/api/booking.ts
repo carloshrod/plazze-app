@@ -5,8 +5,8 @@ export interface CreateBookingParams {
   date_start: string; // YYYY-MM-DD
   hour_start: string; // HH:mm:ss
   hour_end: string; // HH:mm:ss
-  guests: number;
   selected_services: string[]; // Array con el service_id, ej: ["service_0"]
+  service_quantities: Record<string, number>; // Cantidad por cada servicio
   user_id: number;
   first_name: string;
   last_name?: string;

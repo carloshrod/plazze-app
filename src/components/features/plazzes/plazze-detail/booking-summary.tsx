@@ -1,5 +1,5 @@
 import { Divider } from "antd";
-import { LuCalendarDays, LuClock, LuMapPin, LuUsers } from "react-icons/lu";
+import { LuCalendarDays, LuClock, LuMapPin } from "react-icons/lu";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import { formatCurrency } from "@/utils/format";
@@ -15,10 +15,10 @@ interface BookingSummaryProps {
     address: string;
     date: string | dayjs.Dayjs;
     time: string;
-    guests: string;
     price: number;
     image?: string;
-    serviceId: string | null;
+    serviceIds: string[];
+    serviceQuantities: Record<string, number>;
   };
   plazze?: Plazze;
 }
@@ -28,27 +28,27 @@ const BookingSummary = ({ booking, plazze }: BookingSummaryProps) => {
     .locale("es")
     .format("dddd, D [de] MMMM [de] YYYY");
 
-  const guestCount = parseInt(booking.guests) || 1;
-
-  // Obtener información del servicio seleccionado
-  const selectedService =
-    booking.serviceId && plazze?.bookable_services
-      ? plazze.bookable_services.find(
-          (service) => service.id === booking.serviceId
+  // Obtener información de los servicios seleccionados
+  const selectedServices =
+    booking.serviceIds.length > 0 && plazze?.bookable_services
+      ? plazze.bookable_services.filter((service) =>
+          booking.serviceIds.includes(service.id)
         )
-      : null;
-
-  const isOneTimePayment = selectedService?.bookable_options === "onetime";
-
-  // Calcular precio del servicio
-  const servicePrice = selectedService
-    ? isOneTimePayment
-      ? selectedService.price
-      : selectedService.price * guestCount
-    : booking.price || 0;
+      : [];
 
   // Calcular precio total
-  const totalPrice = selectedService ? servicePrice : booking.price || 0;
+  const calculateTotalPrice = () => {
+    if (selectedServices.length > 0) {
+      return selectedServices.reduce((total, service) => {
+        const isOneTime = service.bookable_options === "onetime";
+        const quantity = booking.serviceQuantities[service.id] || 1;
+        return total + (isOneTime ? service.price : service.price * quantity);
+      }, 0);
+    }
+    return booking.price || 0;
+  };
+
+  const totalPrice = calculateTotalPrice();
 
   return (
     <div className="space-y-6">
@@ -88,26 +88,29 @@ const BookingSummary = ({ booking, plazze }: BookingSummaryProps) => {
             </div>
           </div>
 
-          {!isOneTimePayment && (
-            <div className="flex items-center gap-3">
-              <LuUsers size={20} className="text-gray-400" />
-              <div>
-                <p className="text-gray-600">
-                  {guestCount} persona{guestCount > 1 ? "s" : ""}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {selectedService && (
-            <div className="bg-primary/5 p-3 rounded-lg border border-primary/30">
-              <p className="font-semibold">{selectedService.title}</p>
-              <p className="text-sm">
-                {isOneTimePayment ? "Pago único" : "Por persona"}
-              </p>
-              <p className="text-sm mt-1 ">
-                {formatCurrency(selectedService.price)}
-              </p>
+          {selectedServices.length > 0 && (
+            <div className="space-y-2">
+              {selectedServices.map((service) => {
+                const isOneTime = service.bookable_options === "onetime";
+                const quantity = booking.serviceQuantities[service.id] || 1;
+                return (
+                  <div
+                    key={service.id}
+                    className="bg-primary/5 p-3 rounded-lg border border-primary/30"
+                  >
+                    <p className="font-semibold">{service.title}</p>
+                    <p className="text-sm">
+                      {isOneTime
+                        ? "Pago único"
+                        : `${quantity} persona${quantity > 1 ? "s" : ""}`}
+                    </p>
+                    <p className="text-sm mt-1">
+                      {formatCurrency(service.price)}
+                      {!isOneTime && ` × ${quantity}`}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -118,26 +121,29 @@ const BookingSummary = ({ booking, plazze }: BookingSummaryProps) => {
       <div>
         <h2 className="text-lg font-semibold mb-4">Resumen de costos</h2>
         <div className="space-y-2">
-          {selectedService ? (
-            <div className="flex justify-between">
-              <span className="text-gray-600">
-                {selectedService.title}
-                {!isOneTimePayment &&
-                  ` (${formatCurrency(selectedService.price)} × ${guestCount})`}
-              </span>
-              <span className="text-gray-900">
-                {formatCurrency(servicePrice)}
-              </span>
-            </div>
+          {selectedServices.length > 0 ? (
+            selectedServices.map((service) => {
+              const isOneTime = service.bookable_options === "onetime";
+              const quantity = booking.serviceQuantities[service.id] || 1;
+              const serviceTotal = isOneTime
+                ? service.price
+                : service.price * quantity;
+              return (
+                <div key={service.id} className="flex justify-between">
+                  <span className="text-gray-600">
+                    {service.title}
+                    {!isOneTime &&
+                      ` (${formatCurrency(service.price)} × ${quantity})`}
+                  </span>
+                  <span className="text-gray-900">
+                    {formatCurrency(serviceTotal)}
+                  </span>
+                </div>
+              );
+            })
           ) : (
             <div className="flex justify-between">
-              <span className="text-gray-600">
-                {guestCount > 1
-                  ? `Precio base (${formatCurrency(
-                      (booking.price || 0) / guestCount
-                    )} × ${guestCount} persona${guestCount > 1 ? "s" : ""})`
-                  : "Pago único"}
-              </span>
+              <span className="text-gray-600">Pago único</span>
               <span className="text-gray-900">
                 {formatCurrency(booking.price || 0)}
               </span>

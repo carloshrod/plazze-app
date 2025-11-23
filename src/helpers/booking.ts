@@ -10,8 +10,8 @@ interface PrepareBookingDataParams {
   date: string | dayjs.Dayjs;
   startTime: string | dayjs.Dayjs;
   endTime: string | dayjs.Dayjs;
-  guests: number;
-  serviceId: string;
+  serviceIds: string[];
+  serviceQuantities: Record<string, number>;
   firstName: string;
   lastName?: string;
   email: string;
@@ -31,8 +31,8 @@ export const prepareBookingData = (
     date,
     startTime,
     endTime,
-    guests,
-    serviceId,
+    serviceIds,
+    serviceQuantities,
     firstName,
     lastName,
     email,
@@ -53,8 +53,8 @@ export const prepareBookingData = (
     date_start: dateStr,
     hour_start: startTimeStr,
     hour_end: endTimeStr,
-    guests,
-    selected_services: [serviceId],
+    selected_services: serviceIds,
+    service_quantities: serviceQuantities,
     first_name: firstName,
     last_name: lastName,
     email,
