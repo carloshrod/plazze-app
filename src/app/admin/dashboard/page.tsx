@@ -1,7 +1,8 @@
 "use client";
 
-import { Card, Skeleton } from "antd";
 import Link from "next/link";
+import { Alert, Card, Skeleton } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import {
   LuArrowDownRight,
   LuArrowUpRight,
@@ -97,7 +98,7 @@ export default function DashboardPage() {
         <p className="text-gray-600">Bienvenido a tu panel de control</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {statsCards.map((stat) => (
           <Link href={stat.href} key={stat.title}>
             <Card className="border border-gray-200 hover:border-primary/20 hover:shadow-sm transition-all cursor-pointer">
@@ -137,6 +138,17 @@ export default function DashboardPage() {
           </Link>
         ))}
       </div>
+
+      <Alert
+        message={
+          <div className="flex gap-4">
+            <InfoCircleOutlined className="!text-blue-500 !text-xl" />
+            <span>Los de depósitos se realizarán semanalmente los martes.</span>
+          </div>
+        }
+        type="info"
+        className="w-full lg:w-[49%]"
+      />
     </div>
   );
 }

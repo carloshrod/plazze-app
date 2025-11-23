@@ -158,9 +158,7 @@ export default function PaymentStatusPage({
                     </div>
                   }
                   description={
-                    <div className="sm:px-8">
-                      Una vez que completes el pago, tu reserva será confirmada
-                    </div>
+                    "Tu pago está en proceso de revisión, una vez confirmado te llegará una notificación de confirmación."
                   }
                   type="info"
                 />
