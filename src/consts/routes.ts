@@ -12,6 +12,7 @@ export const ROUTES = {
     AUTH: {
       LOGIN: "/auth/login",
       REGISTER: "/auth/registro",
+      FORGOT_PASSWORD: "/auth/restablecer-password",
     },
   },
   ADMIN: {

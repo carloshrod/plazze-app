@@ -4,6 +4,8 @@ import { Button, Form, Input } from "antd";
 import { FormProps } from "antd/lib";
 import { useAuthService } from "@/services/auth";
 import { LoginFormFields } from "@/types/auth";
+import Link from "next/link";
+import { ROUTES } from "@/consts/routes";
 
 interface Props {
   redirect?: boolean;
@@ -55,6 +57,15 @@ const LoginForm = ({ redirect = true, redirectTo = undefined }: Props) => {
         >
           <Input.Password size="large" placeholder="••••••••" />
         </Form.Item>
+
+        <div className="flex justify-end">
+          <Link
+            href={ROUTES.PUBLIC.AUTH.FORGOT_PASSWORD}
+            className="text-sm text-primary hover:text-primary/90"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
 
         <div className="text-end">
           <Button
