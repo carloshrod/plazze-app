@@ -143,7 +143,7 @@ export default function DashboardPage() {
         message={
           <div className="flex gap-4">
             <InfoCircleOutlined className="!text-blue-500 !text-xl" />
-            <span>Los de depósitos se realizarán semanalmente los martes.</span>
+            <span>Hola Plazzer, los depósitos se realizarán cada martes.</span>
           </div>
         }
         type="info"
