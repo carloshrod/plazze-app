@@ -116,7 +116,7 @@ export const plazzeLib = {
         // Obtener los listings con configuración básica
         const { data: listings } = await client.get<PlazzeWP[]>(
           "/wp/v2/listing",
-          { params: apiParams }
+          { params: apiParams },
         );
 
         // Si no hay listings, retornar array vacío
@@ -139,7 +139,7 @@ export const plazzeLib = {
       // Obtener los listings con los parámetros construidos
       const { data: listings } = await client.get<PlazzeWP[]>(
         "/wp/v2/listing",
-        { params: apiParams }
+        { params: apiParams },
       );
 
       // Si no hay listings, retornar array vacío
@@ -152,7 +152,7 @@ export const plazzeLib = {
     } catch (error: any) {
       if (error.response && error.response.data) {
         throw new Error(
-          error.response.data.message || "Error al obtener los plazzes"
+          error.response.data.message || "Error al obtener los plazzes",
         );
       }
       throw new Error("No se pudo conectar con el servidor");
@@ -172,7 +172,7 @@ export const plazzeLib = {
     } catch (error: any) {
       if (error.response && error.response.data) {
         throw new Error(
-          error.response.data.message || "Error al obtener el plazze"
+          error.response.data.message || "Error al obtener el plazze",
         );
       }
       throw new Error("No se pudo conectar con el servidor");
@@ -188,7 +188,7 @@ export const plazzeLib = {
       console.error("❌ Error en búsqueda con filtros:", error);
       if (error.response && error.response.data) {
         throw new Error(
-          error.response.data.message || "Error en la búsqueda con filtros"
+          error.response.data.message || "Error en la búsqueda con filtros",
         );
       }
       throw new Error("No se pudo conectar con el servidor");
@@ -197,7 +197,7 @@ export const plazzeLib = {
 
   // 🏪 NUEVO: Obtener plazzes del usuario autenticado
   getUserPlazzes: async (
-    filters: UserPlazzeFilters = {}
+    filters: UserPlazzeFilters = {},
   ): Promise<UserPlazzesResponse> => {
     const token = Cookies.get("token");
     const userDataCookie = Cookies.get("user");
@@ -241,7 +241,7 @@ export const plazzeLib = {
       if (error.response && error.response.data) {
         throw new Error(
           error.response.data.message ||
-            "Error al obtener los plazzes del usuario"
+            "Error al obtener los plazzes del usuario",
         );
       }
       throw new Error("No se pudo conectar con el servidor");
@@ -322,13 +322,13 @@ export const plazzeLib = {
       // 2. Obtener el listing completo usando nuestra API custom que procesa todos los campos
       try {
         const { data: completeListing } = await client.get(
-          `/wp/v2/listing/${createdListingId}`
+          `/wp/v2/listing/${createdListingId}`,
         );
 
         return completeListing;
       } catch (fetchError) {
         console.warn(
-          "⚠️ No se pudo obtener el listing completo, devolviendo datos básicos"
+          "⚠️ No se pudo obtener el listing completo, devolviendo datos básicos",
         );
         // Si no podemos obtener el listing completo, devolvemos lo que tenemos
         return response.data;
@@ -342,7 +342,7 @@ export const plazzeLib = {
 
       if (error.response?.status === 403) {
         throw new Error(
-          "Acceso denegado. Verifica que tu usuario tenga los permisos correctos."
+          "Acceso denegado. Verifica que tu usuario tenga los permisos correctos.",
         );
       }
 
@@ -352,14 +352,14 @@ export const plazzeLib = {
       }
 
       throw new Error(
-        error.response?.data?.message || "Error al crear el listing"
+        error.response?.data?.message || "Error al crear el listing",
       );
     }
   },
 
   updateListingGallery: async (
     listingId: number,
-    galleryIds: number[]
+    galleryIds: number[],
   ): Promise<void> => {
     try {
       // Intentar con endpoint personalizado directamente (más confiable)
@@ -370,7 +370,7 @@ export const plazzeLib = {
       } catch (customError: any) {
         console.error(
           "❌ Endpoint personalizado falló:",
-          customError.response?.data || customError.message
+          customError.response?.data || customError.message,
         );
         console.error("❌ Status:", customError.response?.status);
         console.error("❌ Full error:", customError);
@@ -385,7 +385,7 @@ export const plazzeLib = {
       console.error("❌ Error response:", error.response?.data);
       console.error("❌ Error status:", error.response?.status);
       throw new Error(
-        error.response?.data?.message || "Error al actualizar la galería"
+        error.response?.data?.message || "Error al actualizar la galería",
       );
     }
   },
@@ -393,7 +393,7 @@ export const plazzeLib = {
   // NUEVO: Actualizar un listing existente
   updateListing: async (
     id: number,
-    data: CreateListingData
+    data: CreateListingData,
   ): Promise<PlazzeWP> => {
     try {
       // 1. Actualizar el listing usando la API estándar de WordPress
@@ -407,13 +407,13 @@ export const plazzeLib = {
             params: {
               _embed: true,
             },
-          }
+          },
         );
 
         return updatedListing;
       } catch (fetchError) {
         console.warn(
-          "⚠️ No se pudo obtener el listing actualizado completo, devolviendo datos básicos"
+          "⚠️ No se pudo obtener el listing actualizado completo, devolviendo datos básicos",
         );
         // Si no podemos obtener el listing completo, devolvemos lo que tenemos
         return response.data;
@@ -427,7 +427,7 @@ export const plazzeLib = {
 
       if (error.response?.status === 403) {
         throw new Error(
-          "Acceso denegado. No tienes permisos para editar este plazze."
+          "Acceso denegado. No tienes permisos para editar este plazze.",
         );
       }
 
@@ -441,14 +441,14 @@ export const plazzeLib = {
       }
 
       throw new Error(
-        error.response?.data?.message || "Error al actualizar el listing"
+        error.response?.data?.message || "Error al actualizar el listing",
       );
     }
   },
 
   deleteListing: async (id: number): Promise<void> => {
     try {
-      await client.delete(`/wp/v2/listing/${id}`);
+      await client.post(`/plazze/v1/listing/${id}/delete`);
     } catch (error: any) {
       console.error(`❌ Error eliminando listing ${id}:`, error);
 
@@ -458,7 +458,7 @@ export const plazzeLib = {
 
       if (error.response?.status === 403) {
         throw new Error(
-          "Acceso denegado. No tienes permisos para eliminar este plazze."
+          "Acceso denegado. No tienes permisos para eliminar este plazze.",
         );
       }
 
@@ -467,7 +467,7 @@ export const plazzeLib = {
       }
 
       throw new Error(
-        error.response?.data?.message || "Error al eliminar el listing"
+        error.response?.data?.message || "Error al eliminar el listing",
       );
     }
   },
