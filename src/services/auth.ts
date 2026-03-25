@@ -42,7 +42,7 @@ export const useAuthService = () => {
   const login = async (
     loginData: LoginFormFields,
     redirect: boolean = true,
-    redirectTo?: string | undefined
+    redirectTo?: string | undefined,
   ) => {
     try {
       setLoading(true);
@@ -172,7 +172,7 @@ export const useAuthService = () => {
 
   const updatePassword = async (
     currentPassword: string,
-    newPassword: string
+    newPassword: string,
   ) => {
     try {
       setLoading(true);
@@ -184,7 +184,7 @@ export const useAuthService = () => {
       if (res?.success) {
         logout();
         showMessage.success(
-          `${res?.message}. Por favor, inicia sesión de nuevo.`
+          `${res?.message}. Por favor, inicia sesión de nuevo.`,
         );
 
         return res;
@@ -201,6 +201,48 @@ export const useAuthService = () => {
     }
   };
 
+  const requestPasswordReset = async (email: string) => {
+    try {
+      setLoading(true);
+      const res = await authLib.requestPasswordReset(email);
+      if (res?.success) {
+        showMessage.success(res.message);
+      }
+      return res;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al solicitar el restablecimiento";
+      showMessage.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmPasswordReset = async (
+    login: string,
+    key: string,
+    newPassword: string,
+  ) => {
+    try {
+      setLoading(true);
+      const res = await authLib.confirmPasswordReset(login, key, newPassword);
+      if (res?.success) {
+        showMessage.success(res.message);
+      }
+      return res;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al restablecer la contraseña";
+      showMessage.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     initAuth,
     login,
@@ -208,6 +250,8 @@ export const useAuthService = () => {
     logout,
     updateEmail,
     updatePassword,
+    requestPasswordReset,
+    confirmPasswordReset,
     loading,
   };
 };

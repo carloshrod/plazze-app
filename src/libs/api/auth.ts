@@ -13,7 +13,7 @@ export const authLib = {
     } catch (error: any) {
       if (error.response && error.response.data) {
         throw new Error(
-          error.response.data.message || "Error de autenticación"
+          error.response.data.message || "Error de autenticación",
         );
       }
       // Si es un error de red o desconocido
@@ -48,14 +48,14 @@ export const authLib = {
                   phone,
                 }
               : undefined,
-        }
+        },
       );
 
       return data;
     } catch (error: any) {
       if (error.response && error.response.data) {
         throw new Error(
-          error.response.data.message || "Error durante el registro"
+          error.response.data.message || "Error durante el registro",
         );
       }
       // Si es un error de red o desconocido
@@ -75,7 +75,7 @@ export const authLib = {
     } catch (error: any) {
       if (error.response && error.response.data) {
         throw new Error(
-          error.response.data.message || "Token inválido o expirado"
+          error.response.data.message || "Token inválido o expirado",
         );
       }
       // Si es un error de red o desconocido
@@ -91,7 +91,7 @@ export const authLib = {
     } catch (error: any) {
       if (error.response && error.response.data) {
         throw new Error(
-          error.response.data.message || "Error al actualizar el email"
+          error.response.data.message || "Error al actualizar el email",
         );
       }
       throw new Error("No se pudo conectar con el servidor");
@@ -109,7 +109,46 @@ export const authLib = {
     } catch (error: any) {
       if (error.response && error.response.data) {
         throw new Error(
-          error.response.data.message || "Error al actualizar la contraseña"
+          error.response.data.message || "Error al actualizar la contraseña",
+        );
+      }
+      throw new Error("No se pudo conectar con el servidor");
+    }
+  },
+
+  requestPasswordReset: async (email: string) => {
+    try {
+      const { data } = await client.post("/plazze/v1/reset-password", {
+        email,
+      });
+      return data;
+    } catch (error: any) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.message ||
+            "Error al solicitar el restablecimiento",
+        );
+      }
+      throw new Error("No se pudo conectar con el servidor");
+    }
+  },
+
+  confirmPasswordReset: async (
+    login: string,
+    key: string,
+    newPassword: string,
+  ) => {
+    try {
+      const { data } = await client.post("/plazze/v1/confirm-reset-password", {
+        login,
+        key,
+        new_password: newPassword,
+      });
+      return data;
+    } catch (error: any) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.message || "Error al restablecer la contraseña",
         );
       }
       throw new Error("No se pudo conectar con el servidor");
