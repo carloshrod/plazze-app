@@ -77,6 +77,7 @@ export const useAuthService = () => {
       if (redirect) {
         if (redirectTo) {
           // Si hay una redirección específica en los parámetros, usarla
+          router.refresh();
           router.push(redirectTo);
         } else {
           // Si no, redirigir según el rol
@@ -84,6 +85,7 @@ export const useAuthService = () => {
             data?.role === "seller" || data?.role === "administrator"
               ? ROUTES.ADMIN.DASHBOARD
               : ROUTES.ADMIN.BOOKINGS;
+          router.refresh();
           router.push(defaultRedirect);
         }
       }
