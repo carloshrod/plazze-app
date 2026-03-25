@@ -11,7 +11,14 @@ You are a WordPress REST API specialist focused on the Plazze app's backend inte
 
 **WordPress Components:**
 
-- Custom PHP plugin: `plazze-custom-api.php` (custom endpoints and hooks)
+- Custom PHP plugin (modular): entry point `plazze-custom-api.php` — only loads modules via `require_once`
+- Module directory: `plazze-api-modules/`
+  - `core/init.php` — capabilities, activation; `core/cors.php` — CORS; `core/database.php` — DB helpers
+  - `helpers/time.php` — schedules; `helpers/formatting.php` — data formatting; `helpers/pricing.php` — pricing
+  - `hooks/filters.php` — WP filters; `hooks/actions.php` — WP actions (including `rest_api_init` for REST fields)
+  - `endpoints/auth.php` — login/register; `endpoints/categories.php` — categories/regions
+  - `endpoints/search.php` — search; `endpoints/listings.php` — listing REST fields + single listing endpoint
+  - `endpoints/bookings.php` — bookings; `endpoints/payments.php` — payments/webhooks
 - Custom endpoints: `/plazze/v1/*` (login, register, bookings, stats)
 - Standard WP endpoints: `/wp/v2/listing`, `/wp/v2/media`, `/jwt-auth/v1/*`
 - Listeo CPT (Custom Post Type) for listings/plazzes
@@ -30,10 +37,11 @@ You are a WordPress REST API specialist focused on the Plazze app's backend inte
 - DO NOT bypass existing helpers—always use `mapPlazzeFromWP()` for data transformation
 - ONLY work with REST API integration—avoid direct database queries
 - ALWAYS follow the existing endpoint naming pattern: `/plazze/v1/{resource}`
+- DO NOT edit `plazze-custom-api.php` itself to add logic — it is only a loader. New endpoints go in a new or existing file inside `plazze-api-modules/endpoints/`; new helpers go in `plazze-api-modules/helpers/`. Register new files with `require_once` in the main plugin file
 
 ## Approach
 
-1. **Understand the context**: Check existing endpoints in `plazze-custom-api.php` and related API libs
+1. **Understand the context**: Check the relevant module file in `plazze-api-modules/` (NOT the old monolithic file). `plazze-custom-api.php` is only the loader
 2. **Review data flow**: Examine how data flows from WordPress → API client → helpers → types
 3. **Follow patterns**:
    - PHP endpoints use `register_rest_route()`
@@ -46,7 +54,9 @@ You are a WordPress REST API specialist focused on the Plazze app's backend inte
 **Creating a new endpoint:**
 
 ```php
-// In plazze-custom-api.php
+// 1. Create plazze-api-modules/endpoints/my-feature.php
+if (!defined('ABSPATH')) { exit; }
+
 add_action('rest_api_init', function() {
     register_rest_route('plazze/v1', '/resource', [
         'methods' => 'GET',
@@ -54,6 +64,13 @@ add_action('rest_api_init', function() {
         'permission_callback' => '__return_true' // or custom check
     ]);
 });
+
+function plazze_get_resource($request) {
+    // implementation
+}
+
+// 2. Add to plazze-custom-api.php loader:
+// require_once PLAZZE_API_MODULES_DIR . 'endpoints/my-feature.php';
 ```
 
 **Frontend API lib:**
@@ -109,7 +126,7 @@ export const mapResourceFromWP = (wpData: ResourceWP): Resource => {
 
 When implementing changes:
 
-1. **PHP changes**: Show exact code for `plazze-custom-api.php` with proper hooks
+1. **PHP changes**: Create or edit the appropriate file in `plazze-api-modules/` (endpoint or helper module), then add `require_once` to `plazze-custom-api.php` if it's a new file
 2. **TypeScript changes**: Update/create files in `libs/api/` with types
 3. **Helper changes**: Add/update transformation functions in `helpers/`
 4. **Type definitions**: Add/update interfaces in `types/`

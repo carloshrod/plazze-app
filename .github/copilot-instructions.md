@@ -151,7 +151,22 @@ npm run lint
 
 **WordPress REST API**:
 
-- Plugin PHP custom: `plazze-custom-api.php` (en raíz del proyecto)
+- Plugin PHP custom modular — punto de entrada: `plazze-custom-api.php` (solo carga módulos)
+- Módulos en `plazze-api-modules/`:
+  - `core/init.php` — capabilities, activation hook
+  - `core/cors.php` — CORS headers
+  - `core/database.php` — helpers de base de datos
+  - `helpers/time.php` — funciones de horarios
+  - `helpers/formatting.php` — funciones de formato
+  - `helpers/pricing.php` — funciones de precios
+  - `hooks/filters.php` — WP filters
+  - `hooks/actions.php` — WP actions
+  - `endpoints/auth.php` — login, registro, perfil
+  - `endpoints/categories.php` — categorías y regiones
+  - `endpoints/search.php` — búsqueda con filtros
+  - `endpoints/listings.php` — campos REST de listings + endpoints individuales
+  - `endpoints/bookings.php` — reservas
+  - `endpoints/payments.php` — pagos y webhooks
 - Endpoints custom en `/plazze/v1/` para auth, bookings, dashboard stats
 - Endpoints WP estándar: `/wp/v2/listing` (CPT de Listeo), `/wp/v2/media`
 
@@ -182,6 +197,7 @@ npm run lint
 5. **Gallery Images**: Las imágenes pueden venir en múltiples formatos, helper `mapPlazzeFromWP()` las normaliza
 6. **Horarios**: Formato de WordPress es específico (`monday_opening_hour`, etc.), usar helpers de `utils/hours.ts`
 7. **TypeScript**: Desactivar `suppressHydrationWarning` solo cuando sea necesario (layout principal lo usa por Ant Design)
+8. **Plugin PHP modular**: Al agregar endpoints nuevos, crear el archivo en `plazze-api-modules/endpoints/` y añadir el `require_once` en `plazze-custom-api.php`. No editar los módulos existentes para agregar funcionalidades no relacionadas
 
 ## Referencias
 
