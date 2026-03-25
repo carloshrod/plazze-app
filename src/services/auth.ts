@@ -74,23 +74,20 @@ export const useAuthService = () => {
         path: "/",
       });
 
+      // Actualizar store ANTES de navegar para que la UI destino tenga auth disponible
+      setAuth(data?.token, userData);
+
       if (redirect) {
-        if (redirectTo) {
-          // Si hay una redirección específica en los parámetros, usarla
-          router.refresh();
-          router.push(redirectTo);
-        } else {
-          // Si no, redirigir según el rol
-          const defaultRedirect =
-            data?.role === "seller" || data?.role === "administrator"
-              ? ROUTES.ADMIN.DASHBOARD
-              : ROUTES.ADMIN.BOOKINGS;
-          router.refresh();
-          router.push(defaultRedirect);
-        }
+        const destination = redirectTo
+          ? redirectTo
+          : data?.role === "seller" || data?.role === "administrator"
+            ? ROUTES.ADMIN.DASHBOARD
+            : ROUTES.ADMIN.BOOKINGS;
+
+        router.push(destination);
+        router.refresh();
       }
 
-      setAuth(data?.token, userData);
       showMessage.success("Inicio de sesión exitoso");
     } catch (error) {
       console.error("Error durante el login:", error);
