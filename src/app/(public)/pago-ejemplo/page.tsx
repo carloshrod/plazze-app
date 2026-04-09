@@ -1,16 +1,16 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card, Descriptions } from "antd";
 import { LuCreditCard } from "react-icons/lu";
 import showMessage from "@/libs/message";
 import { ROUTES } from "@/consts/routes";
 
-export default function PagoEjemploPage() {
+function PagoEjemploContent() {
   const router = useRouter();
   const params = useSearchParams();
   const tipo = params.get("tipo") || "banner";
-  const id = params.get("id");
   const paquete = params.get("paquete");
 
   const tipoLabel = tipo === "banner" ? "Banner" : "Destaque de plazze";
@@ -69,5 +69,13 @@ export default function PagoEjemploPage() {
         </Button>
       </Card>
     </div>
+  );
+}
+
+export default function PagoEjemploPage() {
+  return (
+    <Suspense>
+      <PagoEjemploContent />
+    </Suspense>
   );
 }

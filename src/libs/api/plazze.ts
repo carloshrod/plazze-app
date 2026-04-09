@@ -73,7 +73,12 @@ export interface PlazzeSearchParams {
 
 // Nuevos tipos para plazzes del usuario
 export interface UserPlazzeFilters {
-  status?: "publish" | "pending" | "draft" | "private";
+  status?:
+    | "publish"
+    | "pending"
+    | "draft"
+    | "private"
+    | "publish,draft,pending,private";
   page?: number;
   per_page?: number;
   search?: string;
