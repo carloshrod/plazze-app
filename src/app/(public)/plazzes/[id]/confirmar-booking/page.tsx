@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Button, Card, Steps, Tabs, Spin, message } from "antd";
+import { Button, Card, Steps, Tabs, Spin } from "antd";
 import { LuCreditCard, LuUser } from "react-icons/lu";
 import LoginForm from "@/components/features/auth/login-form";
 import RegisterForm from "@/components/features/auth/register-form";
@@ -13,6 +13,7 @@ import { useAuthStore } from "@/stores/auth";
 import { usePlazzeService } from "@/services/plazze";
 import { Plazze } from "@/types/plazze";
 import { createBooking } from "@/libs/api/booking";
+import showMessage from "@/libs/message";
 import { prepareBookingData, calculateEndTime } from "@/helpers/booking";
 import { ROUTES } from "@/consts/routes";
 import dayjs from "dayjs";
@@ -47,7 +48,7 @@ export default function ConfirmBookingPage({
         } else {
           console.error(
             "❌ No se encontró plazze para booking con ID:",
-            params.id
+            params.id,
           );
           router.push("/plazzes");
           return;
@@ -124,7 +125,7 @@ export default function ConfirmBookingPage({
 
   const handlePayment = async () => {
     if (!user || bookingData.serviceIds.length === 0) {
-      message.error("Faltan datos requeridos para crear la reserva");
+      showMessage.error("Faltan datos requeridos para crear la reserva");
       return;
     }
 
@@ -151,8 +152,8 @@ export default function ConfirmBookingPage({
       const response = await createBooking(bookingParams);
 
       if (response.success) {
-        message.success(
-          "Reserva creada exitosamente! Redirigiendo a PayPal..."
+        showMessage.success(
+          "Reserva creada exitosamente! Redirigiendo a PayPal...",
         );
 
         // Guardar datos en sessionStorage para cuando regrese del pago
@@ -167,7 +168,7 @@ export default function ConfirmBookingPage({
               totalPrice: response.data.total_price,
               services: response.data.services,
               orderId: response.order_id,
-            })
+            }),
           );
         }
 
@@ -178,7 +179,7 @@ export default function ConfirmBookingPage({
 
           // También redireccionar a página de estado de pago
           router.push(
-            `/reservas/${response.booking_id}/payment-status?order_id=${response.order_id}`
+            `/reservas/${response.booking_id}/payment-status?order_id=${response.order_id}`,
           );
         } else {
           // Redireccionar a página de éxito (fallback)
@@ -187,10 +188,10 @@ export default function ConfirmBookingPage({
       }
     } catch (error) {
       console.error("❌ Error al crear reserva:", error);
-      message.error(
+      showMessage.error(
         error instanceof Error
           ? error.message
-          : "Error al crear la reserva. Por favor intenta de nuevo."
+          : "Error al crear la reserva. Por favor intenta de nuevo.",
       );
     } finally {
       setSubmitting(false);

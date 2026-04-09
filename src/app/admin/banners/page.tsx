@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button, Card, Modal, Popover } from "antd";
 import { LuInfo, LuMegaphone, LuSettings2 } from "react-icons/lu";
 import { BannersTable } from "@/components/features/admin/banners-table";
@@ -24,12 +23,18 @@ const bannerConditions = (
 
 export default function BannersPage() {
   const { user } = useAuthStore();
-  const { banners, loading, error } = useBannersStore();
+  const {
+    banners,
+    loading,
+    error,
+    pricingModalOpen,
+    openPricingModal,
+    closePricingModal,
+  } = useBannersStore();
   const isSeller = user?.role === "seller";
   const isAdmin = user?.role === "administrator";
   const showSellerCta = isSeller && !loading && !error && banners.length === 0;
   const showSellerButton = isSeller && !loading && banners.length > 0;
-  const [pricingModalOpen, setPricingModalOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -69,7 +74,7 @@ export default function BannersPage() {
               <Button
                 type="link"
                 icon={<LuSettings2 size={15} />}
-                onClick={() => setPricingModalOpen(true)}
+                onClick={() => openPricingModal()}
                 className="text-gray-500 hover:text-primary px-0"
               >
                 Configurar precios de banners
@@ -125,7 +130,7 @@ export default function BannersPage() {
       <Modal
         title="Configurar precios de paquetes de banners"
         open={pricingModalOpen}
-        onCancel={() => setPricingModalOpen(false)}
+        onCancel={() => closePricingModal()}
         footer={null}
         width={560}
         destroyOnHidden

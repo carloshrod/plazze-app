@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { Card, InputNumber, Button, message, Spin, Alert } from "antd";
+import { Card, InputNumber, Button, Spin, Alert } from "antd";
 import { usePackagePricing } from "@/services/package-pricing";
 import { BannerPosition, PackageDuration } from "@/consts/packagePricing";
+import { useBannersStore } from "@/stores/banners";
+import showMessage from "@/libs/message";
 
 const POSITIONS: BannerPosition[] = ["features", "trending"];
 const DURATIONS: PackageDuration[] = ["7", "15", "30"];
 
 export const BannerPricingConfig: React.FC = () => {
   const { pricing, loading, error, savePricing } = usePackagePricing();
+  const { closePricingModal } = useBannersStore();
   const [localPricing, setLocalPricing] = useState(() => {
     // Estructura inicial completa para evitar errores de tipo
     return {
@@ -50,7 +53,10 @@ export const BannerPricingConfig: React.FC = () => {
     };
     const ok = await savePricing(newPricing);
     setSaving(false);
-    if (ok) message.success("Precios guardados");
+    if (ok) {
+      showMessage.success("Precios guardados");
+      closePricingModal();
+    }
   };
 
   if (loading)

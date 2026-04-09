@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { Card, InputNumber, Button, message, Spin, Alert } from "antd";
+import { Card, InputNumber, Button, Spin, Alert } from "antd";
 import { usePackagePricing } from "@/services/package-pricing";
 import { PackageDuration } from "@/consts/packagePricing";
+import { usePlazzeModalStore } from "@/stores/plazze-modal";
+import showMessage from "@/libs/message";
 
 const DURATIONS: PackageDuration[] = ["7", "15", "30"];
 
 export const FeaturedPricingConfig: React.FC = () => {
   const { pricing, loading, error, savePricing } = usePackagePricing();
+  const { closePricingModal } = usePlazzeModalStore();
   const [localPricing, setLocalPricing] = useState(() => ({
     default: { "7": 0, "15": 0, "30": 0 },
   }));
@@ -38,7 +41,10 @@ export const FeaturedPricingConfig: React.FC = () => {
     };
     const ok = await savePricing(newPricing);
     setSaving(false);
-    if (ok) message.success("Precios guardados");
+    if (ok) {
+      showMessage.success("Precios guardados");
+      closePricingModal();
+    }
   };
 
   if (loading)

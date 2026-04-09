@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button, Card, Modal, Popover } from "antd";
 import { LuInfo, LuSettings2, LuSparkles } from "react-icons/lu";
 import PlazzeModal from "@/components/features/admin/plazze-modal";
@@ -8,6 +7,7 @@ import { PlazzesTable } from "@/components/features/admin/plazzes-table";
 import { useAuthStore } from "@/stores/auth";
 import { FeaturedPricingConfig } from "@/components/features/admin/featured-pricing-config";
 import { cn } from "@/libs/cn";
+import { usePlazzeModalStore } from "@/stores/plazze-modal";
 
 const featureConditions = (
   <ul className="max-w-xs space-y-1 text-sm text-gray-600 list-none">
@@ -22,9 +22,10 @@ const featureConditions = (
 
 export default function PlazzesPage() {
   const { user } = useAuthStore();
+  const { pricingModalOpen, openPricingModal, closePricingModal } =
+    usePlazzeModalStore();
   const isAdmin = user?.role === "administrator";
   const isSeller = user?.role === "seller";
-  const [pricingModalOpen, setPricingModalOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -49,7 +50,7 @@ export default function PlazzesPage() {
             <Button
               type="link"
               icon={<LuSettings2 size={15} />}
-              onClick={() => setPricingModalOpen(true)}
+              onClick={() => openPricingModal()}
               className="text-gray-500 hover:text-primary px-0"
             >
               Configurar precios de destacados
@@ -96,7 +97,7 @@ export default function PlazzesPage() {
       <Modal
         title="Configurar precios de paquetes de destacados"
         open={pricingModalOpen}
-        onCancel={() => setPricingModalOpen(false)}
+        onCancel={() => closePricingModal()}
         footer={null}
         width={480}
         destroyOnHidden

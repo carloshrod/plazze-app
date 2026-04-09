@@ -11,14 +11,19 @@ interface PlazzeModalState {
   editingPlazze: PlazzeWP | null;
   initialFormData: Partial<PlazzeFormData> | null;
 
+  // Modal de configuración de precios de destaque
+  pricingModalOpen: boolean;
+
   // Acciones
   openCreateModal: () => void;
   openEditModal: (
     editPlazze: PlazzeWP,
-    editFormData?: Partial<PlazzeFormData>
+    editFormData?: Partial<PlazzeFormData>,
   ) => void;
   closeModal: () => void;
   reset: () => void;
+  openPricingModal: () => void;
+  closePricingModal: () => void;
 }
 
 export const usePlazzeModalStore = create<PlazzeModalState>((set) => ({
@@ -27,6 +32,7 @@ export const usePlazzeModalStore = create<PlazzeModalState>((set) => ({
   mode: "create",
   editingPlazze: null,
   initialFormData: null,
+  pricingModalOpen: false,
 
   // Abrir modal para crear
   openCreateModal: () =>
@@ -40,7 +46,7 @@ export const usePlazzeModalStore = create<PlazzeModalState>((set) => ({
   // Abrir modal para editar
   openEditModal: (
     editPlazze: PlazzeWP,
-    editFormData?: Partial<PlazzeFormData>
+    editFormData?: Partial<PlazzeFormData>,
   ) =>
     set({
       isOpen: true,
@@ -63,4 +69,7 @@ export const usePlazzeModalStore = create<PlazzeModalState>((set) => ({
       editingPlazze: null,
       initialFormData: null,
     }),
+
+  openPricingModal: () => set({ pricingModalOpen: true }),
+  closePricingModal: () => set({ pricingModalOpen: false }),
 }));
