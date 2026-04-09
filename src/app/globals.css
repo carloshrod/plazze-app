@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 @font-face {
   font-family: 'Mont';
   src: url('/fonts/Mont-Regular.ttf') format('truetype');

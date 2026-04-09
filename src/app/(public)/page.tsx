@@ -10,14 +10,26 @@ import FeaturedPlazzesSection from "@/components/features/landing/featured-plazz
 export default async function Home() {
   return (
     <main className="min-h-screen">
-      <HeroSection />
-      <FeaturesSection />
+      <div id="hero">
+        <HeroSection />
+      </div>
+      <div id="caracteristicas">
+        <FeaturesSection />
+      </div>
       <BannersCarousel position="features" />
-      <FeaturedPlazzesSection />
-      <TrendingPlazzesSection />
+      <div id="destacados">
+        <FeaturedPlazzesSection />
+      </div>
+      <div id="populares">
+        <TrendingPlazzesSection />
+      </div>
       <BannersCarousel position="trending" />
-      <CategoriesSection />
-      <CTASection />
+      <div id="categorias">
+        <CategoriesSection />
+      </div>
+      <div id="plazzer">
+        <CTASection />
+      </div>
       <ScrollToTop />
     </main>
   );

@@ -28,7 +28,7 @@ const HeroSection = () => {
 
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) =>
-        prev === backgroundImages.length - 1 ? 0 : prev + 1
+        prev === backgroundImages.length - 1 ? 0 : prev + 1,
       );
     }, 15000);
 
@@ -36,7 +36,7 @@ const HeroSection = () => {
   }, [backgroundImages.length]);
 
   return (
-    <section className="py-8 relative overflow-hidden">
+    <section className="py-8 -mt-16 relative overflow-hidden">
       {/* Carousel de imágenes de fondo */}
       {backgroundImages.length > 0 && (
         <div className="absolute inset-0 w-full h-full">
@@ -65,7 +65,7 @@ const HeroSection = () => {
       )}
 
       {/* Contenido principal */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 text-center">
         <div className="mb-24">
           <h1
             className={`text-4xl md:text-6xl font-bold mb-6 ${

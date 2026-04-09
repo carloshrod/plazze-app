@@ -52,7 +52,7 @@ export const usePlazzeService = () => {
         setLoading(false);
       }
     },
-    [setPlazzes, setLoading, setError, setAppliedFilters]
+    [setPlazzes, setLoading, setError, setAppliedFilters],
   );
 
   const fetchTrendingPlazzes = useCallback(async () => {
@@ -90,18 +90,12 @@ export const usePlazzeService = () => {
         return data;
       } catch (error) {
         console.error("Error al obtener plazze:", error);
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al obtener el plazze";
-
-        showMessage.error(errorMessage);
         return null;
       } finally {
         setLocalLoading(false);
       }
     },
-    []
+    [],
   );
 
   const searchWithFilters = useCallback(
@@ -166,7 +160,7 @@ export const usePlazzeService = () => {
         setLoading(false);
       }
     },
-    [setPlazzes, setLoading, setError, setAppliedFilters]
+    [setPlazzes, setLoading, setError, setAppliedFilters],
   );
 
   const clearData = useCallback(() => {
@@ -176,7 +170,7 @@ export const usePlazzeService = () => {
   const createPlazze = useCallback(
     async (
       values: PlazzeFormData,
-      coordinates: { lat: number; lng: number } | null
+      coordinates: { lat: number; lng: number } | null,
     ) => {
       try {
         setLocalLoading(true);
@@ -185,7 +179,7 @@ export const usePlazzeService = () => {
         const validation = validateFormData(values);
         if (!validation.isValid) {
           const errorMessage = `Errores en el formulario: ${validation.errors.join(
-            ", "
+            ", ",
           )}`;
           showMessage.error(errorMessage);
           throw new Error(errorMessage);
@@ -230,7 +224,7 @@ export const usePlazzeService = () => {
             console.warn("⚠️ Error actualizando galería:", galleryError);
             // No fallar completamente, solo mostrar warning
             showMessage.error(
-              "Listing creado pero hubo un problema con las imágenes"
+              "Listing creado pero hubo un problema con las imágenes",
             );
           }
         }
@@ -246,14 +240,14 @@ export const usePlazzeService = () => {
         setLocalLoading(false);
       }
     },
-    []
+    [],
   );
 
   const updatePlazze = useCallback(
     async (
       id: number,
       values: PlazzeFormData,
-      coordinates: { lat: number; lng: number } | null
+      coordinates: { lat: number; lng: number } | null,
     ) => {
       try {
         setLocalLoading(true);
@@ -262,7 +256,7 @@ export const usePlazzeService = () => {
         const validation = validateFormData(values);
         if (!validation.isValid) {
           const errorMessage = `Errores en el formulario: ${validation.errors.join(
-            ", "
+            ", ",
           )}`;
           showMessage.error(errorMessage);
           throw new Error(errorMessage);
@@ -318,13 +312,13 @@ export const usePlazzeService = () => {
         // 4. Actualizar el listing
         const result = await plazzeLib.updateListing(
           id,
-          listingDataWithoutGallery
+          listingDataWithoutGallery,
         );
 
         // 5. Detectar cambios en galería y actualizar si es necesario
         const hasNewFiles =
           values.gallery?.some(
-            (item: any) => item.originFileObj instanceof File
+            (item: any) => item.originFileObj instanceof File,
           ) || false;
 
         const currentFormIds =
@@ -334,12 +328,12 @@ export const usePlazzeService = () => {
                 !item.originFileObj &&
                 item.uid &&
                 typeof item.uid === "string" &&
-                item.uid.match(/^\d+$/)
+                item.uid.match(/^\d+$/),
             )
             ?.map((item: any) => parseInt(item.uid)) || [];
 
         const hasRemovedImages = originalGalleryIds.some(
-          (originalId: number) => !currentFormIds.includes(originalId)
+          (originalId: number) => !currentFormIds.includes(originalId),
         );
 
         // Actualizar galería SOLO si hay cambios detectables:
@@ -356,7 +350,7 @@ export const usePlazzeService = () => {
           } catch (galleryError: any) {
             console.warn("⚠️ Error actualizando galería:", galleryError);
             showMessage.error(
-              "Plazze actualizado pero hubo un problema con las imágenes"
+              "Plazze actualizado pero hubo un problema con las imágenes",
             );
           }
         }
@@ -372,7 +366,7 @@ export const usePlazzeService = () => {
         setLocalLoading(false);
       }
     },
-    []
+    [],
   );
 
   const deletePlazze = useCallback(
@@ -397,7 +391,7 @@ export const usePlazzeService = () => {
         setLocalLoading(false);
       }
     },
-    [removePlazze]
+    [removePlazze],
   );
 
   return {

@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { notFound } from "next/navigation";
-import { Spin } from "antd";
-import { LuMapPin, LuStar } from "react-icons/lu";
+import Link from "next/link";
+import { Button, Spin } from "antd";
+import { LuMapPin, LuStar, LuArrowLeft } from "react-icons/lu";
 import { PlazzeImages } from "@/components/features/plazzes/plazze-detail/plazze-images";
 import { BookingForm } from "@/components/features/plazzes/plazze-detail/booking-form";
 import { PlazzeInfo } from "@/components/features/plazzes/plazze-detail/plazze-info";
 import { ScrollToBookingButton } from "@/components/common/ui/scroll-to-booking-button";
 import { usePlazzeService } from "@/services/plazze";
 import { Plazze } from "@/types/plazze";
+import { ROUTES } from "@/consts/routes";
 
 interface PlazzeDetailPageProps {
   params: {
@@ -20,10 +21,16 @@ interface PlazzeDetailPageProps {
 export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
   const [plazze, setPlazze] = useState<Plazze | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isNotFound, setIsNotFound] = useState(false);
   const { fetchPlazzeById } = usePlazzeService();
 
   useEffect(() => {
+    if (!params.id || isNaN(parseInt(params.id))) {
+      setIsNotFound(true);
+      setLoading(false);
+      return;
+    }
+
     const loadPlazze = async () => {
       try {
         setLoading(true);
@@ -33,24 +40,16 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
         if (data) {
           setPlazze(data);
         } else {
-          console.error("❌ No se encontró plazze con ID:", params.id);
-          notFound();
+          setIsNotFound(true);
         }
-      } catch (error) {
-        console.error("❌ Error al cargar plazze:", error);
-        setError(error instanceof Error ? error.message : "Error desconocido");
-        notFound();
+      } catch {
+        setIsNotFound(true);
       } finally {
         setLoading(false);
       }
     };
 
-    if (params.id && !isNaN(parseInt(params.id))) {
-      loadPlazze();
-    } else {
-      console.error("❌ ID inválido:", params.id);
-      notFound();
-    }
+    loadPlazze();
   }, [params.id, fetchPlazzeById]);
 
   if (loading) {
@@ -61,19 +60,25 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
     );
   }
 
-  if (error) {
+  if (isNotFound || !plazze) {
     return (
       <main className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Error</h1>
-          <p className="text-gray-600">{error}</p>
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="text-6xl mb-6">🏢</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Plazze no encontrado
+          </h1>
+          <p className="text-gray-600 mb-8">
+            El espacio que buscas no existe o ya no está disponible.
+          </p>
+          <Link href={ROUTES.PUBLIC.PLAZZES.LIST}>
+            <Button type="primary" size="large" icon={<LuArrowLeft />}>
+              Ver todos los plazzes
+            </Button>
+          </Link>
         </div>
       </main>
     );
-  }
-
-  if (!plazze) {
-    notFound();
   }
 
   // Usar imágenes reales del plazze (galería completa)

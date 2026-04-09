@@ -2,10 +2,18 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "antd";
 import { LuLogOut, LuUser } from "react-icons/lu";
 import { useAuthService } from "@/services/auth";
 import { ROUTES } from "@/consts/routes";
+
+const LANDING_SECTIONS = [
+  { label: "Destacados", href: "#destacados" },
+  { label: "Populares", href: "#populares" },
+  { label: "Categorías", href: "#categorias" },
+  { label: "Para Plazzers", href: "#plazzer" },
+];
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -15,6 +23,8 @@ interface MobileMenuProps {
 
 export function MobileMenu({ isOpen, isAuth, onClose }: MobileMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const isHomepage = pathname === "/";
   const { logout } = useAuthService();
 
   useEffect(() => {
@@ -41,33 +51,39 @@ export function MobileMenu({ isOpen, isAuth, onClose }: MobileMenuProps) {
     <>
       {/* Overlay */}
       <div
-        className="md:hidden fixed inset-0 top-16 bg-black/20 transition-opacity duration-300"
+        className="lg:hidden fixed inset-0 top-16 bg-black/20 transition-opacity duration-300"
         onClick={onClose}
       />
 
       {/* Menu */}
       <div
         ref={menuRef}
-        className="md:hidden fixed inset-x-0 top-16 bg-white border-t border-gray-200 shadow-lg z-10"
+        className="lg:hidden fixed inset-x-0 top-16 bg-white border-t border-gray-200 shadow-lg z-10"
       >
         <div className="max-w-7xl mx-auto">
           <nav className="flex flex-col space-y-4 p-4">
-            <Link
-              href={ROUTES.PUBLIC.PLAZZES.LIST}
-              className="text-gray-700 hover:text-primary transition-colors px-2 py-1"
-              onClick={onClose}
-            >
-              Explorar
-            </Link>
-            {!isAuth ? (
-              <>
-                <Link
-                  href={ROUTES.PUBLIC.AUTH.LOGIN}
+            {isHomepage ? (
+              LANDING_SECTIONS.map(({ label, href }) => (
+                <a
+                  key={href}
+                  href={href}
                   className="text-gray-700 hover:text-primary transition-colors px-2 py-1"
                   onClick={onClose}
                 >
-                  Soy un Plazzer
-                </Link>
+                  {label}
+                </a>
+              ))
+            ) : /^\/plazzes\/\d+/.test(pathname) ? (
+              <Link
+                href={ROUTES.PUBLIC.PLAZZES.LIST}
+                className="text-gray-700 hover:text-primary transition-colors px-2 py-1"
+                onClick={onClose}
+              >
+                Explorar
+              </Link>
+            ) : null}
+            {!isAuth ? (
+              <>
                 <div className="flex flex-col space-y-2 pt-4 border-t border-gray-100">
                   <Link
                     href={ROUTES.PUBLIC.AUTH.LOGIN}
