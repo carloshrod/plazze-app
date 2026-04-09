@@ -155,7 +155,7 @@ export const useAuthService = () => {
           setAuth(token, userData);
         }
 
-        showMessage.success("Email actualizado correctamente");
+        showMessage.success("Email actualizado con éxito");
       }
     } catch (error) {
       console.error("Error al actualizar el email:", error);

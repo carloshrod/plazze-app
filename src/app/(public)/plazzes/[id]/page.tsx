@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import { Spin } from "antd";
-import { LuMapPin } from "react-icons/lu";
+import { LuMapPin, LuStar } from "react-icons/lu";
 import { PlazzeImages } from "@/components/features/plazzes/plazze-detail/plazze-images";
 import { BookingForm } from "@/components/features/plazzes/plazze-detail/booking-form";
 import { PlazzeInfo } from "@/components/features/plazzes/plazze-detail/plazze-info";
@@ -82,7 +82,7 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
   // Agregar todas las imágenes de la galería si existen
   if (plazze.gallery && Array.isArray(plazze.gallery)) {
     const galleryUrls = plazze.gallery.map((img) =>
-      typeof img === "string" ? img : img.url
+      typeof img === "string" ? img : img.url,
     );
     images.push(...galleryUrls);
   }
@@ -98,7 +98,7 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
   // Si no hay imágenes, usar una imagen por defecto
   if (finalImages.length === 0) {
     finalImages.push(
-      "https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1074"
+      "https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1074",
     );
   }
 
@@ -107,11 +107,17 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
       {/* Header con título y ubicación */}
       <div className="pt-8 space-y-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
             <h1
               className="text-3xl font-bold text-gray-900"
               dangerouslySetInnerHTML={{ __html: plazze.name }}
             />
+            {plazze.is_featured && (
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/50">
+                <LuStar size={14} />
+                Destacado
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <LuMapPin size={20} />

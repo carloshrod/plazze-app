@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button, Spin, Empty } from "antd";
-import { LuClock, LuMapPin } from "react-icons/lu";
+import { LuClock, LuMapPin, LuStar } from "react-icons/lu";
 import { ROUTES } from "@/consts/routes";
 import { usePlazzeStore } from "@/stores/plazze";
 import { getTodayHours } from "@/utils";
@@ -70,12 +70,20 @@ const PlazzesList = () => {
             {/* Contenido */}
             <div className="p-4 flex-1">
               <div className="mb-4">
-                <h3
-                  className="text-lg font-semibold text-gray-900 mb-1"
-                  dangerouslySetInnerHTML={{
-                    __html: plazze.name || "",
-                  }}
-                />
+                <div className="flex items-start gap-2 mb-1">
+                  <h3
+                    className="text-lg font-semibold text-gray-900"
+                    dangerouslySetInnerHTML={{
+                      __html: plazze.name || "",
+                    }}
+                  />
+                  {plazze.is_featured && (
+                    <span className="shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/50 mt-1">
+                      <LuStar size={11} />
+                      Destacado
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-gray-600 mb-2 flex items-center gap-1">
                   <LuMapPin size={16} />
                   {plazze.region || "Ubicación no especificada"}

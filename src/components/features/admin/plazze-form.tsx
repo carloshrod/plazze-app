@@ -135,7 +135,7 @@ export default function PlazzeForm({
   const handleMapLocationSelect = (
     lat: number,
     lng: number,
-    address?: string
+    address?: string,
   ) => {
     setCoordinates({ lat, lng });
     form.setFieldsValue({
@@ -150,6 +150,7 @@ export default function PlazzeForm({
       form={form}
       layout="vertical"
       onFinish={onFinish}
+      scrollToFirstError
       className="space-y-6"
       initialValues={{
         gallery: [], // Inicializar galería como array vacío
@@ -230,7 +231,11 @@ export default function PlazzeForm({
 
         <Row gutter={16}>
           <Col xs={24} sm={8}>
-            <Form.Item label="Región" name="region">
+            <Form.Item
+              label="Región"
+              name="region"
+              rules={[{ required: true, message: "La región es requerida" }]}
+            >
               <Select
                 placeholder="Selecciona región"
                 options={regions.map((region) => ({
@@ -295,12 +300,26 @@ export default function PlazzeForm({
             }
             return e?.fileList || [];
           }}
+          rules={[
+            {
+              required: true,
+              message: "Se requiere al menos 1 imagen",
+              validator: (_, fileList) => {
+                if (fileList && fileList.length > 0) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(
+                  new Error("Se requiere al menos 1 imagen"),
+                );
+              },
+            },
+          ]}
         >
           <Upload
             listType="picture-card"
             maxCount={4}
             multiple
-            beforeUpload={() => false} // Prevenir upload automático
+            beforeUpload={() => false}
             showUploadList={{
               showPreviewIcon: true,
               showRemoveIcon: true,
@@ -453,7 +472,7 @@ export default function PlazzeForm({
                 const selectedDays = getSelectedDays(fieldIndex);
                 const scheduleTitle = getScheduleTitle(
                   fieldIndex,
-                  fields.length
+                  fields.length,
                 );
 
                 return (
@@ -538,7 +557,7 @@ export default function PlazzeForm({
                             placeholder="Selecciona días"
                             className="!w-full"
                             key={`schedule-${fieldIndex}-${JSON.stringify(
-                              selectedDays
+                              selectedDays,
                             )}`}
                             options={[
                               {
@@ -617,8 +636,8 @@ export default function PlazzeForm({
                 ? "Actualizando..."
                 : "Creando..."
               : isEditMode
-              ? "Actualizar Plazze"
-              : "Crear Plazze"}
+                ? "Actualizar Plazze"
+                : "Crear Plazze"}
           </Button>
         </Space>
       </Form.Item>

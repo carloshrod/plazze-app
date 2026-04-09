@@ -122,6 +122,9 @@ export interface PlazzeWP {
     };
   };
 
+  // ⭐ Destacado
+  is_featured?: boolean;
+
   // Campos legacy mantenidos por compatibilidad
   price_min?: string;
   price_max?: string;
@@ -279,9 +282,63 @@ export interface Plazze {
     };
   };
 
+  // ⭐ Destacado
+  is_featured: boolean;
+
   // Campos legacy mantenidos por compatibilidad
   price_min: number;
   price_max: number;
+}
+
+export interface Banner {
+  id: number;
+  title: string;
+  image_url: string;
+  image_id: number;
+  image_url_mobile?: string;
+  image_id_mobile?: number;
+  link_url: string;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+  position: "features" | "trending";
+  package?: "7" | "15" | "30";
+  seller_id?: number | null;
+  seller_name?: string;
+  is_rejected?: boolean;
+}
+
+export interface BannerFormData {
+  title: string;
+  image_id: number;
+  image_url?: string;
+  image_id_mobile?: number;
+  image_url_mobile?: string;
+  link_url: string;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+  position: "features" | "trending";
+  package?: "7" | "15" | "30";
+}
+
+export interface FeatureRequest {
+  id: number;
+  plazze_id: number;
+  plazze_title: string;
+  seller_id: number;
+  seller_name: string;
+  status: "pending" | "approved" | "rejected";
+  package: "7" | "15" | "30" | "";
+  message: string;
+  admin_notes: string;
+  created_at: string;
+  approved_at?: string | null;
+}
+
+export interface PendingCounts {
+  feature_requests: number;
+  banner_requests: number;
 }
 
 export interface PlazzeStore {

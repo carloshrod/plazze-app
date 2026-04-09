@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useMyPlazzesStore } from "@/stores/my-plazzes";
 import { plazzeLib } from "@/libs/api/plazze";
+import { useAuthStore } from "@/stores/auth";
 
 export const useMyPlazzesService = () => {
   const {
@@ -15,6 +16,7 @@ export const useMyPlazzesService = () => {
     removePlazze,
     updatePlazze,
   } = useMyPlazzesStore();
+  const { user } = useAuthStore();
 
   const hasFetched = useRef(false);
 
@@ -24,9 +26,11 @@ export const useMyPlazzesService = () => {
       setLoading(true);
       setError(null);
 
-      const response = await plazzeLib.getUserPlazzes({
-        order: "desc",
-      });
+      const isAdmin = user?.role === "administrator";
+      const fetchFn = isAdmin
+        ? plazzeLib.getAllPlazzes
+        : plazzeLib.getUserPlazzes;
+      const response = await fetchFn({ order: "desc" });
 
       setPlazzes(response.plazzes);
     } catch (error: any) {

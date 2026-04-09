@@ -15,7 +15,7 @@ export function middleware(request: NextRequest) {
       // Validar si el request.nextUrl.pathname existe en las rutas definidas
       const allAdminRoutes = Object.values(ROUTES.ADMIN);
       const isValidRoute = allAdminRoutes.includes(
-        request.nextUrl.pathname as any
+        request.nextUrl.pathname as any,
       );
 
       if (isValidRoute) {
@@ -34,7 +34,7 @@ export function middleware(request: NextRequest) {
       // Para guests, definir rutas permitidas
       const guestAllowedRoutes = [ROUTES.ADMIN.BOOKINGS, ROUTES.ADMIN.PROFILE];
       const isAllowedRoute = guestAllowedRoutes.some(
-        (route) => request.nextUrl.pathname === route
+        (route) => request.nextUrl.pathname === route,
       );
 
       // Si es guest o customer y trata de acceder a una ruta no permitida
@@ -43,7 +43,7 @@ export function middleware(request: NextRequest) {
         !isAllowedRoute
       ) {
         return NextResponse.redirect(
-          new URL(ROUTES.ADMIN.BOOKINGS, request.url)
+          new URL(ROUTES.ADMIN.BOOKINGS, request.url),
         );
       }
 

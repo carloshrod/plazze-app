@@ -20,5 +20,6 @@ export const ROUTES = {
     PLAZZES: "/admin/plazzes",
     BOOKINGS: "/admin/reservas",
     PROFILE: "/admin/perfil",
+    BANNERS: "/admin/banners",
   },
 } as const;

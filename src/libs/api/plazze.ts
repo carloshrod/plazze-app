@@ -68,6 +68,7 @@ export interface PlazzeSearchParams {
   category?: string; // ID de categoría
   per_page?: number; // Paginación
   page?: number; // Página
+  featured?: boolean; // Solo destacados
 }
 
 // Nuevos tipos para plazzes del usuario
@@ -242,6 +243,40 @@ export const plazzeLib = {
         throw new Error(
           error.response.data.message ||
             "Error al obtener los plazzes del usuario",
+        );
+      }
+      throw new Error("No se pudo conectar con el servidor");
+    }
+  },
+
+  // 🔑 Admin: Obtener TODOS los plazzes sin filtro de autor
+  getAllPlazzes: async (
+    filters: UserPlazzeFilters = {},
+  ): Promise<UserPlazzesResponse> => {
+    try {
+      const params = {
+        per_page: filters.per_page || 10,
+        page: filters.page || 1,
+        orderby: "date",
+        order: filters.order || "desc",
+        _embed: true,
+        ...(filters.status && { status: filters.status }),
+        ...(filters.search && { search: filters.search }),
+      };
+
+      const response = await client.get(`/wp/v2/listing`, { params });
+      const plazzes = response.data as PlazzeWP[];
+
+      return {
+        plazzes,
+        totalFound: parseInt(response.headers["x-wp-total"] || "0"),
+        totalPages: parseInt(response.headers["x-wp-totalpages"] || "1"),
+        currentPage: filters.page || 1,
+      };
+    } catch (error: any) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.message || "Error al obtener todos los plazzes",
         );
       }
       throw new Error("No se pudo conectar con el servidor");
@@ -468,6 +503,36 @@ export const plazzeLib = {
 
       throw new Error(
         error.response?.data?.message || "Error al eliminar el listing",
+      );
+    }
+  },
+
+  // ⭐ Obtener listings destacados (público)
+  getFeaturedPlazzes: async (): Promise<Plazze[]> => {
+    try {
+      const { data } = await client.get<PlazzeWP[]>(
+        "/plazze/v1/featured-listings",
+      );
+      return data.map((listing) => mapPlazzeFromWP(listing));
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message ||
+          "Error al obtener los plazzes destacados",
+      );
+    }
+  },
+
+  // ⭐ Alternar el estado "destacado" de un listing (solo admin)
+  toggleFeatured: async (
+    id: number,
+  ): Promise<{ id: number; is_featured: boolean }> => {
+    try {
+      const { data } = await client.post(`/plazze/v1/toggle-featured/${id}`);
+      return data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message ||
+          "Error al actualizar el estado destacado",
       );
     }
   },

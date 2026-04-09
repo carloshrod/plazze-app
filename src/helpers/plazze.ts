@@ -27,7 +27,7 @@ export const mapPlazzeFromWP = (listing: PlazzeWP): Plazze => {
   // Buscar dinámicamente los arrays de cada taxonomía
   const findTerms = (taxonomy: string) => {
     const idx = terms.findIndex(
-      (arr: any) => Array.isArray(arr) && arr[0]?.taxonomy === taxonomy
+      (arr: any) => Array.isArray(arr) && arr[0]?.taxonomy === taxonomy,
     );
     return idx !== -1 && Array.isArray(terms[idx]) ? terms[idx] : [];
   };
@@ -41,10 +41,10 @@ export const mapPlazzeFromWP = (listing: PlazzeWP): Plazze => {
   // 💰 Mapear pricing - priorizar nuevo campo pricing, fallback a legacy
   const pricing: PlazzePricing = {
     price_min: parseFloat(
-      listing.pricing?.price_min || listing.price_min || "0"
+      listing.pricing?.price_min || listing.price_min || "0",
     ),
     price_max: parseFloat(
-      listing.pricing?.price_max || listing.price_max || "0"
+      listing.pricing?.price_max || listing.price_max || "0",
     ),
     price: parseFloat(listing.pricing?.price || "0"),
     booking_fee: parseFloat(listing.pricing?.booking_fee || "0"),
@@ -100,7 +100,7 @@ export const mapPlazzeFromWP = (listing: PlazzeWP): Plazze => {
     capacity: listing.capacity,
     features: Array.isArray(listing.features)
       ? listing.features.map((f) =>
-          typeof f === "string" ? f : f.name || f.value || String(f)
+          typeof f === "string" ? f : f.name || f.value || String(f),
         )
       : [],
     gallery: listing.gallery || [],
@@ -108,6 +108,9 @@ export const mapPlazzeFromWP = (listing: PlazzeWP): Plazze => {
     // Campos legacy para compatibilidad
     price_min: pricing.price_min,
     price_max: pricing.price_max,
+
+    // ⭐ Destacado
+    is_featured: listing.is_featured ?? false,
   };
 };
 
@@ -119,7 +122,7 @@ export const mapPlazzeFromWP = (listing: PlazzeWP): Plazze => {
  * Convierte los horarios del formulario al formato que espera Listeo
  */
 export function convertScheduleToListeoFormat(
-  scheduleGroups: any[]
+  scheduleGroups: any[],
 ): Record<string, string> {
   if (!scheduleGroups || scheduleGroups.length === 0) {
     return {};
@@ -192,7 +195,7 @@ export function convertServicesToListeoMenu(bookableServices: any[]): any[] {
  */
 export function formatFormDataForListeo(
   formData: PlazzeFormData,
-  coordinates?: { lat: number; lng: number } | null
+  coordinates?: { lat: number; lng: number } | null,
 ): CreateListingData {
   // Datos básicos
   const listingData: CreateListingData = {
@@ -212,8 +215,8 @@ export function formatFormDataForListeo(
     region: Array.isArray(formData.region)
       ? formData.region
       : formData.region
-      ? [formData.region]
-      : [],
+        ? [formData.region]
+        : [],
 
     // Información del venue
     listing_type: "service", // Usar 'service' que es lo que aparece en el debug
@@ -237,7 +240,7 @@ export function formatFormDataForListeo(
   // Convertir horarios al formato de Listeo (WordPress los guardará con prefijo _)
   if (formData.schedule_groups && formData.schedule_groups.length > 0) {
     const openingHours = convertScheduleToListeoFormat(
-      formData.schedule_groups
+      formData.schedule_groups,
     );
     Object.assign(listingData, openingHours);
 
@@ -302,7 +305,7 @@ export function validateFormData(formData: PlazzeFormData): {
     formData.schedule_groups.forEach((schedule, index) => {
       if (!schedule.open_time || !schedule.close_time) {
         errors.push(
-          `Horario ${index + 1}: Debe especificar hora de apertura y cierre`
+          `Horario ${index + 1}: Debe especificar hora de apertura y cierre`,
         );
       }
 
@@ -329,7 +332,7 @@ export function validateFormData(formData: PlazzeFormData): {
 
       if (!service.bookable_options) {
         errors.push(
-          `Servicio ${index + 1}: Debe seleccionar el tipo de reserva`
+          `Servicio ${index + 1}: Debe seleccionar el tipo de reserva`,
         );
       }
     });
@@ -345,7 +348,7 @@ export function validateFormData(formData: PlazzeFormData): {
  * Convertir datos de WordPress/Listeo al formato del formulario para edición
  */
 export function convertWPToFormData(
-  listing: PlazzeWP
+  listing: PlazzeWP,
 ): Partial<PlazzeFormData> {
   const formData: Partial<PlazzeFormData> = {
     title: cleanHtml(listing.title?.rendered || ""),
@@ -367,10 +370,10 @@ export function convertWPToFormData(
     const terms = listing._embedded["wp:term"] || [];
     const categoryTerms = terms.find(
       (arr: any) =>
-        Array.isArray(arr) && arr[0]?.taxonomy === "listing_category"
+        Array.isArray(arr) && arr[0]?.taxonomy === "listing_category",
     );
     const regionTerms = terms.find(
-      (arr: any) => Array.isArray(arr) && arr[0]?.taxonomy === "region"
+      (arr: any) => Array.isArray(arr) && arr[0]?.taxonomy === "region",
     );
 
     if (categoryTerms && Array.isArray(categoryTerms)) {
@@ -456,7 +459,7 @@ export function convertWPToFormData(
         description: cleanHtml(service.description || ""),
         price: parseFloat(service.price) || 0,
         bookable_options: service.bookable_options || "onetime",
-      })
+      }),
     );
   } else {
     formData.bookable_services = [];
