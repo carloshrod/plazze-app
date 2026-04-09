@@ -29,7 +29,7 @@ const MapClient = ({
   // Función helper para validar y parsear coordenadas
   const parseCoordinates = (
     lat: string,
-    lng: string
+    lng: string,
   ): [number, number] | null => {
     try {
       const latitude = parseFloat(lat);
@@ -65,8 +65,9 @@ const MapClient = ({
   return (
     <MapContainer center={center} zoom={zoom} className={className}>
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://maps.google.com">Google Maps</a>'
+        url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+        maxZoom={20}
       />
 
       {/* Si singleMarker es true, solo mostrar el marker del centro */}
@@ -112,7 +113,7 @@ const MapClient = ({
         validPlazzes.map((plazze) => {
           const coordinates = parseCoordinates(
             plazze.latitude,
-            plazze.longitude
+            plazze.longitude,
           );
 
           // Esta verificación es redundante pero añade seguridad extra
