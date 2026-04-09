@@ -30,7 +30,11 @@ export const useMyPlazzesService = () => {
       const fetchFn = isAdmin
         ? plazzeLib.getAllPlazzes
         : plazzeLib.getUserPlazzes;
-      const response = await fetchFn({ order: "desc" });
+      const response = await fetchFn({
+        order: "desc",
+        per_page: 100,
+        ...(isAdmin && { status: "publish,draft,pending,private" }),
+      });
 
       setPlazzes(response.plazzes);
     } catch (error: any) {
@@ -39,20 +43,20 @@ export const useMyPlazzesService = () => {
     } finally {
       setLoading(false);
     }
-  }, [setLoading, setError, setPlazzes]);
+  }, [setLoading, setError, setPlazzes, user?.role]);
 
   // Función para refrescar los plazzes
   const refreshPlazzes = useCallback(() => {
     fetchPlazzes();
   }, [fetchPlazzes]);
 
-  // Cargar datos automáticamente solo una vez
+  // Cargar datos automáticamente solo una vez (espera a que el rol esté disponible)
   useEffect(() => {
-    if (!hasFetched.current) {
+    if (!hasFetched.current && user?.role) {
       hasFetched.current = true;
       fetchPlazzes();
     }
-  }, [fetchPlazzes]);
+  }, [fetchPlazzes, user?.role]);
 
   return {
     // Estado

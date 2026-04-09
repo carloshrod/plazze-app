@@ -33,8 +33,27 @@ export const useAuthService = () => {
 
       const userData = JSON.parse(decodeURIComponent(userDataCookie));
       setAuth(token, userData);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error en initAuth:", error);
+
+      // Si es un error de red (posible 429/CORS), mantener sesión con cookies
+      const isNetworkError =
+        error?.message === "No se pudo validar el token" ||
+        error?.message === "Network Error";
+
+      if (isNetworkError) {
+        try {
+          const userData = JSON.parse(decodeURIComponent(userDataCookie));
+          setAuth(token, userData);
+          console.warn(
+            "⚠️ Token no validado por error de red, sesión restaurada desde cookies",
+          );
+          return;
+        } catch {
+          // Si falla parsear cookies, hacer logout
+        }
+      }
+
       logout();
     }
   };

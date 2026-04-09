@@ -229,9 +229,7 @@ export function PlazzesTable() {
               placement="topRight"
             >
               <Tooltip title={expiryDate ? `Hasta ${expiryDate}` : undefined}>
-                <Tooltip title={expiryDate ? `Hasta ${expiryDate}` : undefined}>
-                  <Switch size="small" checked={!!isFeatured} />
-                </Tooltip>
+                <Switch size="small" checked={!!isFeatured} />
               </Tooltip>
             </Popconfirm>
             {pendingReq && (
