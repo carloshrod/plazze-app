@@ -80,7 +80,7 @@ const PlazzesList = () => {
                   {plazze.is_featured && (
                     <span className="shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/50 mt-1">
                       <LuStar size={11} />
-                      Destacado
+                      Recomendado
                     </span>
                   )}
                 </div>

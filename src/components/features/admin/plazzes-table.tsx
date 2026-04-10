@@ -137,7 +137,7 @@ export function PlazzesTable() {
               {record.is_featured && (
                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 w-fit">
                   <LuStar size={11} className="fill-amber-400 text-amber-400" />
-                  Destacado
+                  Recomendado
                 </span>
               )}
             </div>

@@ -12,21 +12,21 @@ interface MainNavProps {
 }
 
 const LANDING_SECTIONS = [
-  { label: "Destacados", href: "#destacados", id: "destacados" },
+  { label: "Recomendados", href: "#recomendados", id: "recomendados" },
   { label: "Populares", href: "#populares", id: "populares" },
   { label: "Categorías", href: "#categorias", id: "categorias" },
-  { label: "Para Plazzers", href: "#plazzer", id: "plazzer" },
+  { label: "Plazzers", href: "#plazzer", id: "plazzer" },
 ];
 
 const OBSERVED_SECTION_IDS = [
   "hero",
-  "destacados",
+  "recomendados",
   "populares",
   "categorias",
   "plazzer",
 ];
 
-export function MainNav({ isAuth, isTransparent = false }: MainNavProps) {
+export function MainNav({ isTransparent = false }: MainNavProps) {
   const pathname = usePathname();
   const isHomepage = pathname === "/";
   const [activeSection, setActiveSection] = useState<string>("");

@@ -26,10 +26,6 @@ const FeaturedPlazzesSection = () => {
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 text-primary bg-primary/10 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            <LuStar size={16} />
-            <span>Espacios destacados</span>
-          </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Plazzes recomendados
           </h2>
@@ -59,10 +55,10 @@ const FeaturedPlazzesSection = () => {
                   sizes="(max-width: 640px) 100vw, 256px"
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                {/* Badge destacado */}
+                {/* Badge recomendado */}
                 <div className="absolute top-3 right-3 z-10 bg-primary text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
                   <LuStar size={12} />
-                  Destacado
+                  Recomendado
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">

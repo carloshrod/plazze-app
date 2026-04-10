@@ -73,8 +73,8 @@ export default function PlazzesPage() {
               </h3>
               <p className="mb-3 text-sm text-gray-600">
                 Puedes solicitar que tu plazze aparezca en la sección{" "}
-                <strong>Destacados</strong> eligiendo un paquete de duración. El
-                destaque se activa tras confirmar el pago.{" "}
+                <strong>Recomendados</strong> eligiendo un paquete de duración.
+                El destaque se activa tras confirmar el pago.{" "}
                 <Popover
                   content={featureConditions}
                   title="Cómo funciona el destaque"

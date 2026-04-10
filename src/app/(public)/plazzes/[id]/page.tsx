@@ -120,7 +120,7 @@ export default function PlazzeDetailPage({ params }: PlazzeDetailPageProps) {
             {plazze.is_featured && (
               <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/50">
                 <LuStar size={14} />
-                Destacado
+                Recomendado
               </span>
             )}
           </div>

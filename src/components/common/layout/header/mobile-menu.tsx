@@ -9,7 +9,7 @@ import { useAuthService } from "@/services/auth";
 import { ROUTES } from "@/consts/routes";
 
 const LANDING_SECTIONS = [
-  { label: "Destacados", href: "#destacados" },
+  { label: "Recomendados", href: "#recomendados" },
   { label: "Populares", href: "#populares" },
   { label: "Categorías", href: "#categorias" },
   { label: "Para Plazzers", href: "#plazzer" },
