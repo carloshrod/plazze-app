@@ -14,6 +14,7 @@ interface PromotionsStore {
   setPendingCounts: (counts: PendingCounts) => void;
   decrementFeatureRequests: () => void;
   decrementBannerRequests: () => void;
+  decrementPayoutRequests: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }
@@ -21,7 +22,11 @@ interface PromotionsStore {
 export const usePromotionsStore = create<PromotionsStore>((set) => ({
   featureRequests: [],
   myFeatureRequests: [],
-  pendingCounts: { feature_requests: 0, banner_requests: 0 },
+  pendingCounts: {
+    feature_requests: 0,
+    banner_requests: 0,
+    payout_requests: 0,
+  },
   loading: false,
   error: null,
   setFeatureRequests: (requests) => set({ featureRequests: requests }),
@@ -45,6 +50,13 @@ export const usePromotionsStore = create<PromotionsStore>((set) => ({
       pendingCounts: {
         ...state.pendingCounts,
         banner_requests: Math.max(0, state.pendingCounts.banner_requests - 1),
+      },
+    })),
+  decrementPayoutRequests: () =>
+    set((state) => ({
+      pendingCounts: {
+        ...state.pendingCounts,
+        payout_requests: Math.max(0, state.pendingCounts.payout_requests - 1),
       },
     })),
   setLoading: (loading) => set({ loading }),

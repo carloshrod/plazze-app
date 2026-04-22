@@ -1,9 +1,10 @@
 "use client";
 
-import { Avatar, Card, Table, Tag, Alert, Spin } from "antd";
+import { Avatar, Card, Table, Tag, Alert, Spin, Tooltip } from "antd";
 import { LuBuilding } from "react-icons/lu";
 import { decodeHtmlEntities, formatCurrency } from "@/utils/format";
 import { useBookingsService } from "@/services/bookings";
+import { useAuthStore } from "@/stores/auth";
 import { formatBookingDate, formatBookingTimeRange } from "@/helpers/booking";
 import type { Booking } from "@/libs/api/booking";
 
@@ -27,6 +28,9 @@ export function BookingsTable() {
   const { bookings, loading, error } = useBookingsService({
     per_page: 20,
   });
+  const { user } = useAuthStore();
+  const isSellerOrAdmin =
+    user?.role === "seller" || user?.role === "administrator";
 
   const columns = [
     {
@@ -86,6 +90,30 @@ export function BookingsTable() {
       key: "price",
       render: (price: number) => formatCurrency(price),
     },
+    ...(isSellerOrAdmin
+      ? [
+          {
+            title: "Comisión",
+            key: "commission",
+            render: (_: unknown, record: Booking) => {
+              if (record.status !== "paid") {
+                return <span className="text-gray-400 text-sm">—</span>;
+              }
+              const rate = record.commission_rate ?? 0;
+              const amount = record.commission_amount ?? 0;
+              return (
+                <Tooltip
+                  title={`${(rate * 100).toFixed(0)}% sobre el precio total`}
+                >
+                  <span className="text-orange-600 font-medium">
+                    {formatCurrency(amount)}
+                  </span>
+                </Tooltip>
+              );
+            },
+          },
+        ]
+      : []),
     {
       title: "Estado",
       dataIndex: "status",

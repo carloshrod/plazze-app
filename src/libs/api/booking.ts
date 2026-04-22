@@ -47,6 +47,8 @@ export interface Booking {
   type: string;
   created: string;
   price: number;
+  commission_rate: number;
+  commission_amount: number;
   guests: number;
   customer: BookingCustomer;
   owner: BookingOwner;
@@ -107,11 +109,11 @@ export interface GetOwnerBookingsParams extends GetBookingsParams {
  * Obtener reservas del usuario como COMPRADOR
  */
 export const getMyBookings = async (
-  params?: GetBookingsParams
+  params?: GetBookingsParams,
 ): Promise<BookingsResponse> => {
   const response = await client.get<BookingsResponse>(
     "/plazze/v1/my-bookings",
-    { params }
+    { params },
   );
   return response.data;
 };
@@ -120,11 +122,11 @@ export const getMyBookings = async (
  * Obtener reservas de los listings del usuario como VENDEDOR
  */
 export const getMyListingsBookings = async (
-  params?: GetOwnerBookingsParams
+  params?: GetOwnerBookingsParams,
 ): Promise<BookingsResponse> => {
   const response = await client.get<BookingsResponse>(
     "/plazze/v1/my-listings-bookings",
-    { params }
+    { params },
   );
   return response.data;
 };
@@ -133,7 +135,7 @@ export const getMyListingsBookings = async (
  * Verificar estado de pago de un booking
  */
 export const checkBookingPaymentStatus = async (
-  bookingId: number
+  bookingId: number,
 ): Promise<{
   booking_id: number;
   status: string;
@@ -141,7 +143,7 @@ export const checkBookingPaymentStatus = async (
   payment_completed: boolean;
 }> => {
   const response = await client.get(
-    `/plazze/v1/booking/${bookingId}/payment-status`
+    `/plazze/v1/booking/${bookingId}/payment-status`,
   );
   return response.data;
 };
@@ -150,11 +152,11 @@ export const checkBookingPaymentStatus = async (
  * Crear una reserva directamente en Listeo
  */
 export const createBooking = async (
-  params: CreateBookingParams
+  params: CreateBookingParams,
 ): Promise<BookingResponse> => {
   const response = await client.post<BookingResponse>(
     "/plazze/v1/create-listeo-booking",
-    params
+    params,
   );
   return response.data;
 };

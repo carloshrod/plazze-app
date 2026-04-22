@@ -339,6 +339,7 @@ export interface FeatureRequest {
 export interface PendingCounts {
   feature_requests: number;
   banner_requests: number;
+  payout_requests: number;
 }
 
 export interface PlazzeStore {

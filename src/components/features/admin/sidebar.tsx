@@ -10,6 +10,7 @@ import {
   LuLayoutDashboard,
   LuMegaphone,
   LuUser,
+  LuWallet,
 } from "react-icons/lu";
 import { useAuthStore } from "@/stores/auth";
 import { usePromotionsStore } from "@/stores/promotions";
@@ -38,6 +39,11 @@ const sellerMenuItems = [
     title: "Banners",
     href: ROUTES.ADMIN.BANNERS,
     icon: <LuMegaphone size={20} />,
+  },
+  {
+    title: "Wallet",
+    href: ROUTES.ADMIN.WALLET,
+    icon: <LuWallet size={20} />,
   },
   {
     title: "Mi Perfil",
@@ -89,6 +95,7 @@ export const Sidebar = () => {
   const badgeByHref: Record<string, number> = {
     [ROUTES.ADMIN.PLAZZES]: pendingCounts.feature_requests,
     [ROUTES.ADMIN.BANNERS]: pendingCounts.banner_requests,
+    [ROUTES.ADMIN.WALLET]: pendingCounts.payout_requests,
   };
 
   return (

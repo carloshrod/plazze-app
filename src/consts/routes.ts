@@ -19,6 +19,7 @@ export const ROUTES = {
     DASHBOARD: "/admin/dashboard",
     PLAZZES: "/admin/plazzes",
     BOOKINGS: "/admin/reservas",
+    WALLET: "/admin/wallet",
     PROFILE: "/admin/perfil",
     BANNERS: "/admin/banners",
   },

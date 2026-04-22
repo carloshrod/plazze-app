@@ -17,7 +17,9 @@ export default function ReservasPage() {
           <p className="text-gray-600">
             {isAdmin
               ? "Gestiona todas las reservas de la plataforma"
-              : "Gestiona las reservas de tus espacios"}
+              : user?.role === "seller"
+                ? "Gestiona las reservas de tus espacios"
+                : "Consulta el historial de tus reservas"}
           </p>
         </div>
       </div>

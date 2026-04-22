@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 import { Banner, BannerFormData } from "@/types/plazze";
 import { client } from "./client";
 
@@ -18,8 +19,28 @@ export const bannerLib = {
   },
 
   createBanner: async (bannerData: BannerFormData): Promise<Banner> => {
-    const { data } = await client.post<Banner>("/plazze/v1/banner", bannerData);
-    return data;
+    // Usamos el proxy Next.js (/api/plazze/banner) para evitar bloqueos CORS
+    // en el servidor de producción (WAF / Cloudflare). El browser habla con
+    // la misma origen y Next.js reenvía server-to-server a WordPress.
+    const token = Cookies.get("token");
+    const response = await fetch("/api/plazze/banner", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(bannerData),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw Object.assign(
+        new Error(
+          (data as { message?: string }).message || response.statusText,
+        ),
+        { status: response.status, data },
+      );
+    }
+    return data as Banner;
   },
 
   updateBanner: async (
