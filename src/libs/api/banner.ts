@@ -68,7 +68,13 @@ export const bannerLib = {
     return data;
   },
 
-  deleteBanner: async (id: number): Promise<void> => {
-    await client.post(`/plazze/v1/banner/${id}/delete`);
+  deleteBanner: async (id: number): Promise<Banner> => {
+    const { data } = await client.post(`/plazze/v1/banner/${id}/delete`);
+    return data;
+  },
+
+  restoreBanner: async (id: number): Promise<Banner> => {
+    const { data } = await client.post(`/plazze/v1/banner/${id}/restore`);
+    return data;
   },
 };

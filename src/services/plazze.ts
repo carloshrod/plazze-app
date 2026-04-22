@@ -3,6 +3,7 @@ import { usePlazzeStore } from "@/stores/plazze";
 import { useSearchStore } from "@/stores/search";
 import { usePlazzeModalStore } from "@/stores/plazze-modal";
 import { useMyPlazzesStore } from "@/stores/my-plazzes";
+import { usePromotionsStore } from "@/stores/promotions";
 import { plazzeLib, PlazzeSearchParams } from "@/libs/api/plazze";
 import { uploadFiles } from "@/libs/api/upload";
 import showMessage from "@/libs/message";
@@ -377,7 +378,38 @@ export const usePlazzeService = () => {
         // Eliminar el plazze usando la API
         await plazzeLib.deleteListing(id);
 
-        // Eliminar del estado
+        // Marcar como orphaned en el store las feature requests activas de este plazze,
+        // para que la UI muestre la alerta sin necesidad de un nuevo fetch al backend.
+        const promotionsState = usePromotionsStore.getState();
+        const affected = promotionsState.featureRequests.filter(
+          (r) =>
+            r.plazze_id === id &&
+            (r.status === "pending" || r.status === "approved"),
+        );
+        if (affected.length > 0) {
+          promotionsState.setFeatureRequests(
+            promotionsState.featureRequests.map((r) =>
+              r.plazze_id === id &&
+              (r.status === "pending" || r.status === "approved")
+                ? { ...r, status: "orphaned" as const, plazze_deleted: true }
+                : r,
+            ),
+          );
+          // Incrementar el conteo del sidebar por cada request que pasa de
+          // 'approved' (no contaba como pendiente) a 'orphaned' (sí cuenta).
+          const approvedCount = affected.filter(
+            (r) => r.status === "approved",
+          ).length;
+          if (approvedCount > 0) {
+            promotionsState.setPendingCounts({
+              ...promotionsState.pendingCounts,
+              feature_requests:
+                promotionsState.pendingCounts.feature_requests + approvedCount,
+            });
+          }
+        }
+
+        // Eliminar del estado de plazzes
         removePlazze(id);
 
         showMessage.success("Plazze eliminado exitosamente!");

@@ -41,9 +41,27 @@ export const promotionsLib = {
     return data;
   },
 
+  archiveFeatureRequest: async (id: number): Promise<FeatureRequest> => {
+    const { data } = await client.post<FeatureRequest>(
+      `/plazze/v1/feature-request/${id}/archive`,
+    );
+    return data;
+  },
+
   getPendingCounts: async (): Promise<PendingCounts> => {
     const { data } = await client.get<PendingCounts>(
       "/plazze/v1/pending-counts",
+    );
+    return data;
+  },
+
+  reassignFeatureRequest: async (
+    featureRequestId: number,
+    newPlazzeId: number,
+  ): Promise<FeatureRequest> => {
+    const { data } = await client.post<FeatureRequest>(
+      "/plazze/v1/feature-request/reassign",
+      { feature_request_id: featureRequestId, new_plazze_id: newPlazzeId },
     );
     return data;
   },

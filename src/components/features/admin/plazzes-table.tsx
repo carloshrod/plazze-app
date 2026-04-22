@@ -59,8 +59,20 @@ export function PlazzesTable() {
   const { user } = useAuthStore();
   const { myFeatureRequests, loadMyFeatureRequests, createFeatureRequest } =
     useMyFeatureRequestsService();
-  const { featureRequests, loadFeatureRequests, approveFeatureRequest } =
-    useFeatureRequestsService();
+  const {
+    featureRequests,
+    loadFeatureRequests,
+    approveFeatureRequest,
+    archiveFeatureRequest,
+    reassignFeatureRequest,
+  } = useFeatureRequestsService();
+  // Modal de reasignación
+  const [reassignModal, setReassignModal] = useState<{
+    open: boolean;
+    featureRequestId: number;
+  } | null>(null);
+  const [selectedPlazze, setSelectedPlazze] = useState<number | null>(null);
+  const [reassignLoading, setReassignLoading] = useState(false);
   const [featReqModal, setFeatReqModal] = useState<{
     open: boolean;
     plazzeId: number;
@@ -324,10 +336,59 @@ export function PlazzesTable() {
             )}
             <Popconfirm
               title="Eliminar plazze"
-              description={`¿Estás seguro de que quieres eliminar "${decodeHtmlEntities(
-                record.title.rendered,
-              )}"?`}
-              onConfirm={() => deletePlazze(record.id)}
+              description={(() => {
+                const activeReqs = (
+                  user?.role === "administrator"
+                    ? featureRequests
+                    : myFeatureRequests
+                ).filter(
+                  (r) =>
+                    r.plazze_id === record.id &&
+                    (r.status === "pending" || r.status === "approved"),
+                );
+                const isFeat = !!record.is_featured;
+                // Si está destacado, solo mostrar advertencia de destacado
+                if (isFeat) {
+                  return (
+                    <span>
+                      ¿Estás seguro de que quieres eliminar &ldquo;
+                      {decodeHtmlEntities(record.title.rendered)}&rdquo;?
+                      <br />
+                      <span className="text-red-600 font-medium">
+                        ⚠ Este plazze está actualmente destacado.
+                      </span>
+                    </span>
+                  );
+                }
+                // Si no está destacado pero hay solicitudes activas (pendientes)
+                if (activeReqs.length > 0) {
+                  return (
+                    <span>
+                      ¿Estás seguro de que quieres eliminar &ldquo;
+                      {decodeHtmlEntities(record.title.rendered)}&rdquo;?
+                      <br />
+                      <span className="text-red-600 font-medium">
+                        ⚠ Tiene {activeReqs.length} solicitud
+                        {activeReqs.length > 1 ? "es" : ""} de destaque activa
+                        {activeReqs.length > 1 ? "s" : ""} que serán canceladas.
+                      </span>
+                    </span>
+                  );
+                }
+                // Sin advertencias
+                return (
+                  <span>
+                    ¿Estás seguro de que quieres eliminar &ldquo;
+                    {decodeHtmlEntities(record.title.rendered)}&rdquo;?
+                  </span>
+                );
+              })()}
+              onConfirm={async () => {
+                await deletePlazze(record.id);
+                if (user?.role === "administrator") {
+                  loadFeatureRequests();
+                }
+              }}
               okText="Sí, eliminar"
               cancelText="Cancelar"
               okType="danger"
@@ -371,6 +432,204 @@ export function PlazzesTable() {
 
   return (
     <>
+      {user?.role === "administrator" &&
+        featureRequests.some((r) => r.status === "orphaned") && (
+          <Card
+            className="mb-4 border-orange-200 bg-orange-50"
+            size="small"
+            title={
+              <span className="text-orange-700 font-semibold text-sm">
+                Destaques huérfanos (
+                {featureRequests.filter((r) => r.status === "orphaned").length})
+              </span>
+            }
+          >
+            <details className="w-full">
+              <summary className="cursor-pointer py-2 px-1 flex items-center gap-2 text-orange-700 font-medium">
+                <Tag color="orange">Huérfanos</Tag>
+                <span>
+                  {
+                    featureRequests.filter((r) => r.status === "orphaned")
+                      .length
+                  }{" "}
+                  destaque
+                  {featureRequests.filter((r) => r.status === "orphaned")
+                    .length === 1
+                    ? ""
+                    : "s"}
+                </span>
+                <span className="ml-2 text-xs text-orange-500">
+                  (haz clic para ver detalles)
+                </span>
+              </summary>
+              <div className="space-y-3 mt-3">
+                {featureRequests
+                  .filter((r) => r.status === "orphaned")
+                  .map((r) => {
+                    const diasContratados = Number(r.package) || 0;
+                    const fechaAprobacion = r.approved_at
+                      ? dayjs(r.approved_at)
+                      : null;
+                    const fechaEliminacion = r.deleted_at
+                      ? dayjs(r.deleted_at)
+                      : null;
+                    let diasRestantes = null;
+                    // Mostrar siempre la fecha de eliminación y días restantes si hay datos
+                    if (
+                      fechaAprobacion &&
+                      diasContratados &&
+                      fechaEliminacion
+                    ) {
+                      const fin = fechaAprobacion.add(diasContratados, "day");
+                      diasRestantes = fin.diff(fechaEliminacion, "day");
+                    }
+                    return (
+                      <div
+                        key={r.id}
+                        className="flex flex-col md:flex-row md:items-center gap-2 text-sm text-orange-800 border border-orange-100 rounded p-2 bg-orange-50"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Tag color="orange">Huérfano</Tag>
+                            <span className="font-medium">{r.seller_name}</span>
+                            <span className="text-orange-600">—</span>
+                            <span>
+                              {r.plazze_title || `Plazze #${r.plazze_id}`}
+                            </span>
+                            <Tag color="blue">{r.package} días</Tag>
+                          </div>
+                          <div className="flex flex-wrap gap-4 mt-1 text-xs text-orange-700">
+                            <span>
+                              <b>Aprobado:</b>{" "}
+                              {r.approved_at
+                                ? dayjs(r.approved_at).format("DD/MM/YYYY")
+                                : "-"}
+                            </span>
+                            <span>
+                              <b>Eliminado:</b>{" "}
+                              {r.deleted_at
+                                ? dayjs(r.deleted_at).format("DD/MM/YYYY HH:mm")
+                                : "-"}
+                            </span>
+                            <span>
+                              <b>Días restantes:</b>{" "}
+                              {diasRestantes !== null ? diasRestantes : "-"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 mt-2 md:mt-0 md:ml-auto">
+                          <Popconfirm
+                            title="Archivar solicitud huérfana"
+                            description="Marca esta solicitud como resuelta. El destaque ya fue cancelado. ¿Confirmas?"
+                            onConfirm={() => archiveFeatureRequest(r.id)}
+                            okText="Sí, archivar"
+                            cancelText="Cancelar"
+                            placement="topLeft"
+                          >
+                            <Button
+                              size="small"
+                              type="text"
+                              className="!text-orange-500 hover:!text-orange-700"
+                            >
+                              Archivar
+                            </Button>
+                          </Popconfirm>
+                          <Button
+                            size="small"
+                            type="default"
+                            className="!text-orange-500 border-orange-300 hover:!text-orange-700"
+                            onClick={() => {
+                              setReassignModal({
+                                open: true,
+                                featureRequestId: r.id,
+                              });
+                              setSelectedPlazze(null);
+                            }}
+                          >
+                            Reasignar
+                          </Button>
+                        </div>
+                        {/* Modal de reasignación de destaque huérfano */}
+                        {reassignModal &&
+                          (() => {
+                            // Buscar el feature request huérfano seleccionado
+                            const orphanReq = featureRequests.find(
+                              (f) => f.id === reassignModal.featureRequestId,
+                            );
+                            // Filtrar plazzes del mismo seller
+                            const sellerPlazzes = orphanReq
+                              ? plazzes.filter(
+                                  (p) =>
+                                    (p as any).author === orphanReq.seller_id,
+                                )
+                              : [];
+                            return (
+                              <Modal
+                                title="Reasignar destaque huérfano"
+                                open={reassignModal.open}
+                                onCancel={() => setReassignModal(null)}
+                                confirmLoading={reassignLoading}
+                                okText="Reasignar"
+                                onOk={async () => {
+                                  if (!selectedPlazze) {
+                                    showMessage.error(
+                                      "Selecciona un plazze destino",
+                                    );
+                                    return;
+                                  }
+                                  setReassignLoading(true);
+                                  await reassignFeatureRequest(
+                                    reassignModal.featureRequestId,
+                                    selectedPlazze,
+                                  );
+                                  setReassignLoading(false);
+                                  setReassignModal(null);
+                                  setSelectedPlazze(null);
+                                }}
+                              >
+                                <div className="mb-2">
+                                  Selecciona el plazze al que reasignar el
+                                  destaque:
+                                </div>
+                                <Select
+                                  showSearch
+                                  style={{ width: "100%" }}
+                                  placeholder="Buscar plazze por nombre"
+                                  value={selectedPlazze ?? undefined}
+                                  onChange={setSelectedPlazze}
+                                  filterOption={(input, option) => {
+                                    const label =
+                                      typeof option?.children === "string"
+                                        ? option.children
+                                        : Array.isArray(option?.children)
+                                          ? option.children.join(" ")
+                                          : "";
+                                    return label
+                                      .toLowerCase()
+                                      .includes(input.toLowerCase());
+                                  }}
+                                >
+                                  {sellerPlazzes.map((p) => (
+                                    <Select.Option key={p.id} value={p.id}>
+                                      {decodeHtmlEntities(p.title.rendered)}
+                                    </Select.Option>
+                                  ))}
+                                </Select>
+                              </Modal>
+                            );
+                          })()}
+                      </div>
+                    );
+                  })}
+              </div>
+              <p className="text-xs text-orange-600 mt-3">
+                Estos destaques fueron pagados pero el espacio ya no existe.
+                Gestiona el reembolso manualmente o reasigna el destaque a otro
+                plazze.
+              </p>
+            </details>
+          </Card>
+        )}
       <Card>
         <div className="overflow-x-auto -mx-4 md:mx-0">
           <Table

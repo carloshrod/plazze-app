@@ -50,6 +50,36 @@ export const useFeatureRequestsService = () => {
     }
   };
 
+  const archiveFeatureRequest = async (id: number) => {
+    try {
+      await promotionsLib.archiveFeatureRequest(id);
+      store.setFeatureRequests(
+        store.featureRequests.filter((r) => r.id !== id),
+      );
+      store.decrementFeatureRequests();
+      showMessage.success("Solicitud archivada");
+    } catch {
+      showMessage.error("Error al archivar la solicitud");
+    }
+  };
+
+  const reassignFeatureRequest = async (
+    featureRequestId: number,
+    newPlazzeId: number,
+  ) => {
+    try {
+      const updated = await promotionsLib.reassignFeatureRequest(
+        featureRequestId,
+        newPlazzeId,
+      );
+      store.updateFeatureRequest(updated);
+      showMessage.success("Destaque reasignado correctamente");
+      return updated;
+    } catch {
+      showMessage.error("Error al reasignar el destaque");
+    }
+  };
+
   return {
     featureRequests: store.featureRequests,
     loading: store.loading,
@@ -57,6 +87,8 @@ export const useFeatureRequestsService = () => {
     loadFeatureRequests,
     approveFeatureRequest,
     rejectFeatureRequest,
+    archiveFeatureRequest,
+    reassignFeatureRequest,
   };
 };
 

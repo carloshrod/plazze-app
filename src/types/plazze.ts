@@ -306,6 +306,9 @@ export interface Banner {
   seller_id?: number | null;
   seller_name?: string;
   is_rejected?: boolean;
+  is_deleted?: boolean;
+  deleted_at?: string | null;
+  deleted_by?: string | null;
 }
 
 export interface BannerFormData {
@@ -326,14 +329,16 @@ export interface FeatureRequest {
   id: number;
   plazze_id: number;
   plazze_title: string;
+  plazze_deleted: boolean;
   seller_id: number;
   seller_name: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "orphaned" | "archived";
   package: "7" | "15" | "30" | "";
   message: string;
   admin_notes: string;
   created_at: string;
   approved_at?: string | null;
+  deleted_at?: string | null;
 }
 
 export interface PendingCounts {

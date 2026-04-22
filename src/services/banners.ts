@@ -18,12 +18,19 @@ export const useBannersService = () => {
     removeBanner,
   } = useBannersStore();
 
+  // Solo ejecutar fetchBanners una vez al montar
   const hasFetched = useRef(false);
+  useEffect(() => {
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      fetchBanners();
+    }
+  }, []);
 
   const fetchBanners = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
       const data = await bannerLib.getAllBanners();
       setBanners(data);
     } catch (err: any) {
@@ -92,8 +99,9 @@ export const useBannersService = () => {
             (b) =>
               b.id === id && !b.is_active && !!b.seller_id && !b.is_rejected,
           );
-        await bannerLib.deleteBanner(id);
-        removeBanner(id);
+        // El endpoint ahora hace soft delete y retorna el banner actualizado
+        const deleted = await bannerLib.deleteBanner(id);
+        updateBanner(id, deleted);
         if (wasPending) {
           usePromotionsStore.getState().decrementBannerRequests();
         }
@@ -103,7 +111,7 @@ export const useBannersService = () => {
         throw err;
       }
     },
-    [removeBanner],
+    [updateBanner],
   );
 
   const rejectBanner = useCallback(
@@ -112,7 +120,8 @@ export const useBannersService = () => {
         const banner = await bannerLib.rejectBanner(id);
         updateBanner(id, banner);
         usePromotionsStore.getState().decrementBannerRequests();
-        showMessage.success("Solicitud de banner rechazada");
+        showMessage.success("Banner rechazado");
+        return banner;
       } catch (err: any) {
         showMessage.error(err.message || "Error al rechazar el banner");
         throw err;
@@ -121,23 +130,38 @@ export const useBannersService = () => {
     [updateBanner],
   );
 
-  useEffect(() => {
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      fetchBanners();
-    }
-  }, [fetchBanners]);
+  const restoreBanner = useCallback(
+    async (id: number) => {
+      try {
+        const restored = await bannerLib.restoreBanner(id);
+        updateBanner(id, restored);
+        showMessage.success("Banner restaurado exitosamente");
+        return restored;
+      } catch (err: any) {
+        showMessage.error(err.message || "Error al restaurar el banner");
+        throw err;
+      }
+    },
+    [updateBanner],
+  );
 
   return {
     banners,
     loading,
     error,
+    setBanners,
+    setLoading,
+    setError,
+    addBanner,
+    updateBanner,
+    removeBanner,
     fetchBanners,
     refreshBanners,
-    approveBanner,
-    rejectBanner,
     createBanner,
     editBanner,
+    approveBanner,
     deleteBanner,
+    rejectBanner,
+    restoreBanner,
   };
 };
