@@ -2,7 +2,7 @@
 
 import Footer from "@/components/common/layout/footer";
 import Header from "@/components/common/layout/header";
-import { Sidebar } from "@/components/features/admin/sidebar";
+import { Sidebar } from "@/components/common/layout/sidebar";
 import { useInitializeData } from "@/hooks/useAppData";
 
 function DashboardContent({ children }: { children: React.ReactNode }) {

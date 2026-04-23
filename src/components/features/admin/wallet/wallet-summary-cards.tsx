@@ -10,10 +10,7 @@ interface WalletSummaryCardsProps {
   loading: boolean;
 }
 
-export function WalletSummaryCards({
-  summary,
-  loading,
-}: WalletSummaryCardsProps) {
+const WalletSummaryCards = ({ summary, loading }: WalletSummaryCardsProps) => {
   if (loading || !summary) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -102,4 +99,6 @@ export function WalletSummaryCards({
       ))}
     </div>
   );
-}
+};
+
+export default WalletSummaryCards;

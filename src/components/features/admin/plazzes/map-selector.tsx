@@ -76,11 +76,11 @@ interface Suggestion {
   description: string;
 }
 
-export default function MapSelector({
+const MapSelector = ({
   onLocationSelect,
   initialCoordinates,
   isVisible = true,
-}: MapSelectorProps) {
+}: MapSelectorProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const sessionTokenRef =
@@ -370,4 +370,6 @@ export default function MapSelector({
       )}
     </div>
   );
-}
+};
+
+export default MapSelector;

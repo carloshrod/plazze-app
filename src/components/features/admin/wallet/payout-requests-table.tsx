@@ -36,7 +36,7 @@ interface PayoutRequestsTableProps {
   refreshKey?: number;
 }
 
-export function PayoutRequestsTable({ refreshKey }: PayoutRequestsTableProps) {
+const PayoutRequestsTable = ({ refreshKey }: PayoutRequestsTableProps) => {
   const { requests, loading, error, refetch } = usePayoutRequests({
     per_page: 20,
   });
@@ -109,4 +109,6 @@ export function PayoutRequestsTable({ refreshKey }: PayoutRequestsTableProps) {
       size="small"
     />
   );
-}
+};
+
+export default PayoutRequestsTable;

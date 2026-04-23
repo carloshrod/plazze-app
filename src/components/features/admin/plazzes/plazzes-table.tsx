@@ -51,7 +51,7 @@ const statusLabels = {
   private: "Privado",
 } as const;
 
-export function PlazzesTable() {
+const PlazzesTable = () => {
   const { plazzes, loading, error, updatePlazze } = useMyPlazzesService();
   const { getCategoryName } = useAppData();
   const { openEditModal } = usePlazzeModalStore();
@@ -711,4 +711,6 @@ export function PlazzesTable() {
       )}
     </>
   );
-}
+};
+
+export default PlazzesTable;

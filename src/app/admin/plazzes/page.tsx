@@ -2,10 +2,10 @@
 
 import { Button, Card, Modal, Popover } from "antd";
 import { LuInfo, LuSettings2, LuSparkles } from "react-icons/lu";
-import PlazzeModal from "@/components/features/admin/plazze-modal";
-import { PlazzesTable } from "@/components/features/admin/plazzes-table";
+import PlazzeModal from "@/components/features/admin/plazzes/plazze-modal";
+import PlazzesTable from "@/components/features/admin/plazzes/plazzes-table";
 import { useAuthStore } from "@/stores/auth";
-import { FeaturedPricingConfig } from "@/components/features/admin/featured-pricing-config";
+import { FeaturedPricingConfig } from "@/components/features/admin/plazzes/featured-pricing-config";
 import { cn } from "@/libs/cn";
 import { usePlazzeModalStore } from "@/stores/plazze-modal";
 

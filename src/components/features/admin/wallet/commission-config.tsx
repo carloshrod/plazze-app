@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { InputNumber, Button, Spin, Alert } from "antd";
 import { useCommissionSettings } from "@/services/wallet";
 
@@ -8,9 +8,7 @@ interface CommissionConfigProps {
   onClose?: () => void;
 }
 
-export const CommissionConfig: React.FC<CommissionConfigProps> = ({
-  onClose,
-}) => {
+const CommissionConfig = ({ onClose }: CommissionConfigProps) => {
   const { settings, loading, saving, updateSettings } = useCommissionSettings();
   const [localPercentage, setLocalPercentage] = useState<number>(10);
 
@@ -99,3 +97,5 @@ export const CommissionConfig: React.FC<CommissionConfigProps> = ({
     </div>
   );
 };
+
+export default CommissionConfig;

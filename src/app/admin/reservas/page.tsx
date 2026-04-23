@@ -1,6 +1,6 @@
 "use client";
 
-import { BookingsTable } from "@/components/features/admin/bookings-table";
+import { BookingsTable } from "@/components/features/admin/bookings/bookings-table";
 import { useAuthStore } from "@/stores/auth";
 
 export default function ReservasPage() {

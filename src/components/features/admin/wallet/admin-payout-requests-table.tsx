@@ -54,7 +54,7 @@ interface ActionModalState {
   targetStatus: PayoutStatus | null;
 }
 
-export function AdminPayoutRequestsTable() {
+const AdminPayoutRequestsTable = () => {
   const [statusFilter, setStatusFilter] = useState<PayoutStatus | undefined>(
     undefined,
   );
@@ -338,4 +338,6 @@ export function AdminPayoutRequestsTable() {
       </Modal>
     </>
   );
-}
+};
+
+export default AdminPayoutRequestsTable;

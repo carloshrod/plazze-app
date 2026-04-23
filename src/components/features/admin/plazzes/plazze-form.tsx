@@ -29,7 +29,7 @@ const MapSelector = dynamic(() => import("./map-selector"), { ssr: false });
 const { TextArea } = Input;
 const { Option } = Select;
 
-export default function PlazzeForm({
+const PlazzeForm = ({
   initialValues,
   onSuccess,
   isModalVisible = true,
@@ -37,7 +37,7 @@ export default function PlazzeForm({
   initialValues?: Partial<PlazzeFormData>;
   onSuccess?: () => void;
   isModalVisible?: boolean;
-}) {
+}) => {
   const [form] = Form.useForm();
   const { categories, regions } = useAppData();
   const { createPlazze, updatePlazze, loading } = usePlazzeService();
@@ -643,4 +643,6 @@ export default function PlazzeForm({
       </Form.Item>
     </Form>
   );
-}
+};
+
+export default PlazzeForm;

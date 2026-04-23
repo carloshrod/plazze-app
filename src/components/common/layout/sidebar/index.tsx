@@ -4,70 +4,16 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Badge, Skeleton } from "antd";
-import {
-  LuBuilding2,
-  LuCalendarDays,
-  LuLayoutDashboard,
-  LuMegaphone,
-  LuUser,
-  LuWallet,
-} from "react-icons/lu";
 import { useAuthStore } from "@/stores/auth";
 import { usePromotionsStore } from "@/stores/promotions";
 import { promotionsLib } from "@/libs/api/promotions";
 import { cn } from "@/libs/cn";
 import { ROUTES } from "@/consts/routes";
-
-// Items para seller
-const sellerMenuItems = [
-  {
-    title: "Dashboard",
-    href: ROUTES.ADMIN.DASHBOARD,
-    icon: <LuLayoutDashboard size={20} />,
-  },
-  {
-    title: "Plazzes",
-    href: ROUTES.ADMIN.PLAZZES,
-    icon: <LuBuilding2 size={20} />,
-  },
-  {
-    title: "Reservas",
-    href: ROUTES.ADMIN.BOOKINGS,
-    icon: <LuCalendarDays size={20} />,
-  },
-  {
-    title: "Banners",
-    href: ROUTES.ADMIN.BANNERS,
-    icon: <LuMegaphone size={20} />,
-  },
-  {
-    title: "Wallet",
-    href: ROUTES.ADMIN.WALLET,
-    icon: <LuWallet size={20} />,
-  },
-  {
-    title: "Mi Perfil",
-    href: ROUTES.ADMIN.PROFILE,
-    icon: <LuUser size={20} />,
-  },
-];
-
-// Admin tiene el mismo menú que seller (ambos usan banners)
-const administratorMenuItems = sellerMenuItems;
-
-// Items para guest
-const guestMenuItems = [
-  {
-    title: "Reservas",
-    href: ROUTES.ADMIN.BOOKINGS,
-    icon: <LuCalendarDays size={20} />,
-  },
-  {
-    title: "Mi Perfil",
-    href: ROUTES.ADMIN.PROFILE,
-    icon: <LuUser size={20} />,
-  },
-];
+import {
+  administratorMenuItems,
+  guestMenuItems,
+  sellerMenuItems,
+} from "./items";
 
 export const Sidebar = () => {
   const pathname = usePathname();

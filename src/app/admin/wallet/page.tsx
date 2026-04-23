@@ -5,11 +5,11 @@ import { Alert, Button, Card, Divider, Modal, Spin } from "antd";
 import { LuWallet, LuSettings2 } from "react-icons/lu";
 import { useAuthStore } from "@/stores/auth";
 import { useWalletSummary, useCreatePayoutRequest } from "@/services/wallet";
-import { WalletSummaryCards } from "@/components/features/wallet/wallet-summary-cards";
-import { BankDataForm } from "@/components/features/wallet/bank-data-form";
-import { PayoutRequestsTable } from "@/components/features/wallet/payout-requests-table";
-import { AdminPayoutRequestsTable } from "@/components/features/wallet/admin-payout-requests-table";
-import { CommissionConfig } from "@/components/features/admin/commission-config";
+import WalletSummaryCards from "@/components/features/admin/wallet/wallet-summary-cards";
+import BankDataForm from "@/components/features/admin/wallet/bank-data-form";
+import PayoutRequestsTable from "@/components/features/admin/wallet/payout-requests-table";
+import AdminPayoutRequestsTable from "@/components/features/admin/wallet/admin-payout-requests-table";
+import CommissionConfig from "@/components/features/admin/wallet/commission-config";
 import { formatCurrency } from "@/utils/format";
 
 // ─────────────────────────────────────────────────────────

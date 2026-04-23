@@ -5,7 +5,7 @@ import { Button, Form, Input, Select, Skeleton } from "antd";
 import { useBankData } from "@/services/wallet";
 import type { BankData } from "@/types/wallet";
 
-export function BankDataForm() {
+const BankDataForm = () => {
   const [form] = Form.useForm<BankData>();
   const { bankData, loading, saving, saveBankData } = useBankData();
 
@@ -88,4 +88,6 @@ export function BankDataForm() {
       </Form.Item>
     </Form>
   );
-}
+};
+
+export default BankDataForm;

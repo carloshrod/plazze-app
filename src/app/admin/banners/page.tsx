@@ -2,11 +2,11 @@
 
 import { Button, Card, Modal, Popover } from "antd";
 import { LuInfo, LuMegaphone, LuSettings2 } from "react-icons/lu";
-import { BannersTable } from "@/components/features/admin/banners-table";
-import BannerModal from "@/components/features/admin/banner-modal";
+import { BannersTable } from "@/components/features/admin/banners/banners-table";
+import BannerModal from "@/components/features/admin/banners/banner-modal";
 import { useAuthStore } from "@/stores/auth";
 import { useBannersStore } from "@/stores/banners";
-import { BannerPricingConfig } from "@/components/features/admin/banner-pricing-config";
+import { BannerPricingConfig } from "@/components/features/admin/banners/banner-pricing-config";
 
 const bannerConditions = (
   <ul className="max-w-xs space-y-1 text-sm text-gray-600 list-none">

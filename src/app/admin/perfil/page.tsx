@@ -2,8 +2,8 @@
 
 import { Card } from "antd";
 import { LuUser } from "react-icons/lu";
-import EmailForm from "@/components/features/admin/email-form";
-import PasswordForm from "@/components/features/admin/password-form";
+import EmailForm from "@/components/features/admin/profile/email-form";
+import PasswordForm from "@/components/features/admin/profile/password-form";
 import { useAuthStore } from "@/stores/auth";
 
 export default function ProfilePage() {
