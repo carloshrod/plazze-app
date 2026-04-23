@@ -13,7 +13,14 @@ import {
   Tag,
   Tooltip,
 } from "antd";
-import { LuCheck, LuMegaphone, LuPen, LuTrash2, LuX } from "react-icons/lu";
+import {
+  LuCheck,
+  LuMegaphone,
+  LuPen,
+  LuTrash2,
+  LuX,
+  LuUndo2,
+} from "react-icons/lu";
 import { useBannersService } from "@/services/banners";
 import { useAuthStore } from "@/stores/auth";
 import BannerModal from "./banner-modal";
@@ -161,17 +168,17 @@ export const BannersTable = () => {
         // Restaurar si está eliminado
         if (record.is_deleted) {
           return isAdmin ? (
-            <Button
-              type="primary"
-              size="middle"
-              icon={<LuCheck size={18} />}
-              onClick={async () => {
-                await restoreBanner(record.id);
-                refreshBanners();
-              }}
-            >
-              Restaurar
-            </Button>
+            <Tooltip title="Restaurar banner">
+              <Button
+                type="text"
+                className="hover:!text-green-600"
+                icon={<LuUndo2 size={18} />}
+                onClick={async () => {
+                  await restoreBanner(record.id);
+                  refreshBanners();
+                }}
+              />
+            </Tooltip>
           ) : null;
         }
         return (

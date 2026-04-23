@@ -434,32 +434,19 @@ export function PlazzesTable() {
     <>
       {user?.role === "administrator" &&
         featureRequests.some((r) => r.status === "orphaned") && (
-          <Card
-            className="mb-4 border-orange-200 bg-orange-50"
-            size="small"
-            title={
-              <span className="text-orange-700 font-semibold text-sm">
-                Destaques huérfanos (
-                {featureRequests.filter((r) => r.status === "orphaned").length})
-              </span>
-            }
-          >
+          <Card className="mb-4 border-orange-200 bg-orange-50" size="small">
             <details className="w-full">
               <summary className="cursor-pointer py-2 px-1 flex items-center gap-2 text-orange-700 font-medium">
-                <Tag color="orange">Huérfanos</Tag>
-                <span>
+                <span className="text-orange-700 font-semibold text-sm">
+                  Destaques sin plazze asignado (
                   {
                     featureRequests.filter((r) => r.status === "orphaned")
                       .length
-                  }{" "}
-                  destaque
-                  {featureRequests.filter((r) => r.status === "orphaned")
-                    .length === 1
-                    ? ""
-                    : "s"}
+                  }
+                  )
                 </span>
                 <span className="ml-2 text-xs text-orange-500">
-                  (haz clic para ver detalles)
+                  Haz clic para ver detalles
                 </span>
               </summary>
               <div className="space-y-3 mt-3">
@@ -486,11 +473,10 @@ export function PlazzesTable() {
                     return (
                       <div
                         key={r.id}
-                        className="flex flex-col md:flex-row md:items-center gap-2 text-sm text-orange-800 border border-orange-100 rounded p-2 bg-orange-50"
+                        className="flex flex-col md:flex-row md:items-center gap-2 text-sm text-orange-800 bg-gray-50 border-b rounded-t p-4"
                       >
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 space-y-4">
                           <div className="flex flex-wrap items-center gap-2">
-                            <Tag color="orange">Huérfano</Tag>
                             <span className="font-medium">{r.seller_name}</span>
                             <span className="text-orange-600">—</span>
                             <span>
@@ -536,8 +522,7 @@ export function PlazzesTable() {
                           </Popconfirm>
                           <Button
                             size="small"
-                            type="default"
-                            className="!text-orange-500 border-orange-300 hover:!text-orange-700"
+                            type="primary"
                             onClick={() => {
                               setReassignModal({
                                 open: true,
