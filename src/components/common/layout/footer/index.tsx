@@ -6,11 +6,16 @@ import { cn } from "@/libs/cn";
 
 const Footer = ({ isDashboard = false }: { isDashboard?: boolean }) => {
   return (
-    <footer className="bg-gray-50 border-t border-gray-200">
+    <footer
+      className={cn(
+        "bg-gray-50 border-t border-gray-200",
+        isDashboard && "mt-8",
+      )}
+    >
       <div
         className={cn(
           "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
-          isDashboard ? "py-4" : "py-8"
+          isDashboard ? "pt-8" : "py-8",
         )}
       >
         {!isDashboard && (

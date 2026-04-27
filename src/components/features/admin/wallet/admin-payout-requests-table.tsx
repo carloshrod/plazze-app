@@ -262,7 +262,6 @@ const AdminPayoutRequestsTable = () => {
         dataSource={requests}
         columns={columns}
         rowKey="id"
-        pagination={{ pageSize: 20 }}
         locale={{ emptyText: "No hay solicitudes de pago" }}
         expandable={{
           expandedRowRender: (record) =>

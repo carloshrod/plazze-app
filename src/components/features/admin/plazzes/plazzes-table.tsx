@@ -623,7 +623,6 @@ const PlazzesTable = () => {
             rowKey="id"
             scroll={{ x: 820 }}
             className="min-w-[820px]"
-            pagination={false}
           />
         </div>
       </Card>

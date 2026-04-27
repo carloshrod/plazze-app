@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Alert, Card, Skeleton } from "antd";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { Card, Skeleton } from "antd";
 import {
   LuArrowDownRight,
   LuArrowUpRight,
@@ -127,7 +126,7 @@ export default function DashboardPage() {
                   )}
                   <span
                     className={cn(
-                      stat.trendUp ? "text-green-600" : "text-red-600"
+                      stat.trendUp ? "text-green-600" : "text-red-600",
                     )}
                   >
                     {stat.trend}
@@ -138,17 +137,6 @@ export default function DashboardPage() {
           </Link>
         ))}
       </div>
-
-      <Alert
-        message={
-          <div className="flex gap-4">
-            <InfoCircleOutlined className="!text-blue-500 !text-xl" />
-            <span>Hola Plazzer, los depósitos se realizarán cada martes.</span>
-          </div>
-        }
-        type="info"
-        className="w-full lg:w-[49%]"
-      />
     </div>
   );
 }

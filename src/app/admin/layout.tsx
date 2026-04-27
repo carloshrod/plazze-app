@@ -16,17 +16,19 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <div className="h-screen overflow-hidden flex flex-col">
       <Header />
-      <div className="min-h-[calc(100vh-64px)] bg-gray-50">
-        <div className="flex flex-col md:flex-row">
+      <div className="flex-1 bg-gray-50 flex flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
           <Sidebar />
-          <main className="flex-1 p-4 md:p-8 overflow-x-auto">
-            <DashboardContent>{children}</DashboardContent>
+          <main className="flex-1 flex flex-col p-4 md:p-8 overflow-y-auto [scrollbar-gutter:stable]">
+            <div className="flex-1">
+              <DashboardContent>{children}</DashboardContent>
+            </div>
+            <Footer isDashboard={true} />
           </main>
         </div>
-        <Footer isDashboard={true} />
       </div>
-    </>
+    </div>
   );
 }

@@ -1,13 +1,13 @@
 "use client";
 
-import { Card } from "antd";
+import { Card, Skeleton } from "antd";
 import { LuUser } from "react-icons/lu";
 import EmailForm from "@/components/features/admin/profile/email-form";
 import PasswordForm from "@/components/features/admin/profile/password-form";
 import { useAuthStore } from "@/stores/auth";
 
 export default function ProfilePage() {
-  const { user } = useAuthStore();
+  const { user, isLoadingAuth } = useAuthStore();
 
   return (
     <div>
@@ -23,10 +23,19 @@ export default function ProfilePage() {
               <LuUser size={40} className="text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">
-                {user?.displayName}
-              </h2>
-              <p className="text-gray-600">{user?.email}</p>
+              {isLoadingAuth ? (
+                <>
+                  <Skeleton.Input active size="default" className="mb-1" />
+                  <Skeleton.Input active size="small" />
+                </>
+              ) : (
+                <>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {user?.displayName}
+                  </h2>
+                  <p className="text-gray-600">{user?.email}</p>
+                </>
+              )}
             </div>
           </div>
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { Button, Card, Modal, Popover } from "antd";
+import { Button, Card, Modal, Popover, Skeleton } from "antd";
 import { LuInfo, LuMegaphone, LuSettings2 } from "react-icons/lu";
 import { BannersTable } from "@/components/features/admin/banners/banners-table";
 import BannerModal from "@/components/features/admin/banners/banner-modal";
 import { useAuthStore } from "@/stores/auth";
 import { useBannersStore } from "@/stores/banners";
 import { BannerPricingConfig } from "@/components/features/admin/banners/banner-pricing-config";
+import { cn } from "@/libs/cn";
 
 const bannerConditions = (
   <ul className="max-w-xs space-y-1 text-sm text-gray-600 list-none">
@@ -22,7 +23,7 @@ const bannerConditions = (
 );
 
 export default function BannersPage() {
-  const { user } = useAuthStore();
+  const { user, isLoadingAuth } = useAuthStore();
   const {
     banners,
     loading,
@@ -38,52 +39,62 @@ export default function BannersPage() {
 
   return (
     <div className="space-y-6">
-      {isSeller ? (
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Banners</h1>
-            <p className="text-gray-500 mt-1">
-              Solicita un banner para promocionar tu espacio en la landing page
-            </p>
-          </div>
-          {showSellerButton && (
-            <BannerModal
-              isSeller
-              trigger={
-                <Button
-                  type="primary"
-                  size="large"
-                  icon={<LuMegaphone size={16} />}
-                >
-                  Solicitar banner
-                </Button>
-              }
-            />
+      <div
+        className={cn(
+          "flex items-center justify-between",
+          !isSeller && "flex-wrap gap-4 md:px-4",
+        )}
+      >
+        <div>
+          {isLoadingAuth ? (
+            <div className="flex flex-col gap-2">
+              <Skeleton.Input active size="large" className="!min-w-80" />
+              <Skeleton.Input active className="!min-w-96" />
+            </div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {isSeller ? "Mis Banners" : "Banners"}
+              </h1>
+              <p className="text-gray-500 mt-1">
+                {isSeller
+                  ? "Solicita un banner para promocionar tu espacio en la landing page"
+                  : "Gestiona los banners que se muestran en la landing page"}
+              </p>
+            </>
           )}
         </div>
-      ) : (
-        <div className="flex flex-wrap items-center justify-between gap-4 md:px-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Banners</h1>
-            <p className="text-gray-500 mt-1">
-              Gestiona los banners que se muestran en la landing page
-            </p>
-          </div>
-          <div className="w-full flex items-center justify-between gap-3">
-            {isAdmin && (
+
+        {showSellerButton && (
+          <BannerModal
+            isSeller
+            trigger={
               <Button
-                type="link"
-                icon={<LuSettings2 size={15} />}
-                onClick={() => openPricingModal()}
-                className="text-gray-500 hover:text-primary px-0"
+                type="primary"
+                size="large"
+                icon={<LuMegaphone size={16} />}
               >
-                Configurar precios de banners
+                Solicitar banner
               </Button>
-            )}
+            }
+          />
+        )}
+
+        {isAdmin && (
+          <div className="w-full flex items-center justify-between gap-3">
+            <Button
+              type="link"
+              icon={<LuSettings2 size={15} />}
+              onClick={() => openPricingModal()}
+              className="text-gray-500 hover:text-primary px-0"
+            >
+              Configurar precios de banners
+            </Button>
+
             <BannerModal />
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {showSellerCta && (
         <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">

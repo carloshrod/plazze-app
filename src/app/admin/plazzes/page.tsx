@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, Modal, Popover } from "antd";
+import { Button, Card, Modal, Popover, Skeleton } from "antd";
 import { LuInfo, LuSettings2, LuSparkles } from "react-icons/lu";
 import PlazzeModal from "@/components/features/admin/plazzes/plazze-modal";
 import PlazzesTable from "@/components/features/admin/plazzes/plazzes-table";
@@ -21,7 +21,7 @@ const featureConditions = (
 );
 
 export default function PlazzesPage() {
-  const { user } = useAuthStore();
+  const { user, isLoadingAuth } = useAuthStore();
   const { pricingModalOpen, openPricingModal, closePricingModal } =
     usePlazzeModalStore();
   const isAdmin = user?.role === "administrator";
@@ -31,37 +31,48 @@ export default function PlazzesPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 md:px-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">
-            {isAdmin ? "Todos los Plazzes" : "Mis Plazzes"}
-          </h1>
-          <p className="text-gray-600">
-            {isAdmin
-              ? "Gestiona todos los espacios de la plataforma"
-              : "Gestiona tus espacios"}
-          </p>
+          {isLoadingAuth ? (
+            <div className="flex flex-col gap-2">
+              <Skeleton.Input active size="large" className="!min-w-80" />
+              <Skeleton.Input active className="!min-w-96" />
+            </div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-semibold text-gray-900">
+                {isAdmin ? "Plazzes" : "Mis Plazzes"}
+              </h1>
+              <p className="text-gray-600">
+                {isAdmin
+                  ? "Gestiona todos los espacios de la plataforma"
+                  : "Gestiona tus espacios"}
+              </p>
+            </>
+          )}
         </div>
-        <div
-          className={cn(
-            "flex items-center justify-between gap-3",
-            isAdmin && "w-full",
-          )}
-        >
-          {isAdmin && (
-            <Button
-              type="link"
-              icon={<LuSettings2 size={15} />}
-              onClick={() => openPricingModal()}
-              className="text-gray-500 hover:text-primary px-0"
-            >
-              Configurar precios de destacados
-            </Button>
-          )}
+        {!isLoadingAuth && (
+          <div
+            className={cn(
+              "flex items-center justify-between gap-3",
+              isAdmin && "w-full",
+            )}
+          >
+            {isAdmin && (
+              <Button
+                type="link"
+                icon={<LuSettings2 size={15} />}
+                onClick={() => openPricingModal()}
+                className="text-gray-500 hover:text-primary px-0"
+              >
+                Configurar precios de destacados
+              </Button>
+            )}
 
-          <PlazzeModal />
-        </div>
+            <PlazzeModal />
+          </div>
+        )}
       </div>
 
-      {isSeller && (
+      {!isLoadingAuth && isSeller && (
         <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
           <div className="flex items-start gap-4">
             <div className="rounded-lg bg-primary/10 p-3">

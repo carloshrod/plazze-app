@@ -45,12 +45,12 @@ export const Sidebar = () => {
   };
 
   return (
-    <aside className="w-full md:w-48 bg-white border-b md:border-b-0 md:border-r border-gray-200 md:min-h-[calc(100vh-64px)]">
+    <aside className="w-full md:w-48 bg-white border-b md:border-b-0 md:border-r border-gray-200">
       <nav className="p-2 md:p-4">
         <ul className="flex md:flex-col gap-1 md:gap-2 overflow-x-auto md:overflow-x-visible">
           {isLoadingAuth
             ? // Skeleton loader mientras se cargan los datos
-              [...Array(5)].map((_, index) => (
+              [...Array(6)].map((_, index) => (
                 <li key={index} className="flex-shrink-0 w-full">
                   <Skeleton.Input active block className="min-w-0 mb-1" />
                 </li>

@@ -105,7 +105,6 @@ const PayoutRequestsTable = ({ refreshKey }: PayoutRequestsTableProps) => {
       dataSource={requests}
       columns={columns}
       rowKey="id"
-      pagination={false}
       size="small"
     />
   );

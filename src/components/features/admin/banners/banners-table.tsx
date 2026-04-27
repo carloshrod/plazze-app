@@ -329,7 +329,6 @@ export const BannersTable = () => {
           dataSource={filteredBanners}
           rowKey="id"
           scroll={{ x: 860 }}
-          pagination={false}
         />
       </div>
     </Card>
