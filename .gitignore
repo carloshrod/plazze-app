@@ -38,3 +38,4 @@ next-env.d.ts
 
 # WordPress plugin
 *.php
+listeo-fields.txt

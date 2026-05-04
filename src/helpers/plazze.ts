@@ -111,6 +111,13 @@ export const mapPlazzeFromWP = (listing: PlazzeWP): Plazze => {
 
     // ⭐ Destacado
     is_featured: listing.is_featured ?? false,
+
+    // ⏳ Expiración
+    listing_expires: listing.listing_expires,
+    is_expired: listing.is_expired ?? false,
+    expiration_date: listing.listing_expires
+      ? dayjs.unix(listing.listing_expires).format("DD/MM/YYYY")
+      : undefined,
   };
 };
 

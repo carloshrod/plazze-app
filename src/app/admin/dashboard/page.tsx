@@ -2,20 +2,16 @@
 
 import Link from "next/link";
 import { Card, Skeleton } from "antd";
-import {
-  LuArrowDownRight,
-  LuArrowUpRight,
-  LuBuilding2,
-  LuCalendar,
-  LuDollarSign,
-  LuUsers,
-} from "react-icons/lu";
-import { cn } from "@/libs/cn";
+import { LuBuilding2, LuCalendar, LuDollarSign, LuUsers } from "react-icons/lu";
 import { ROUTES } from "@/consts/routes";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { useAuthStore } from "@/stores/auth";
+import { PlanStatusCard } from "@/components/features/admin/dashboard/PlanStatusCard";
 
 export default function DashboardPage() {
   const { stats, loading, error } = useDashboardStats();
+  const { user } = useAuthStore();
+  const isSeller = user?.role === "seller";
 
   if (error) {
     return (
@@ -46,8 +42,6 @@ export default function DashboardPage() {
   const statsCards: Array<{
     title: string;
     value: string;
-    trend: string;
-    trendUp: boolean;
     icon: JSX.Element;
     href: string;
     subtitle?: string;
@@ -55,16 +49,12 @@ export default function DashboardPage() {
     {
       title: "Total Plazzes",
       value: stats.plazzes.total.toString(),
-      trend: stats.plazzes.trend,
-      trendUp: stats.plazzes.trend_up,
       icon: <LuBuilding2 className="text-primary" size={24} />,
       href: ROUTES.ADMIN.PLAZZES,
     },
     {
       title: "Reservas Activas",
       value: stats.bookings.active.toString(),
-      trend: stats.bookings.trend,
-      trendUp: stats.bookings.trend_up,
       icon: <LuCalendar className="text-primary" size={24} />,
       href: ROUTES.ADMIN.BOOKINGS,
     },
@@ -74,8 +64,6 @@ export default function DashboardPage() {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
       })}`,
-      trend: stats.revenue.trend,
-      trendUp: stats.revenue.trend_up,
       icon: <LuDollarSign className="text-primary" size={24} />,
       href: ROUTES.ADMIN.BOOKINGS,
     },
@@ -83,8 +71,6 @@ export default function DashboardPage() {
       title: "Clientes Este Mes",
       value: stats.clients.new_this_month.toString(),
       subtitle: `Total: ${stats.clients.total}`,
-      trend: stats.clients.trend,
-      trendUp: stats.clients.trend_up,
       icon: <LuUsers className="text-primary" size={24} />,
       href: ROUTES.ADMIN.BOOKINGS,
     },
@@ -118,25 +104,13 @@ export default function DashboardPage() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-1 text-sm font-medium">
-                  {stat.trendUp ? (
-                    <LuArrowUpRight size={16} className="text-green-600" />
-                  ) : (
-                    <LuArrowDownRight size={16} className="text-red-600" />
-                  )}
-                  <span
-                    className={cn(
-                      stat.trendUp ? "text-green-600" : "text-red-600",
-                    )}
-                  >
-                    {stat.trend}
-                  </span>
-                </div>
               </div>
             </Card>
           </Link>
         ))}
       </div>
+
+      {isSeller && <PlanStatusCard />}
     </div>
   );
 }

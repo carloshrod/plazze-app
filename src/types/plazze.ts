@@ -125,6 +125,10 @@ export interface PlazzeWP {
   // ⭐ Destacado
   is_featured?: boolean;
 
+  // ⏳ Expiración del listing (Unix timestamp nativo de Listeo)
+  listing_expires?: number;
+  is_expired?: boolean;
+
   // Campos legacy mantenidos por compatibilidad
   price_min?: string;
   price_max?: string;
@@ -284,6 +288,11 @@ export interface Plazze {
 
   // ⭐ Destacado
   is_featured: boolean;
+
+  // ⏳ Expiración
+  listing_expires?: number;
+  is_expired: boolean;
+  expiration_date?: string; // Fecha formateada para UI
 
   // Campos legacy mantenidos por compatibilidad
   price_min: number;

@@ -33,10 +33,12 @@ const PlazzeForm = ({
   initialValues,
   onSuccess,
   isModalVisible = true,
+  photoLimit = 4,
 }: {
   initialValues?: Partial<PlazzeFormData>;
   onSuccess?: () => void;
   isModalVisible?: boolean;
+  photoLimit?: number;
 }) => {
   const [form] = Form.useForm();
   const { categories, regions } = useAppData();
@@ -291,7 +293,7 @@ const PlazzeForm = ({
       {/* Gallery */}
       <Card title="Galería" className="mb-4">
         <Form.Item
-          label="Imágenes (Máximo 4)"
+          label={`Imágenes (Máximo ${photoLimit})`}
           name="gallery"
           valuePropName="fileList"
           getValueFromEvent={(e) => {
@@ -317,7 +319,7 @@ const PlazzeForm = ({
         >
           <Upload
             listType="picture-card"
-            maxCount={4}
+            maxCount={photoLimit}
             multiple
             beforeUpload={() => false}
             showUploadList={{

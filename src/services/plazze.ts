@@ -234,8 +234,20 @@ export const usePlazzeService = () => {
         return result;
       } catch (error: any) {
         console.error("❌ Error creando plazze:", error);
-        const errorMessage = error.message || "Error al crear el plazze";
-        showMessage.error(errorMessage);
+        // Manejar errores de cupo/plan del backend
+        const code = error?.response?.data?.code;
+        if (code === "quota_exceeded") {
+          showMessage.error(
+            "Has alcanzado el límite de plazzes de tu plan. Actualiza tu plan para crear más.",
+          );
+        } else if (code === "plan_expired") {
+          showMessage.error(
+            "Tu plan ha vencido. Renueva tu plan para crear nuevos plazzes.",
+          );
+        } else {
+          const errorMessage = error.message || "Error al crear el plazze";
+          showMessage.error(errorMessage);
+        }
         throw error;
       } finally {
         setLocalLoading(false);

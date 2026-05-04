@@ -1,13 +1,16 @@
 "use client";
 
-import { Button, Card, Modal, Popover, Skeleton } from "antd";
-import { LuInfo, LuSettings2, LuSparkles } from "react-icons/lu";
+import { useEffect, useState } from "react";
+import { Button, Card, Modal, Popover, Skeleton, Alert } from "antd";
+import { LuInfo, LuSettings2, LuSparkles, LuRefreshCw } from "react-icons/lu";
 import PlazzeModal from "@/components/features/admin/plazzes/plazze-modal";
 import PlazzesTable from "@/components/features/admin/plazzes/plazzes-table";
 import { useAuthStore } from "@/stores/auth";
 import { FeaturedPricingConfig } from "@/components/features/admin/plazzes/featured-pricing-config";
 import { cn } from "@/libs/cn";
 import { usePlazzeModalStore } from "@/stores/plazze-modal";
+import { useSellerPlanService } from "@/services/plan";
+import { PlanSelectionModal } from "@/components/features/admin/dashboard/PlanSelectionModal";
 
 const featureConditions = (
   <ul className="max-w-xs space-y-1 text-sm text-gray-600 list-none">
@@ -22,10 +25,56 @@ const featureConditions = (
 
 export default function PlazzesPage() {
   const { user, isLoadingAuth } = useAuthStore();
-  const { pricingModalOpen, openPricingModal, closePricingModal } =
-    usePlazzeModalStore();
+  const {
+    pricingModalOpen,
+    openPricingModal,
+    closePricingModal,
+    openCreateModal,
+  } = usePlazzeModalStore();
   const isAdmin = user?.role === "administrator";
   const isSeller = user?.role === "seller";
+
+  const { sellerPlan, fetchSellerPlan } = useSellerPlanService();
+  const [planSelectionOpen, setPlanSelectionOpen] = useState(false);
+
+  useEffect(() => {
+    if (isSeller) {
+      fetchSellerPlan();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSeller]);
+
+  const quotaExceeded =
+    isSeller &&
+    sellerPlan !== null &&
+    sellerPlan.listings_used >= sellerPlan.listings_quota;
+  const planExpired =
+    isSeller && sellerPlan !== null && sellerPlan.is_plan_expired;
+  const createBlocked = quotaExceeded || planExpired;
+
+  const disabledReason = planExpired
+    ? "Tu plan ha vencido. Renueva tu plan para crear nuevos plazzes."
+    : quotaExceeded
+      ? `Has alcanzado el límite de plazzes de tu plan (${sellerPlan?.listings_quota} máx).`
+      : undefined;
+
+  /**
+   * Intercepta el clic en "Nuevo Plazze" para sellers:
+   * - Primera vez (0 listings activos Y cuota no excedida): muestra selector de planes
+   * - Si ya tiene listings: abre el formulario directamente
+   */
+  const handleNewPlazze = () => {
+    if (
+      isSeller &&
+      sellerPlan !== null &&
+      sellerPlan.listings_used === 0 &&
+      !createBlocked
+    ) {
+      setPlanSelectionOpen(true);
+    } else {
+      openCreateModal();
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -67,7 +116,13 @@ export default function PlazzesPage() {
               </Button>
             )}
 
-            <PlazzeModal />
+            <PlazzeModal
+              disabled={createBlocked}
+              disabledReason={disabledReason}
+              onTriggerClick={isSeller ? handleNewPlazze : undefined}
+              onAfterSuccess={isSeller ? fetchSellerPlan : undefined}
+              photoLimit={isSeller ? (sellerPlan?.photo_limit ?? 4) : undefined}
+            />
           </div>
         )}
       </div>
@@ -105,6 +160,26 @@ export default function PlazzesPage() {
 
       <PlazzesTable />
 
+      {isSeller && createBlocked && (
+        <Alert
+          type={planExpired ? "error" : "warning"}
+          showIcon
+          message={planExpired ? "Plan vencido" : "Límite de plazzes alcanzado"}
+          description={disabledReason}
+          className="mb-2"
+          action={
+            <Button
+              size="small"
+              type="primary"
+              icon={<LuRefreshCw size={13} />}
+              onClick={() => setPlanSelectionOpen(true)}
+            >
+              Actualizar plan
+            </Button>
+          }
+        />
+      )}
+
       <Modal
         title="Configurar precios de paquetes de destacados"
         open={pricingModalOpen}
@@ -115,6 +190,17 @@ export default function PlazzesPage() {
       >
         <FeaturedPricingConfig />
       </Modal>
+
+      {isSeller && (
+        <PlanSelectionModal
+          open={planSelectionOpen}
+          onClose={() => {
+            setPlanSelectionOpen(false);
+            fetchSellerPlan();
+          }}
+          afterSelect={() => openCreateModal()}
+        />
+      )}
     </div>
   );
 }

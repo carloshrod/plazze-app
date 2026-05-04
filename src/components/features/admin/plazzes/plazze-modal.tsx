@@ -1,18 +1,39 @@
 "use client";
 
-import { Button, Modal } from "antd";
+import { Button, Modal, Tooltip } from "antd";
 import { LuPlus } from "react-icons/lu";
 import PlazzeForm from "./plazze-form";
 import { useMyPlazzesService } from "@/services/my-plazzes";
 import { usePlazzeModalStore } from "@/stores/plazze-modal";
 
-const PlazzeModal = () => {
+interface PlazzeModalProps {
+  disabled?: boolean;
+  disabledReason?: string;
+  /** Si se provee, el botón llama este callback en vez de abrir el modal directamente */
+  onTriggerClick?: () => void;
+  /** Callback ejecutado después de crear/actualizar un plazze exitosamente */
+  onAfterSuccess?: () => void;
+  /** Límite de fotos según el plan del seller */
+  photoLimit?: number;
+}
+
+const PlazzeModal = ({
+  disabled,
+  disabledReason,
+  onTriggerClick,
+  onAfterSuccess,
+  photoLimit,
+}: PlazzeModalProps) => {
   const { refreshPlazzes } = useMyPlazzesService();
   const { isOpen, mode, initialFormData, openCreateModal, closeModal } =
     usePlazzeModalStore();
 
   const handleOpenModal = () => {
-    openCreateModal();
+    if (onTriggerClick) {
+      onTriggerClick();
+    } else {
+      openCreateModal();
+    }
   };
 
   const handleCloseModal = () => {
@@ -22,19 +43,23 @@ const PlazzeModal = () => {
   const handleSuccess = () => {
     handleCloseModal();
     refreshPlazzes();
+    onAfterSuccess?.();
   };
 
   return (
     <>
       {/* Trigger por defecto para crear plazzes */}
-      <Button
-        type="primary"
-        icon={<LuPlus size={20} />}
-        size="large"
-        onClick={handleOpenModal}
-      >
-        Nuevo Plazze
-      </Button>
+      <Tooltip title={disabled ? disabledReason : undefined}>
+        <Button
+          type="primary"
+          icon={<LuPlus size={20} />}
+          size="large"
+          onClick={handleOpenModal}
+          disabled={disabled}
+        >
+          Nuevo Plazze
+        </Button>
+      </Tooltip>
 
       <Modal
         title={mode === "create" ? "Nuevo Plazze" : "Editar Plazze"}
@@ -59,6 +84,7 @@ const PlazzeModal = () => {
           initialValues={initialFormData || undefined}
           onSuccess={handleSuccess}
           isModalVisible={isOpen}
+          photoLimit={photoLimit}
         />
       </Modal>
     </>

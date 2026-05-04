@@ -33,7 +33,7 @@ export const useMyPlazzesService = () => {
       const response = await fetchFn({
         order: "desc",
         per_page: 100,
-        ...(isAdmin && { status: "publish,draft,pending,private" }),
+        status: "publish,draft,pending,private",
       });
 
       setPlazzes(response.plazzes);

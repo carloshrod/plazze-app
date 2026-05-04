@@ -18,7 +18,14 @@ import {
   Tooltip,
 } from "antd";
 import Link from "next/link";
-import { LuPen, LuSparkles, LuStar, LuTrash2 } from "react-icons/lu";
+import {
+  LuPen,
+  LuPower,
+  LuPowerOff,
+  LuSparkles,
+  LuStar,
+  LuTrash2,
+} from "react-icons/lu";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import showMessage from "@/libs/message";
@@ -35,6 +42,7 @@ import { convertWPToFormData } from "@/helpers/plazze";
 import { decodeHtmlEntities } from "@/utils";
 import { ROUTES } from "@/consts/routes";
 import { plazzeLib } from "@/libs/api/plazze";
+import { planLib } from "@/libs/api/plan";
 import { type PlazzeWP } from "@/types/plazze";
 
 const statusColors = {
@@ -268,6 +276,23 @@ const PlazzesTable = () => {
       width: 110,
     },
     {
+      title: "Expiración",
+      dataIndex: "listing_expires",
+      key: "listing_expires",
+      width: 120,
+      render: (listing_expires: number | undefined, record: PlazzeWP) => {
+        if (!listing_expires)
+          return <span className="text-gray-400 text-xs">—</span>;
+        const expired = record.is_expired;
+        const date = dayjs.unix(listing_expires).format("DD/MM/YYYY");
+        return (
+          <Tag color={expired ? "red" : "default"} className="text-xs">
+            {expired ? "Vencido" : date}
+          </Tag>
+        );
+      },
+    },
+    {
       title: "Acciones",
       fixed: "right" as const,
       key: "actions",
@@ -301,6 +326,83 @@ const PlazzesTable = () => {
                 openEditModal(record, formData);
               }}
             />
+            {user?.role === "seller" && (
+              <Tooltip
+                title={
+                  record.status === "publish"
+                    ? "Pausar plazze (mover a borrador)"
+                    : "Publicar plazze"
+                }
+              >
+                <Popconfirm
+                  title={
+                    record.status === "publish"
+                      ? "Pausar plazze"
+                      : "Publicar plazze"
+                  }
+                  description={
+                    record.status === "publish"
+                      ? "¿Mover este plazze a borrador? Dejará de aparecer en búsquedas."
+                      : "¿Publicar este plazze? Aparecerá en búsquedas."
+                  }
+                  onConfirm={async () => {
+                    try {
+                      const result = await planLib.toggleListingStatus(
+                        record.id,
+                      );
+                      if (result.success) {
+                        updatePlazze(record.id, {
+                          status: result.new_status as PlazzeWP["status"],
+                        });
+                        showMessage.success(result.message);
+                      } else {
+                        showMessage.error(result.message);
+                      }
+                    } catch (err: unknown) {
+                      const axiosErr = err as {
+                        response?: {
+                          data?: { message?: string; code?: string };
+                        };
+                      };
+                      const code = axiosErr?.response?.data?.code;
+                      const message = axiosErr?.response?.data?.message;
+                      if (code === "quota_exceeded") {
+                        showMessage.error(
+                          "No tienes cupo para activar más plazzes",
+                        );
+                      } else if (code === "plan_expired") {
+                        showMessage.error(
+                          "Tu plan ha vencido. Renueva tu plan para activar plazzes",
+                        );
+                      } else {
+                        showMessage.error(
+                          message || "Error al cambiar el estado",
+                        );
+                      }
+                    }
+                  }}
+                  okText="Confirmar"
+                  cancelText="Cancelar"
+                  placement="topRight"
+                >
+                  <Button
+                    type="text"
+                    className={
+                      record.status === "publish"
+                        ? "hover:!text-orange-500"
+                        : "hover:!text-green-600"
+                    }
+                    icon={
+                      record.status === "publish" ? (
+                        <LuPowerOff size={18} />
+                      ) : (
+                        <LuPower size={18} />
+                      )
+                    }
+                  />
+                </Popconfirm>
+              </Tooltip>
+            )}
             {user?.role === "seller" && (
               <Tooltip
                 title={
@@ -427,7 +529,7 @@ const PlazzesTable = () => {
 
   const columnsToShow =
     user?.role === "administrator"
-      ? columns
+      ? columns.filter((col) => col.key !== "listing_expires")
       : columns.filter((col) => col.key !== "is_featured");
 
   return (
