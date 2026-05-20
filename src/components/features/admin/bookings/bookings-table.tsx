@@ -34,6 +34,23 @@ export function BookingsTable() {
 
   const columns = [
     {
+      title: "ID",
+      key: "id",
+      render: (_: unknown, record: Booking) => (
+        <div className="flex flex-col text-xs text-gray-500 whitespace-nowrap">
+          <span className="font-mono font-semibold text-gray-700">
+            #{record.id}
+          </span>
+          {record.order_id && (
+            <span className="font-mono text-gray-400">
+              WC #{record.order_id}
+            </span>
+          )}
+        </div>
+      ),
+      width: 90,
+    },
+    {
       title: "Plazze",
       dataIndex: "listing_title",
       key: "listing_title",
@@ -100,11 +117,14 @@ export function BookingsTable() {
                 return <span className="text-gray-400 text-sm">—</span>;
               }
               const rate = record.commission_rate ?? 0;
+              const fixed = record.commission_fixed ?? 0;
               const amount = record.commission_amount ?? 0;
+              const tooltipText =
+                fixed > 0
+                  ? `${(rate * 100).toFixed(0)}% + ${formatCurrency(fixed)} sobre el precio total`
+                  : `${(rate * 100).toFixed(0)}% sobre el precio total`;
               return (
-                <Tooltip
-                  title={`${(rate * 100).toFixed(0)}% sobre el precio total`}
-                >
+                <Tooltip title={tooltipText}>
                   <span className="text-orange-600 font-medium">
                     {formatCurrency(amount)}
                   </span>

@@ -17,7 +17,7 @@ const HERO_THRESHOLD = 500;
 
 const Header = () => {
   const pathname = usePathname();
-  const { isAuthenticated: isAuth, isLoadingAuth } = useAuthStore();
+  const { isAuthenticated: isAuth, isLoadingAuth, user } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
 
@@ -57,7 +57,11 @@ const Header = () => {
                 <Skeleton.Input active className="!w-64" />
               </div>
             ) : (
-              <MainNav isAuth={isAuth} isTransparent={isTransparent} />
+              <MainNav
+                isAuth={isAuth}
+                isTransparent={isTransparent}
+                userRole={user?.role}
+              />
             )}
           </div>
 

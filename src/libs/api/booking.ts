@@ -48,6 +48,7 @@ export interface Booking {
   created: string;
   price: number;
   commission_rate: number;
+  commission_fixed: number;
   commission_amount: number;
   guests: number;
   customer: BookingCustomer;

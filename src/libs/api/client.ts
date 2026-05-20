@@ -49,5 +49,19 @@ client.interceptors.response.use(undefined, async (error: AxiosError) => {
     return client(config);
   }
 
+  // Extraer mensaje legible desde la respuesta de la API (ej: errores de Dokan, WP)
+  // para que los catch de los servicios reciban un Error.message con el texto real.
+  // Dokan puede devolver mensajes con HTML (ej: precio formateado con <span>), se limpia.
+  const rawMessage = (error.response?.data as { message?: string } | undefined)
+    ?.message;
+  if (rawMessage) {
+    const cleanMessage =
+      typeof window !== "undefined"
+        ? (new DOMParser().parseFromString(rawMessage, "text/html").body
+            .textContent ?? rawMessage)
+        : rawMessage.replace(/<[^>]*>/g, "").replace(/&#36;/g, "$");
+    return Promise.reject(new Error(cleanMessage));
+  }
+
   return Promise.reject(error);
 });

@@ -5,10 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ROUTES } from "@/consts/routes";
 import { cn } from "@/libs/cn";
+import type { UserRole } from "@/types/auth";
 
 interface MainNavProps {
   isAuth: boolean;
   isTransparent?: boolean;
+  userRole?: UserRole;
 }
 
 const LANDING_SECTIONS = [
@@ -26,9 +28,10 @@ const OBSERVED_SECTION_IDS = [
   "plazzer",
 ];
 
-export function MainNav({ isTransparent = false }: MainNavProps) {
+export function MainNav({ isTransparent = false, userRole }: MainNavProps) {
   const pathname = usePathname();
   const isHomepage = pathname === "/";
+  const isAdminPanel = pathname.startsWith("/admin");
   const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
@@ -57,7 +60,14 @@ export function MainNav({ isTransparent = false }: MainNavProps) {
 
   return (
     <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8 ml-6 xl:ml-16">
-      {isHomepage ? (
+      {isAdminPanel && userRole === "guest" ? (
+        <Link
+          href={ROUTES.PUBLIC.PLAZZES.LIST}
+          className="text-gray-700 hover:text-primary transition-colors"
+        >
+          Explorar plazzes
+        </Link>
+      ) : isHomepage ? (
         LANDING_SECTIONS.map(({ label, href, id }) => {
           const isActive = activeSection === id;
           return (
@@ -84,7 +94,7 @@ export function MainNav({ isTransparent = false }: MainNavProps) {
           href={ROUTES.PUBLIC.PLAZZES.LIST}
           className="text-gray-700 hover:text-primary transition-colors"
         >
-          Explorar
+          Explorar plazzes
         </Link>
       ) : null}
     </nav>

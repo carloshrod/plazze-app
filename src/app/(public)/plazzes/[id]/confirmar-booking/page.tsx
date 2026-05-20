@@ -152,9 +152,7 @@ export default function ConfirmBookingPage({
       const response = await createBooking(bookingParams);
 
       if (response.success) {
-        showMessage.success(
-          "Reserva creada exitosamente! Redirigiendo a PayPal...",
-        );
+        showMessage.success("Reserva creada exitosamente!");
 
         // Guardar datos en sessionStorage para cuando regrese del pago
         if (response.data) {
@@ -172,17 +170,11 @@ export default function ConfirmBookingPage({
           );
         }
 
-        // Redireccionar a PayPal si hay payment_url
+        // Redireccionar a Tilopay en la misma pestaña
         if (response.payment_url) {
-          // Abrir en nueva pestaña
-          window.open(response.payment_url, "_blank");
-
-          // También redireccionar a página de estado de pago
-          router.push(
-            `/reservas/${response.booking_id}/payment-status?order_id=${response.order_id}`,
-          );
+          window.location.href = response.payment_url;
         } else {
-          // Redireccionar a página de éxito (fallback)
+          // Fallback: ir directamente a éxito si no hay URL de pago
           router.push(ROUTES.PUBLIC.BOOKINGS.SUCCESS(response.booking_id));
         }
       }
@@ -303,7 +295,7 @@ export default function ConfirmBookingPage({
                         onClick={handlePayment}
                         className="flex items-center justify-center h-12 !bg-primary hover:!bg-primary/90"
                       >
-                        {submitting ? "Creando reserva..." : "Ir al pago"}
+                        {submitting ? "Redirigiendo al pago..." : "Ir al pago"}
                       </Button>
                     </div>
                     <Button

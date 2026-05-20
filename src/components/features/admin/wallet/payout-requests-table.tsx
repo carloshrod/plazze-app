@@ -2,33 +2,34 @@
 
 import { useEffect } from "react";
 import { Alert, Spin, Table, Tag } from "antd";
-import { usePayoutRequests } from "@/services/wallet";
+import { useWithdrawals } from "@/services/wallet";
 import { formatCurrency } from "@/utils/format";
-import type { PayoutRequest, PayoutStatus } from "@/types/wallet";
+import type { WithdrawRequest, WithdrawStatus } from "@/types/wallet";
 
-const statusColors: Record<PayoutStatus, string> = {
+const statusColors: Record<WithdrawStatus, string> = {
   pending: "warning",
   approved: "blue",
-  paid: "green",
-  rejected: "error",
+  cancelled: "error",
 };
 
-const statusLabels: Record<PayoutStatus, string> = {
+const statusLabels: Record<WithdrawStatus, string> = {
   pending: "Pendiente",
   approved: "Aprobado",
-  paid: "Pagado",
-  rejected: "Rechazado",
+  cancelled: "Cancelado",
 };
 
 function formatDate(dateStr: string): string {
   try {
-    return new Date(dateStr).toLocaleDateString("es-PA", {
+    if (!dateStr) return "—";
+    const date = new Date(dateStr.replace(" ", "T"));
+    if (isNaN(date.getTime())) return "—";
+    return date.toLocaleDateString("es-PA", {
       day: "2-digit",
       month: "short",
       year: "numeric",
     });
   } catch {
-    return dateStr;
+    return "—";
   }
 }
 
@@ -37,7 +38,7 @@ interface PayoutRequestsTableProps {
 }
 
 const PayoutRequestsTable = ({ refreshKey }: PayoutRequestsTableProps) => {
-  const { requests, loading, error, refetch } = usePayoutRequests({
+  const { requests, loading, error, refetch } = useWithdrawals({
     per_page: 20,
   });
 
@@ -66,16 +67,16 @@ const PayoutRequestsTable = ({ refreshKey }: PayoutRequestsTableProps) => {
       title: "Estado",
       dataIndex: "status",
       key: "status",
-      render: (status: PayoutStatus) => (
+      render: (status: WithdrawStatus) => (
         <Tag color={statusColors[status]}>{statusLabels[status]}</Tag>
       ),
     },
     {
       title: "Notas",
-      dataIndex: "admin_notes",
-      key: "admin_notes",
-      render: (notes: string | null) => (
-        <span className="text-gray-500 text-sm">{notes || "—"}</span>
+      dataIndex: "note",
+      key: "note",
+      render: (note: string) => (
+        <span className="text-gray-500 text-sm">{note || "—"}</span>
       ),
     },
   ];
@@ -101,7 +102,7 @@ const PayoutRequestsTable = ({ refreshKey }: PayoutRequestsTableProps) => {
   }
 
   return (
-    <Table<PayoutRequest>
+    <Table<WithdrawRequest>
       dataSource={requests}
       columns={columns}
       rowKey="id"

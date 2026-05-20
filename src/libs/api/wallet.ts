@@ -1,73 +1,40 @@
 import { client } from "./client";
 import type {
-  WalletSummaryResponse,
-  BankDataResponse,
+  DokanBalance,
+  DokanSettings,
+  DokanWithdraw,
   BankData,
-  SaveBankDataResponse,
-  CreatePayoutResponse,
-  PayoutRequestsResponse,
-  GetPayoutRequestsParams,
-  CommissionSettingsResponse,
-  UpdateCommissionResponse,
+  GetWithdrawsParams,
 } from "@/types/wallet";
 
 export const walletLib = {
-  getSummary: (seller_id?: number): Promise<WalletSummaryResponse> =>
+  // Saldo disponible — balance nativo de Dokan
+  getBalance: (): Promise<DokanBalance> =>
+    client.get<DokanBalance>("/dokan/v1/withdraw/balance").then((r) => r.data),
+
+  // Datos bancarios — Dokan settings
+  getBankData: (): Promise<DokanSettings> =>
+    client.get<DokanSettings>("/dokan/v1/settings").then((r) => r.data),
+
+  // Guardar datos bancarios en Dokan settings
+  saveBankData: (data: BankData): Promise<DokanSettings> =>
     client
-      .get<WalletSummaryResponse>("/plazze/v1/wallet/summary", {
-        params: seller_id ? { seller_id } : undefined,
-      })
+      .put<DokanSettings>("/dokan/v1/settings", { payment: { bank: data } })
       .then((r) => r.data),
 
-  getBankData: (): Promise<BankDataResponse> =>
+  // Listar solicitudes de retiro (Dokan)
+  getWithdraws: (params?: GetWithdrawsParams): Promise<DokanWithdraw[]> =>
     client
-      .get<BankDataResponse>("/plazze/v1/wallet/bank-data")
+      .get<DokanWithdraw[]>("/dokan/v1/withdraw/", { params })
       .then((r) => r.data),
 
-  saveBankData: (data: BankData): Promise<SaveBankDataResponse> =>
+  // Crear solicitud de retiro (Dokan)
+  createWithdraw: (amount: number, notes?: string): Promise<DokanWithdraw> =>
     client
-      .post<SaveBankDataResponse>("/plazze/v1/wallet/bank-data", data)
-      .then((r) => r.data),
-
-  createPayoutRequest: (amount: number): Promise<CreatePayoutResponse> =>
-    client
-      .post<CreatePayoutResponse>("/plazze/v1/wallet/payout-request", {
-        amount,
-      })
-      .then((r) => r.data),
-
-  getPayoutRequests: (
-    params?: GetPayoutRequestsParams,
-  ): Promise<PayoutRequestsResponse> =>
-    client
-      .get<PayoutRequestsResponse>("/plazze/v1/wallet/payout-requests", {
-        params,
-      })
-      .then((r) => r.data),
-
-  updatePayoutRequest: (
-    id: number,
-    status: string,
-    admin_notes?: string,
-  ): Promise<{ success: boolean; message: string }> =>
-    client
-      .put<{
-        success: boolean;
-        message: string;
-      }>(`/plazze/v1/wallet/payout-request/${id}`, { status, admin_notes })
-      .then((r) => r.data),
-
-  getCommissionSettings: (): Promise<CommissionSettingsResponse> =>
-    client
-      .get<CommissionSettingsResponse>("/plazze/v1/commission")
-      .then((r) => r.data),
-
-  updateCommissionSettings: (
-    commission_percentage: number,
-  ): Promise<UpdateCommissionResponse> =>
-    client
-      .put<UpdateCommissionResponse>("/plazze/v1/commission", {
-        commission_percentage,
+      .post<DokanWithdraw>("/dokan/v1/withdraw/", {
+        amount: String(amount),
+        notes: notes ?? "",
+        method: "bank",
       })
       .then((r) => r.data),
 };

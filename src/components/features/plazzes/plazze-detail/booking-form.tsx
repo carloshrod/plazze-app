@@ -32,8 +32,9 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
     Record<string, number>
   >({});
   const [availabilityError, setAvailabilityError] = useState<string | null>(
-    null
+    null,
   );
+  const [isBooking, setIsBooking] = useState(false);
 
   // Verificar disponibilidad cuando cambien fecha o hora
   useEffect(() => {
@@ -68,11 +69,12 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
     const localDate = date.locale("es");
     const day = localDate.format("dddd");
     return localDate.format(
-      `[${day.charAt(0).toUpperCase() + day.slice(1)}], D [de] MMMM [de] YYYY`
+      `[${day.charAt(0).toUpperCase() + day.slice(1)}], D [de] MMMM [de] YYYY`,
     );
   };
 
   const handleBooking = () => {
+    setIsBooking(true);
     const params = new URLSearchParams();
 
     if (selectedDate) {
@@ -94,7 +96,7 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
     params.append("totalPrice", totalPrice.toString());
 
     const confirmUrl = `${ROUTES.PUBLIC.PLAZZES.CONFIRM_BOOKING(
-      plazze.id
+      plazze.id,
     )}?${params.toString()}`;
     router.push(confirmUrl);
   };
@@ -141,7 +143,7 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
     }
 
     return plazze.bookable_services.filter((service) =>
-      selectedServices.includes(service.id)
+      selectedServices.includes(service.id),
     );
   };
 
@@ -316,14 +318,16 @@ export const BookingForm = ({ plazze }: BookingFormProps) => {
             size="large"
             className="w-full"
             onClick={handleBooking}
+            loading={isBooking}
             disabled={
               !!availabilityError ||
               !selectedDate ||
               !selectedTime ||
-              selectedServices.length === 0
+              selectedServices.length === 0 ||
+              isBooking
             }
           >
-            Reservar ahora
+            {isBooking ? "Procesando..." : "Reservar ahora"}
           </Button>
         </div>
       </div>

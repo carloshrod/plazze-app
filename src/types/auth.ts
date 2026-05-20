@@ -45,7 +45,7 @@ export interface User {
   email: string;
   username: string;
   displayName: string;
-  role: string;
+  role: UserRole;
 }
 
 export interface AuthState {

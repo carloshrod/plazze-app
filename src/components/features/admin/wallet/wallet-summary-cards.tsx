@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, Skeleton } from "antd";
-import { LuBanknote, LuDollarSign, LuPercent, LuWallet } from "react-icons/lu";
+import { LuBanknote, LuWallet } from "react-icons/lu";
 import { formatCurrency } from "@/utils/format";
 import type { WalletSummary } from "@/types/wallet";
 
@@ -13,8 +13,8 @@ interface WalletSummaryCardsProps {
 const WalletSummaryCards = ({ summary, loading }: WalletSummaryCardsProps) => {
   if (loading || !summary) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {[1, 2, 3, 4].map((i) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {[1, 2].map((i) => (
           <Card key={i}>
             <Skeleton active />
           </Card>
@@ -25,33 +25,9 @@ const WalletSummaryCards = ({ summary, loading }: WalletSummaryCardsProps) => {
 
   const cards = [
     {
-      title: "Total generado",
-      value: formatCurrency(summary.total_earned),
-      subtitle: `${summary.paid_bookings_count} reserva${summary.paid_bookings_count === 1 ? "" : "s"} pagada${summary.paid_bookings_count === 1 ? "" : "s"}`,
-      icon: <LuDollarSign className="text-primary" size={24} />,
-      highlight: false,
-    },
-    {
-      title: "Comisión Plazze",
-      value: formatCurrency(summary.commission_amount),
-      subtitle: `Tasa actual: ${(summary.current_commission_rate * 100).toFixed(0)}%`,
-      icon: <LuPercent className="text-orange-500" size={24} />,
-      highlight: false,
-    },
-    {
-      title: "Neto generado",
-      value: formatCurrency(summary.net_earned),
-      subtitle: "Total − comisión Plazze",
-      icon: <LuBanknote className="text-blue-500" size={24} />,
-      highlight: false,
-    },
-    {
       title: "Saldo disponible",
       value: formatCurrency(summary.available_balance),
-      subtitle:
-        summary.total_requested > 0
-          ? `${formatCurrency(summary.total_requested)} en solicitud`
-          : "Listo para retirar",
+      subtitle: "Listo para retirar",
       icon: (
         <LuWallet
           size={24}
@@ -62,10 +38,17 @@ const WalletSummaryCards = ({ summary, loading }: WalletSummaryCardsProps) => {
       ),
       highlight: summary.available_balance > 0,
     },
+    {
+      title: "Mínimo de retiro",
+      value: formatCurrency(summary.withdraw_limit),
+      subtitle: "Monto mínimo para solicitar pago",
+      icon: <LuBanknote className="text-blue-500" size={24} />,
+      highlight: false,
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
       {cards.map((card) => (
         <Card
           key={card.title}

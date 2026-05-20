@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Form, Input, Select, Skeleton } from "antd";
+import { Button, Form, Input, Skeleton } from "antd";
 import { useBankData } from "@/services/wallet";
 import type { BankData } from "@/types/wallet";
 
@@ -52,10 +52,11 @@ const BankDataForm = () => {
         layout="vertical"
         onFinish={onFinish}
         requiredMark={false}
+        className="bank-data-form"
       >
         <Form.Item
           label="Titular de la cuenta"
-          name="account_holder"
+          name="ac_name"
           rules={[{ required: true, message: "Ingresa el nombre del titular" }]}
         >
           <Input
@@ -72,7 +73,7 @@ const BankDataForm = () => {
         >
           <Input
             size="large"
-            placeholder="Ej: Banco General, BAC, etc."
+            placeholder="Nombre de tu banco (opcional)"
             readOnly={!isEditing}
           />
         </Form.Item>
@@ -80,7 +81,7 @@ const BankDataForm = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
           <Form.Item
             label="Número de cuenta"
-            name="account_number"
+            name="ac_number"
             rules={[{ required: true, message: "Ingresa el número de cuenta" }]}
           >
             <Input
@@ -90,35 +91,32 @@ const BankDataForm = () => {
             />
           </Form.Item>
 
-          <Form.Item
-            label="Tipo de cuenta"
-            name="account_type"
-            rules={[
-              { required: true, message: "Selecciona el tipo de cuenta" },
-            ]}
-          >
-            <Select
+          <Form.Item label="Routing / ABA" name="routing_number">
+            <Input
               size="large"
-              placeholder="Seleccionar"
-              open={!isEditing ? false : undefined}
-            >
-              <Select.Option value="corriente">Corriente</Select.Option>
-              <Select.Option value="ahorros">Ahorros</Select.Option>
-            </Select>
+              placeholder="Número de routing (si aplica)"
+              readOnly={!isEditing}
+            />
           </Form.Item>
         </div>
 
-        <Form.Item
-          label="Número de identificación (cédula o RUC)"
-          name="id_number"
-          rules={[{ required: false }]}
-        >
-          <Input
-            size="large"
-            placeholder="Ej: 8-888-8888"
-            readOnly={!isEditing}
-          />
-        </Form.Item>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+          <Form.Item label="IBAN" name="iban">
+            <Input
+              size="large"
+              placeholder="IBAN (si aplica)"
+              readOnly={!isEditing}
+            />
+          </Form.Item>
+
+          <Form.Item label="SWIFT / BIC" name="swift">
+            <Input
+              size="large"
+              placeholder="SWIFT/BIC (si aplica)"
+              readOnly={!isEditing}
+            />
+          </Form.Item>
+        </div>
 
         {isEditing && (
           <Form.Item className="mb-0">

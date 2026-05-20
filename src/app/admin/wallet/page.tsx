@@ -2,14 +2,17 @@
 
 import { useState } from "react";
 import { Alert, Button, Card, Divider, Modal, Skeleton, Spin } from "antd";
-import { LuWallet, LuSettings2 } from "react-icons/lu";
+import { LuWallet } from "react-icons/lu";
 import { useAuthStore } from "@/stores/auth";
-import { useWalletSummary, useCreatePayoutRequest } from "@/services/wallet";
+import {
+  useWalletSummary,
+  useCreateWithdrawal,
+  useBankData,
+} from "@/services/wallet";
 import WalletSummaryCards from "@/components/features/admin/wallet/wallet-summary-cards";
 import BankDataForm from "@/components/features/admin/wallet/bank-data-form";
 import PayoutRequestsTable from "@/components/features/admin/wallet/payout-requests-table";
 import AdminPayoutRequestsTable from "@/components/features/admin/wallet/admin-payout-requests-table";
-import CommissionConfig from "@/components/features/admin/wallet/commission-config";
 import { formatCurrency } from "@/utils/format";
 
 // ─────────────────────────────────────────────────────────
@@ -19,13 +22,19 @@ import { formatCurrency } from "@/utils/format";
 function SellerWalletView() {
   const { isLoadingAuth } = useAuthStore();
   const { summary, loading, error, refetch } = useWalletSummary();
-  const { loading: requesting, createRequest } = useCreatePayoutRequest();
+  const { loading: requesting, createWithdrawal } = useCreateWithdrawal();
+  const { bankData, loading: bankLoading } = useBankData();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [tableRefreshKey, setTableRefreshKey] = useState(0);
 
+  const hasBankData = !!bankData?.ac_number;
+  const meetsMinimum =
+    (summary?.available_balance ?? 0) >= (summary?.withdraw_limit ?? 50);
+  const canWithdraw = hasBankData && meetsMinimum;
+
   const handleRequestPayout = async () => {
     if (!summary) return;
-    const ok = await createRequest(summary.available_balance);
+    const ok = await createWithdrawal(summary.available_balance);
     if (ok) {
       setConfirmOpen(false);
       setTableRefreshKey((k) => k + 1);
@@ -111,11 +120,19 @@ function SellerWalletView() {
                     size="large"
                     block
                     icon={<LuWallet size={18} />}
-                    disabled={(summary?.available_balance ?? 0) <= 0}
+                    disabled={loading || bankLoading || !canWithdraw}
                     onClick={() => setConfirmOpen(true)}
                   >
                     Solicitar pago
                   </Button>
+
+                  {!loading && !bankLoading && !canWithdraw && (
+                    <p className="text-xs text-gray-500 text-center mt-2">
+                      {!hasBankData
+                        ? "Configura tus datos bancarios para poder solicitar un pago."
+                        : `Necesitas al menos ${formatCurrency(summary?.withdraw_limit ?? 50)} para solicitar un pago.`}
+                    </p>
+                  )}
 
                   <div className="mt-4">
                     <Alert
@@ -171,7 +188,6 @@ function SellerWalletView() {
 
 function AdminWalletView() {
   const { isLoadingAuth } = useAuthStore();
-  const [commissionModalOpen, setCommissionModalOpen] = useState(false);
 
   return (
     <div>
@@ -188,23 +204,11 @@ function AdminWalletView() {
                 Solicitudes de Pago
               </h1>
               <p className="text-gray-600">
-                Gestiona las solicitudes de pago de los vendedores
+                Supervisión de solicitudes de retiro de los vendedores
               </p>
             </>
           )}
         </div>
-        {!isLoadingAuth && (
-          <div className="w-full flex items-center justify-between gap-3">
-            <Button
-              type="link"
-              icon={<LuSettings2 size={15} />}
-              onClick={() => setCommissionModalOpen(true)}
-              className="text-gray-500 hover:text-primary px-0"
-            >
-              Configurar comisión
-            </Button>
-          </div>
-        )}
       </div>
 
       {isLoadingAuth ? (
@@ -212,20 +216,7 @@ function AdminWalletView() {
           <Spin size="large" />
         </div>
       ) : (
-        <>
-          <AdminPayoutRequestsTable />
-
-          <Modal
-            title="Configurar comisión de la plataforma"
-            open={commissionModalOpen}
-            onCancel={() => setCommissionModalOpen(false)}
-            footer={null}
-            width={480}
-            destroyOnHidden
-          >
-            <CommissionConfig onClose={() => setCommissionModalOpen(false)} />
-          </Modal>
-        </>
+        <AdminPayoutRequestsTable />
       )}
     </div>
   );

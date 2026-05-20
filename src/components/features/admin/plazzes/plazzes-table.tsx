@@ -330,7 +330,7 @@ const PlazzesTable = () => {
               <Tooltip
                 title={
                   record.status === "publish"
-                    ? "Pausar plazze (mover a borrador)"
+                    ? "Pausar plazze"
                     : "Publicar plazze"
                 }
               >

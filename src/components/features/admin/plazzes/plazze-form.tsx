@@ -211,6 +211,18 @@ const PlazzeForm = ({
 
       {/* Location */}
       <Card title="Ubicación" className="mb-4">
+        {/* Mapa para seleccionar ubicación */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2">
+            Seleccionar ubicación en el mapa
+          </label>
+          <MapSelector
+            onLocationSelect={handleMapLocationSelect}
+            initialCoordinates={coordinates}
+            isVisible={isModalVisible}
+          />
+        </div>
+
         <Row gutter={16}>
           <Col xs={24} sm={12}>
             <Form.Item
@@ -276,18 +288,6 @@ const PlazzeForm = ({
             </Form.Item>
           </Col>
         </Row>
-
-        {/* Mapa para seleccionar ubicación */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">
-            Seleccionar ubicación en el mapa
-          </label>
-          <MapSelector
-            onLocationSelect={handleMapLocationSelect}
-            initialCoordinates={coordinates}
-            isVisible={isModalVisible}
-          />
-        </div>
       </Card>
 
       {/* Gallery */}

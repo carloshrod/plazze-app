@@ -108,7 +108,9 @@ export const PlanStatusCard = () => {
                   ? "Tu plan ha vencido. Renueva para poder publicar plazzes."
                   : isNearExpiry
                     ? `Tu plan vence en ${sellerPlan.days_to_expire} día${sellerPlan.days_to_expire === 1 ? "" : "s"}.`
-                    : "Estás cerca de tu límite de plazzes publicados."}
+                    : quotaPercent >= 100
+                      ? "Has alcanzado el límite de plazzes publicados en tu plan."
+                      : "Estás cerca de tu límite de plazzes publicados."}
               </span>
             </div>
           )}
