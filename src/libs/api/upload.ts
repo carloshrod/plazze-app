@@ -1,6 +1,67 @@
 import { client } from "./client";
 import Cookies from "js-cookie";
 
+/**
+ * Comprime una imagen usando Canvas API antes de subirla.
+ * Reduce imágenes grandes a max 1600px de ancho con calidad 82%.
+ * Si el resultado es mayor que el original, retorna el original.
+ * Salta archivos ya pequeños (< 800KB) y GIFs.
+ */
+const compressImage = (file: File, maxWidthPx = 1600, quality = 0.82): Promise<File> => {
+  if (
+    !file.type.startsWith("image/") ||
+    file.type === "image/gif" ||
+    file.size < 500 * 1024
+  ) {
+    return Promise.resolve(file);
+  }
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+
+      const canvas = document.createElement("canvas");
+      let w = img.naturalWidth;
+      let h = img.naturalHeight;
+
+      if (w > maxWidthPx) {
+        h = Math.round((h * maxWidthPx) / w);
+        w = maxWidthPx;
+      }
+
+      canvas.width = w;
+      canvas.height = h;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return resolve(file);
+
+      ctx.drawImage(img, 0, 0, w, h);
+
+      const outputType = file.type === "image/png" ? "image/png" : "image/jpeg";
+      canvas.toBlob(
+        (blob) => {
+          if (!blob || blob.size >= file.size) return resolve(file);
+          const ext = outputType === "image/png" ? ".png" : ".jpg";
+          const name = file.name.replace(/\.[^.]+$/, ext);
+          resolve(new File([blob], name, { type: outputType, lastModified: Date.now() }));
+        },
+        outputType,
+        quality,
+      );
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(file);
+    };
+
+    img.src = objectUrl;
+  });
+};
+
 export interface UploadResponse {
   id: number;
   title: { rendered: string };
@@ -76,8 +137,9 @@ export const uploadFiles = async (
   const BATCH_SIZE = 3;
 
   const uploadOne = async (file: File): Promise<BatchUploadItem> => {
+    const compressed = await compressImage(file);
     const formData = new FormData();
-    formData.append("files[]", file);
+    formData.append("files[]", compressed);
 
     const response = await fetch("/api/plazze/upload", {
       method: "POST",

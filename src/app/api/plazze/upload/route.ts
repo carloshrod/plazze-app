@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios, { type AxiosError } from "axios";
 
-// El body parser de Next.js tiene un límite de 1MB por defecto.
-// Las galerías de imágenes pueden superar ese límite fácilmente.
-export const maxDuration = 60;
-export const dynamic = "force-dynamic";
-
 const WP_MEDIA_URL = `${process.env.NEXT_PUBLIC_API_URL}/wp/v2/media`;
 
 /** Subidas simultáneas máximas por lote (evita 429 en WordPress). */
