@@ -45,10 +45,10 @@ export const PlazzeImages = ({ images }: PlazzeImagesProps) => {
   }
 
   return (
-    <div className="grid md:grid-cols-[5fr_4fr] gap-1 md:gap-4">
+    <div className="flex flex-col md:flex-row gap-2 md:gap-4">
       {/* Imagen principal con navegación */}
       <div
-        className="w-full relative aspect-[16/9] rounded-lg overflow-hidden bg-gray-100 cursor-pointer group"
+        className="md:flex-[5] min-w-0 relative aspect-[16/9] rounded-lg overflow-hidden bg-gray-100 cursor-pointer group"
         onClick={handleNext}
       >
         <Image
@@ -90,13 +90,13 @@ export const PlazzeImages = ({ images }: PlazzeImagesProps) => {
       </div>
 
       {/* Thumbnails grid: max 4, con "+N más" en el último si aplica */}
-      <div className="grid grid-cols-4 md:grid-cols-2 gap-1 md:gap-4">
+      <div className="md:flex-[4] min-w-0 grid grid-cols-4 md:grid-cols-2 md:grid-rows-2 gap-1 md:gap-2">
         {visibleThumbs.map((image, index) => {
           const isLast = index === MAX_THUMBS - 1 && extraCount > 0;
           return (
             <div
               key={index}
-              className={`relative aspect-[16/9] md:aspect-square rounded-lg overflow-hidden cursor-pointer border-2 bg-gray-100 transition-all duration-200 ${
+              className={`relative aspect-[16/9] md:aspect-auto rounded-lg overflow-hidden cursor-pointer border-2 bg-gray-100 transition-all duration-200 ${
                 selectedIndex === index
                   ? "border-primary shadow-md"
                   : "border-transparent hover:border-gray-300"
