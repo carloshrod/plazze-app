@@ -64,18 +64,21 @@ export interface BatchUploadItem {
 
 /**
  * Subir múltiples archivos a través del proxy Next.js (/api/plazze/upload).
- * El proxy sube cada archivo secuencialmente a /wp/v2/media desde el servidor,
- * evitando CORS, límites de post_max_size y errores 429.
+ *
+ * Envía UN archivo por request para evitar 413 en proxies con bajo
+ * client_max_body_size (nginx por defecto: 1MB). La concurrencia de 3
+ * se aplica en el cliente, agrupando los requests en lotes de BATCH_SIZE.
  */
 export const uploadFiles = async (
   files: File[],
 ): Promise<BatchUploadItem[]> => {
   const token = Cookies.get("token");
+  const BATCH_SIZE = 3;
 
-  const formData = new FormData();
-  files.forEach((file) => formData.append("files[]", file));
+  const uploadOne = async (file: File): Promise<BatchUploadItem> => {
+    const formData = new FormData();
+    formData.append("files[]", file);
 
-  try {
     const response = await fetch("/api/plazze/upload", {
       method: "POST",
       headers: {
@@ -87,28 +90,45 @@ export const uploadFiles = async (
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
       const msg = (errData as { message?: string })?.message;
-
       if (response.status === 401)
         throw new Error("No tienes permisos para subir archivos");
       if (response.status === 413)
-        throw new Error("Los archivos son demasiado grandes");
-      throw new Error(msg || "Error al subir los archivos");
+        throw new Error(`${file.name}: El archivo es demasiado grande`);
+      throw new Error(msg ?? `Error al subir ${file.name}`);
     }
 
-    const { uploaded, errors } = (await response.json()) as {
+    const { uploaded } = (await response.json()) as {
       uploaded: BatchUploadItem[];
       errors: string[];
     };
 
-    if (errors && errors.length > 0) {
-      console.warn("⚠️ Algunos archivos fallaron al subir:", errors);
-    }
+    if (!uploaded?.[0]) throw new Error(`Error al subir ${file.name}`);
+    return uploaded[0];
+  };
 
-    return uploaded;
-  } catch (error: unknown) {
-    console.error("❌ Error subiendo archivos:", error);
-    throw error instanceof Error
-      ? error
-      : new Error("Error al subir los archivos");
+  const uploaded: BatchUploadItem[] = [];
+  const errors: string[] = [];
+
+  for (let i = 0; i < files.length; i += BATCH_SIZE) {
+    const batch = files.slice(i, i + BATCH_SIZE);
+    const results = await Promise.allSettled(batch.map(uploadOne));
+    results.forEach((result, idx) => {
+      if (result.status === "fulfilled") {
+        uploaded.push(result.value);
+      } else {
+        const reason = result.reason;
+        errors.push(
+          reason instanceof Error
+            ? reason.message
+            : `Error al subir ${batch[idx].name}`,
+        );
+      }
+    });
   }
+
+  if (errors.length > 0) {
+    console.warn("⚠️ Algunos archivos fallaron al subir:", errors);
+  }
+
+  return uploaded;
 };
