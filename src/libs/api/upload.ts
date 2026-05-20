@@ -7,7 +7,11 @@ import Cookies from "js-cookie";
  * Si el resultado es mayor que el original, retorna el original.
  * Salta archivos ya pequeños (< 800KB) y GIFs.
  */
-const compressImage = (file: File, maxWidthPx = 1600, quality = 0.82): Promise<File> => {
+const compressImage = (
+  file: File,
+  maxWidthPx = 1600,
+  quality = 0.82,
+): Promise<File> => {
   if (
     !file.type.startsWith("image/") ||
     file.type === "image/gif" ||
@@ -46,7 +50,12 @@ const compressImage = (file: File, maxWidthPx = 1600, quality = 0.82): Promise<F
           if (!blob || blob.size >= file.size) return resolve(file);
           const ext = outputType === "image/png" ? ".png" : ".jpg";
           const name = file.name.replace(/\.[^.]+$/, ext);
-          resolve(new File([blob], name, { type: outputType, lastModified: Date.now() }));
+          resolve(
+            new File([blob], name, {
+              type: outputType,
+              lastModified: Date.now(),
+            }),
+          );
         },
         outputType,
         quality,
